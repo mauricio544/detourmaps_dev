@@ -1,0 +1,88 @@
+{% extends "base-new.html" %}
+{% block title %}{{ page.name|capfirst }}{% endblock %}
+{% block head %}
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}community/css/dtmfront-evolution.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}community/css/style_home.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}animation/style.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}web-icon/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="{{ STATIC_URL }}custom-theme/jquery-ui-1.10.3.custom.css"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}modal/jquery.modal.css" type="text/css" media="screen"/>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var h3 = $(".text h3");
+            $("h3").next("div").hide();
+            $("h3").click(function(e){
+                $(this).next("div").slideToggle("fast");
+                $("h3").next("div").not($(this).next("div")).slideUp("slow");
+                e.returnValue = false;
+                return false;
+            });
+        });
+    </script>
+    <style type="text/css">
+        h3{
+            cursor: pointer;
+            text-transform: capitalize;
+        }
+        h3:hover{
+            color: #F48131;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #bababa;
+            margin: 0 -20px;
+        }
+    </style>
+{% endblock %}
+{% block bar-container %}{% endblock %}
+{% block content %}
+    <div class="container main">
+        <div class="row internal">
+            <div class="sixcol">
+                <div class="text">
+                    {% for text in complex %}
+                        {{ text.text|safe }}
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="sixcol last">
+                <div class="form">
+                    <form action="" enctype="multipart/form-data" method="post">
+                        {% csrf_token %}
+                        {{ form.non_field_errors }}
+                        <h2>Apply!</h2>
+                        <p>
+                            <label for="id_interested">I'm interested in </label>
+                            {{ form.interested }}
+                            {{ form.interested.errors }}
+                        </p>
+                        <p>
+                            <label for="id_name">Name</label>
+                            {{ form.name }}
+                            {{ form.name.errors }}
+                        </p>
+                        <p>
+                            {{ form.email.errors }}
+                            <label for="id_email">Email</label>
+                            {{ form.email }}
+                        </p>
+                        <p>
+                            <label for="id_phones">Phone</label>
+                            {{ form.phones }}
+                            {{ form.phones.errors }}
+                        </p>
+                        <p>
+                            <label for="id_resume">Your Resume</label>
+                            {{ form.resume }}
+                            {{ form.resume.errors }}
+                        </p>
+                        <p class="submit">
+                            <button id="btnContact" type="submit">Send</button>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

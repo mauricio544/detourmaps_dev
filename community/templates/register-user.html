@@ -1,0 +1,171 @@
+{% extends 'base-new.html' %}
+{% block title %}Register User{% endblock %}
+{% block head %}
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" type="text/css"
+          href="http://fonts.googleapis.com/css?family=Arvo:400,700|Istok+Web:400,700|Metrophobic!Open+Sans|Open+Sans+Condensed:300">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}community/css/dtmfront-evolution.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}community/css/style_home.css">
+    <style type="text/css">
+        body {
+            background: #ffffff !important;
+        }
+
+        input:focus {
+            background-color: #ffffff;
+        !important;
+        }
+
+        .overmenu {
+            z-index: 1000;
+        }
+        .wrap-form{
+            position: relative;
+            width: 90%;
+            margin: auto;
+            padding: 4% 0;
+        }
+    </style>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $('#frmlogin').validate({
+                rules: {
+                    user_email: {
+                        required: true,
+                        email: true,
+                        remote: {
+                            url: '{% url "remote-confirm" %}',
+                            type: "post",
+                            data: {
+                                username: function () {
+                                    return $("#frmlogin_email").val();
+                                }
+                            }
+                        }
+                    },
+                    user_password: {
+                        required: true,
+                        minlength: 6,
+                        maxlength: 16
+                    },
+                    user_terms: {
+                        required: true
+                    }
+                },
+                messages: {
+                    user_email: {
+                        email: "Not a valid email address",
+                        remote: 'This account already exists. Do you wish ' +
+                                '<a href="{% url "loginUser" %}">enter</a> or <a href="{% url "newPassword" %}" id="linkreset">forgot your password?</a>?'
+                    },
+                    user_password: "Not a valid password",
+                    user_terms: "Must accept the user terms"
+                }
+            });
+            $(document).on("click", "a#linkreset", function(e){
+                e.preventDefault();
+                $.post('/user/reset-email', {email: $("input[name='user_email']").val()}, function (data) {
+                    new Messi(data, {title: 'DetourMaps - Register System', modal: true});
+                });
+            });
+            $("#frmlogin").submit(function (e) {
+                e.preventDefault();
+                if ($("#frmlogin").valid()) {
+                    $.post('{% url "register-user" %}', $('#frmlogin').serialize(),
+                            function (data, status) {
+                                if (data.state) {
+                                    alert("Please check your email inbox");
+                                    document.location.href = "{% url "loginUser" %}";
+                                } else {
+                                    document.location.href = "{% url "registerUser" %}";
+                                }
+                            }, "json"
+                    );
+                }
+            });
+        });
+
+    </script>
+{% endblock %}
+{% block bar-container %}{% endblock %}
+{% block content %}
+    <div class="pure-g details content">
+        <div class="wrap-form">
+            <div id="benefits" class="pure-u-1 pure-u-md-1-2 pure-u-sm-1">
+            <h2 id="title-benefits" class="pure-u-1">Stay Connected to your neighborhood with <span>Detourmaps</span></h2>
+
+            <div class="pure-u-1 text-help">
+                <div class="pure-u-1-4">
+                    <img src="{{ STATIC_URL }}community/evolution/logo-detour-register.png">
+                </div>
+                <div class="pure-u-2-3 p">
+                    <div id="text-benefits">
+                        <p>Save with $10 Savings Card, coupons, and other deals available directly from our side.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="pure-u-1 text-help">
+                <div class="pure-u-1-4">
+                    <img src="{{ STATIC_URL }}community/evolution/logo-local-register.png">
+                </div>
+                <div class="pure-u-2-3 p">
+                    <div id="text-benefits">
+                        <p>Stay local and be part of community events like festivals, town meetings, and more.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="pure-u-1 text-help">
+                <div class="pure-u-1-4">
+                    <img src="{{ STATIC_URL }}community/evolution/logo-share-register.png">
+                </div>
+                <div class="pure-u-2-3 p">
+                    <div id="text-benefits">
+                        <p>Share directions, deals, reviews and more local with information with friends and
+                            neighbors.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="registerUsers" class="pure-u-1 pure-u-md-1-2 pure-u-sm-1">
+
+            <form id="frmlogin" style="padding: 0 35px;">
+
+                <p>By registering will have access to review, share and </br>
+                    explore local community deals and promotions.</br>
+                    You don't need to go anywhere else to shop local.
+                </p>
+                <hr width=%50 align="center">
+                </br>
+                <div style="display: block;">
+                    <div class="pure-u-1-1">
+                        Email
+                    </div>
+                    <div class="pure-u-1-1">
+                        <input class="inputLogin" id="frmlogin_email" type="email" name="user_email">
+                    </div>
+                </div>
+                </br>
+                <div style="display: block;">
+                    <div class="pure-u-1-1">
+                        Password
+                    </div>
+                    <div class="pure-u-1-1">
+                        <input class="inputLogin" type="password" name="user_password">
+                    </div>
+                </div>
+                </br>
+                <div style="display: block;text-align: right;">
+                    <button style="width: 130px;padding-left:0px ">
+                        Sign Up
+                    </button>
+                </div>
+                </br>
+                <input id="register_user_terms" type="checkbox" name="user_terms" id="user_terms">
+                <label for="register_user_terms">I have read the Terms and Conditions</label>
+                <a id="link_lear_more" href="{% url "terms" %}" style="color: red; margin-left: 1.8em">Learn More</a>
+            </form>
+        </div>
+        </div>
+    </div>
+{% endblock %}

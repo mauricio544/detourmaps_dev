@@ -1,0 +1,428 @@
+{% extends 'base-new.html' %}
+{% load thumbnail %}
+{% load queryset %}
+{% block title %}Dashboard{% endblock %}
+{% block head %}
+    <meta name="Description" content="{{ community.description }}">
+    <meta name="Keywords" content="{{ community.keywords }}">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}community/css/dtmfront-evolution.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}community/css/style_home.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}animation/style.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}web-icon/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}userdash/css/bootstrap.css" media="screen">
+    <link rel="stylesheet" href="{{ STATIC_URL }}userdash/css/bootswatch.min.css">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="../bower_components/html5shiv/dist/html5shiv.js"></script>
+      <script src="../bower_components/respond/dest/respond.min.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" href="{{ STATIC_URL }}custom-theme/jquery-ui-1.10.3.custom.css"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}modal/jquery.modal.css" type="text/css" media="screen"/>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=geometry"></script>
+    <style type="text/css">
+        body {
+            background: #ffffff !important;
+        }
+
+        footer {
+            position: relative !important;
+            top: 0 !important;
+            margin-top: 180px;
+        }
+
+        input:focus {
+            background-color: #ffffff;
+        }
+
+        .overmenu {
+            z-index: 10000;
+        }
+
+        .menuJoin li {
+            width: 100%;
+        }
+
+        .menuJoin li a {
+            text-align: left !important;
+        }
+    </style>
+{% endblock %}
+{% block bar-container %}{% endblock %}
+{% block content %}
+        <div class="container">
+            <div class="bs-component main-content-header">
+                <div class="jumbotron">
+                    <ul>
+                    	<li>
+                        	<img src="images/main-content-header-image.png" alt="orange deal dashboard" />
+                        </li>
+                    	<li>
+                        	<a href="index.html">
+                            	<span class="active"><img src="images/icons-share.png" alt="Share" width="61"></span>
+                                <span class="active">Scope</span>
+                            </a>
+                        </li>
+                        <li>
+                        	<a href="promotions.html">
+                            	<span><img src="images/icons-promotion.png" alt="Share" width="61"></span>
+                                <span>Promotions</span>
+                            </a>
+                        </li>
+                        <li>
+                        	<a href="customers.html">
+                            	<span><img src="images/icons-customers.png" alt="Share" width="61"></span>
+                                <span>Customers</span>
+                            </a>
+                        </li>
+                        <li>
+                        	<a href="visits.html">
+                            	<span><img src="images/icons-visits.png" alt="Share" width="61"></span>
+                                <span>Visits</span>
+                            </a>
+                        </li>
+                        <li class="notification">
+                        	<a href="feedback.html">
+                            	<span><img src="images/icons-feedback.png" alt="Share" width="61"></span>
+                                <span>Feedback</span>
+                            </a>
+                            <span>3</span>
+                        </li>
+                        <li>
+                        	<h4>My Business - Jeo Smith</h4>
+                            <h6>Joined March 2014</h6>
+                            <h5>Culvers - Berwyn, IL</h5>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-2 quick-scope">
+                        QUICK SCOPE
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-11 welcome-messge">
+                    	<a href="javascript:void(0)" onClick="$(this).parent().parent().hide();"><img height="20" src="images/close.png" /></a>
+                        <h3>Welcome Joe</h3>
+                        <h4>Check out the most recent activity in your account. Use the icons above to select what section you would like to view.</h4>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-9 details-wrapper">
+                    	<div class="row">
+                            <div class="col-md-3 customer-count">
+                            	<h4>Customers</h4>
+                                <div>43</div>
+                                <h6><a href="">view customers</a></h6>
+                            </div>
+                            <div class="col-md-9">
+                            	<div class="text-data-01">Most Popular Deals</div>
+                            	<div id="piechart-placeholder"></div>
+                                <div class="text-data-02"><a href="">view promotions</a></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-9 details-wrapper graph">
+                    	<h4>Deals Used</h4>
+                        <div id="sales-charts"></div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-9 details-wrapper table-list">
+                    	<div class="heading">
+                        	<span>Recent Visits</span>&nbsp;&nbsp;<a href="">view all visits</a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>TIME</th>
+                                        <th>NAME</th>
+                                        <th>DEAL REDEEMED</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>March 28, 2014 2.21 PM</td>
+                                        <td>Alex Rodriguez</td>
+                                        <td>10 of, smart buy</td>
+                                    </tr>
+                                    <tr>
+                                        <td>March 28, 2014 2.21 PM</td>
+                                        <td>Manuel Pacheco </td>
+                                        <td>Smart Buy, 10 visits</td>
+                                    </tr>
+                                    <tr>
+                                        <td>March 28, 2014 2.21 PM</td>
+                                        <td>Ana Santos</td>
+                                        <td>none</td>
+                                    </tr>
+									 <tr>
+                                        <td>March 28, 2014 2.21 PM</td>
+                                        <td>J ohn Avers</td>
+                                        <td>5=25</td>
+                                    </tr>
+									 <tr>
+                                        <td>March 28, 2014 2.21 PM</td>
+                                        <td>Betty white</td>
+                                        <td>10 of</td>
+                                    </tr>
+									 <tr>
+                                        <td>March 28, 2014 2.21 PM</td>
+                                        <td>Maria Lopez</td>
+                                        <td>Smart Buy</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-9 details-wrapper table-list no-border">
+                    	<div class="heading">
+                        	<span>Feedback</span>&nbsp;&nbsp;<a href="">view all feedback</a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>TIME</th>
+                                        <th>CUSTOMER</th>
+                                        <th>RATING</th>
+                                        <th>FEEDBACK</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>3/28/14 2.21 PM</td>
+                                        <td>Alex Rodriguez</td>
+                                        <td>Good</td>
+                                        <td>Very slow visit during my last visits</td>
+                                    </tr>
+                                    <tr>
+                                        <td>3/28/14 2.21 PM</td>
+                                        <td>Manuel Pacheco </td>
+                                        <td>OK</td>
+                                        <td>Can you make more special during</td>
+                                    </tr>
+                                    <tr>
+                                        <td>3/28/14 2.21 PM</td>
+                                        <td>Ana Santos</td>
+                                        <td>Good</td>
+                                        <td>Love your guys pizza, and karaoke</td>
+                                    </tr>
+									<tr>
+                                        <td>3/28/14 2.21 PM</td>
+                                        <td>John Avers</td>
+                                        <td>Good</td>
+                                        <td>Very slow visit during my last visits</td>
+                                    </tr>
+									<tr>
+                                        <td>3/28/14 2.21 PM</td>
+                                        <td>Betty white</td>
+                                        <td>Good</td>
+                                        <td>Can you make more special during</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="container footer">
+        	<div class="col-md-11 footer-inner">
+				<div class="row">
+					<div class="col-md-3 footer_section">
+						<ul>
+                            <li><a href="">Detour Maps</a></li>
+                            <li><a href="">About Detour Maps</a></li>
+                            <li><a href="">How to use Detour Maps</a></li>
+                            <li><a href="">Search your community</a></li>
+                            <li><a href="">Blog</a></li>
+						</ul>
+						<ul>
+                            <li><a href="">Partners</a></li>
+                            <li><a href="">Entire Marketting Group LLC</a></li>
+                            <li><a href="">QMOQUI</a></li>
+						</ul>
+					</div>
+					<div class="col-md-3 footer_section">
+						<ul>
+                            <li><a href="">Join Us</a></li>
+                            <li><a href="">Register</a></li>
+                            <li><a href="">Free Business Listing</a></li>
+                            <li><a href="">Recieve our Newsletter</a></li>
+                            <li><a href="">Join the Local Evolution</a></li>
+                        </ul>
+					</div>
+					<div class="col-md-3 footer_section">	
+						<ul>
+                            <li><a href="">What you need to Know</a></li>
+                            <li><a href="">FAQ</a></li>
+                            <li><a href="">Terms and Conditions</a></li>
+                            <li><a href="">Privacy Policy</a></li>
+                            <li><a href="">Recieve our Newsletter</a></li>
+                            <li><a href="">Join the local evolution</a></li>
+                        </ul>
+					</div>
+					<div class="col-md-3 footer_section">
+						<ul>
+                            <li>Follow Us</li>
+                        </ul>
+                        <ul class="social-links">
+                            <li><a href=""><img src="images/social-01.png" /></a></li>
+                            <li><a href=""><img src="images/social-02.png" /></a></li>
+                            <li><a href=""><img src="images/social-03.png" /></a></li>
+                            <li><a href=""><img src="images/social-04.png" /></a></li>
+                            <li><a href=""><img src="images/social-05.png" /></a></li>
+                        </ul>
+					</div>
+				</div>
+                <div class="copyright">
+                	Copyright &#169; 2013 Detour Maps powered by Entire Marketing Group LLC
+                </div>
+            </div>
+        </div>
+    
+		<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+        <script src="js/jquery-ui-1.10.3.custom.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/bootswatch.js"></script>
+    	<script src="js/flot/jquery.flot.min.js"></script>
+		<script src="js/flot/jquery.flot.pie.min.js"></script>
+        <script src="js/flot/jquery.flot.resize.min.js"></script>
+        
+        <script type="text/javascript">
+			$(function() {
+			
+				$(".main-content-header ul li a").mouseover(function() {
+					$(this).find('span:first-child').css( "background", "#f39231" );
+					$(this).children().css( "color", "#f39231" );
+				});
+				
+				$(".main-content-header ul li a").mouseout(function() {
+					if($(this).find("span").hasClass("active") != true)
+					{
+						$(this).find('span:first-child').css( "background", "#fff" );
+						$(this).children().css( "color", "#fff" );
+					}
+				});
+			
+				var d1 = [];
+				for (var i = 0; i < Math.PI * 2; i += 0.5) {
+				  d1.push([i, Math.sin(i)]);
+				}
+			  
+				var d2 = [];
+				for (var i = 0; i < Math.PI * 2; i += 0.5) {
+				  d2.push([i, Math.cos(i)]);
+				}
+			  
+				var d3 = [];
+				for (var i = 0; i < Math.PI * 2; i += 0.2) {
+				  d3.push([i, Math.tan(i)]);
+				} 
+			 
+				var data = [
+					{ label: "10$ of Savings",  data: 30.7, color: "#40a7f4"},
+					{ label: "Smart Buys",  data: 24.5, color: "#fe1d25"},
+					{ label: "10 Visits Loyality",  data: 20.2, color: "#ff911e"},
+					{ label: "5=25 Referrals",  data: 16.6, color: "#7ac743"}
+				];
+				
+				var placeholder = $('#piechart-placeholder').css({'width':'96%' , 'min-height':'220px'});
+				
+				$.plot(placeholder, data, 
+				{
+					series: 
+					{
+						pie: 
+						{
+							show: true,
+							tilt:1.0,
+							highlight: 
+							{
+								opacity: 0.25
+							},
+							stroke: 
+							{
+								color: '#fff',
+								width: 2
+							},
+							startAngle: 2
+						}
+					},
+					legend: 
+					{
+						show: true,
+						position: "ne", 
+						labelBoxBorderColor: null,
+						margin:[-30,15]
+					},
+					grid: 
+					{
+						hoverable: true,
+						clickable: true
+					},
+					tooltip: true, //activate tooltip
+					tooltipOpts: 
+					{
+						content: "%s : %y.1",
+						shifts: 
+						{
+							x: -30,
+							y: -50
+						}
+					}
+				});
+				
+				var sales_charts = $('#sales-charts').css({'width':'100%' , 'height':'220px'});
+				
+				$.plot("#sales-charts", [
+					{ label: "Yellow", data: d1 },
+					{ label: "Blue", data: d2 },
+					{ label: "Red", data: d3 }
+				], 
+				{
+					hoverable: true,
+					shadowSize: 0,
+					series: 
+					{
+						lines: { show: true },
+						points: { show: true }
+					},
+					xaxis: 
+					{
+						tickLength: 0
+					},
+					yaxis: 
+					{
+						ticks: 10,
+						min: -2,
+						max: 2,
+						tickDecimals: 3
+					},
+					grid: 
+					{
+						backgroundColor: 
+						{ 
+							colors: [ "#fff", "#fff" ] 
+						},
+						borderWidth: 1,
+						borderColor:'#555'
+					}
+				});
+				
+			})
+		</script>
+{% endblock %}

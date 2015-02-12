@@ -1,0 +1,616 @@
+{% extends 'base-new.html' %}
+{% block title %}How It Works{% endblock %}
+{% block head %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <!--Dinamicos-->
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}community/css/dtmfront-evolution.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}community/css/style_home.css">
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}community/slick/slick.css"/>
+    <script type="text/javascript" src="{{ STATIC_URL }}community/slick/slick.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("a.link-slide").click(function(e){
+                e.preventDefault();
+                var $target = $(this.hash);
+                $('html,body').animate({
+                    scrollTop: $target.offset().top
+                }, 2000, 'swing');
+            });
+            $('.bodyElement1').slick({
+                dots: true,
+                infinite: true,
+                speed: 1000,
+                arrows: true,
+                cssEase: 'ease',
+                responsive: [
+                    {
+                        breakpoint: 1024,
+                        settings: {
+                            slidesToShow: 1,
+                            slidesToScroll: 1,
+                            infinite: true,
+                            dots: true
+                        }
+                    },
+                    {
+                        breakpoint: 600,
+                        settings: {
+                            slidesToShow: 1,
+                            slidesToScroll: 1
+                        }
+                    },
+                    {
+                        breakpoint: 480,
+                        settings: {
+                            slidesToShow: 1,
+                            slidesToScroll: 1
+                        }
+                    }
+                ]
+            });
+            $('.bodyElement2').slick({
+                dots: true,
+                infinite: true,
+                speed: 1000,
+                arrows: true,
+                cssEase: 'ease',
+                responsive: [
+                    {
+                        breakpoint: 1024,
+                        settings: {
+                            slidesToShow: 1,
+                            slidesToScroll: 1,
+                            infinite: true,
+                            dots: true
+                        }
+                    },
+                    {
+                        breakpoint: 600,
+                        settings: {
+                            slidesToShow: 1,
+                            slidesToScroll: 1
+                        }
+                    },
+                    {
+                        breakpoint: 480,
+                        settings: {
+                            slidesToShow: 1,
+                            slidesToScroll: 1
+                        }
+                    }
+                ]
+            });
+            $('.bodyElement3').slick({
+                dots: true,
+                infinite: true,
+                speed: 1000,
+                arrows: true,
+                cssEase: 'ease',
+                responsive: [
+                    {
+                        breakpoint: 1024,
+                        settings: {
+                            slidesToShow: 1,
+                            slidesToScroll: 1,
+                            infinite: true,
+                            dots: true
+                        }
+                    },
+                    {
+                        breakpoint: 600,
+                        settings: {
+                            slidesToShow: 1,
+                            slidesToScroll: 1
+                        }
+                    },
+                    {
+                        breakpoint: 480,
+                        settings: {
+                            slidesToShow: 1,
+                            slidesToScroll: 1
+                        }
+                    }
+                ]
+            });
+            $('.bodyElement4').slick({
+                dots: true,
+                infinite: true,
+                speed: 1000,
+                arrows: true,
+                cssEase: 'ease',
+                responsive: [
+                    {
+                        breakpoint: 1024,
+                        settings: {
+                            slidesToShow: 1,
+                            slidesToScroll: 1,
+                            infinite: true,
+                            dots: true
+                        }
+                    },
+                    {
+                        breakpoint: 600,
+                        settings: {
+                            slidesToShow: 1,
+                            slidesToScroll: 1
+                        }
+                    },
+                    {
+                        breakpoint: 480,
+                        settings: {
+                            slidesToShow: 1,
+                            slidesToScroll: 1
+                        }
+                    }
+                ]
+            });
+            $('.verticalslide').slick({
+                dots: true,
+                infinite: true,
+                vertical: true,
+                speed: 1000,
+                arrows: false,
+                cssEase: 'ease',
+                responsive: [
+                    {
+                        breakpoint: 1024,
+                        settings: {
+                            slidesToShow: 1,
+                            slidesToScroll: 1,
+                            infinite: true,
+                            dots: true
+                        }
+                    },
+                    {
+                        breakpoint: 600,
+                        settings: {
+                            slidesToShow: 1,
+                            slidesToScroll: 1
+                        }
+                    },
+                    {
+                        breakpoint: 480,
+                        settings: {
+                            slidesToShow: 1,
+                            slidesToScroll: 1
+                        }
+                    }
+                ]
+            });
+        });
+    </script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+
+        body ul {
+            list-style: none;
+            margin: 0px;
+            padding: 0px;
+        }
+
+        body li {
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        .orangeHeader {
+            width: 100%;
+            height: 350px;
+            background-color: #F05A29;
+            min-width: 900px;
+        }
+
+        .headerInfo {
+            width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .headerText {
+            color: #FFF;
+            font-family: 'Source sans pro', sans-serif;
+            padding-top: 75px;
+        }
+
+        .headerText p {
+            font-family: 'Source sans pro', sans-serif;
+            font-weight: lighter;
+            font-size: 1.05em;
+        }
+
+        .headerIcons {
+            margin-top: 90px;
+        }
+
+        .bodyElement1 {
+            width: 900px;
+            font-family: 'Source sans pro', sans-serif;
+            border-bottom: thin #333 solid;
+            height: 575px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 4em;
+        }
+
+        .bodyElement2 {
+            width: 900px;
+            font-family: 'Source sans pro', sans-serif;
+            border-bottom: thin #333 solid;
+            height: 575px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 4em;
+        }
+
+        .bodyElement3 {
+            width: 900px;
+            font-family: 'Source sans pro', sans-serif;
+            border-bottom: thin #333 solid;
+            height: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 4em;
+        }
+
+        .bodyElement4 {
+            width: 900px;
+            font-family: 'Source sans pro', sans-serif;
+            border-bottom: thin #333 solid;
+            height: 575px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 4em;
+        }
+
+        .bodyElement5 {
+            width: 900px;
+            font-family: 'Source sans pro', sans-serif;
+            height: 200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        figure.pure-u-1-2 img {
+            margin: auto;
+            margin-bottom: 2em;
+            margin-top: 5em;
+            display: block;
+        }
+        .verticalslide figure.pure-u-1-2 img {
+            margin: auto;
+            margin-bottom: 0;
+            margin-top: 0;
+            display: block;
+        }
+        .slidedeal img.icon-slide{
+            margin: auto;
+            margin-top: 5em;
+            display: block;
+        }
+        .slidedeal img.images{
+            margin: auto;
+        }
+        .slidedeal h1.first {
+            font-family: 'Source sans pro', sans-serif;
+            font-weight: lighter;
+            color: #414042;
+            font-size: 3em;
+        }
+
+        .slidedeal h1.icon {
+            font-family: 'Source sans pro', sans-serif;
+            font-weight: lighter;
+            color: #414042;
+            font-size: 1.95em;
+        }
+
+        .slidedeal p {
+            color: #828282;
+            font-family: 'Source sans pro', sans-serif;
+            font-size: 1.2em;
+            font-weight: lighter
+        }
+    </style>
+{% endblock %}
+{% block bar-container %}
+
+{% endblock %}
+{% block content %}
+    <div class="orangeHeader pure-g">
+        <div class="headerInfo">
+            <div class="headerText pure-u-5-12">
+                <h1 style="font-size:40px;">BECOME A<br>DEAL EXPERT</h1>
+
+                <p>Our deals are free and easy to use. <br>Here's a short intro on how to<br> use these deals so you can<br>
+                    start saving today. </p>
+            </div>
+            <div class="headerIcons pure-u-7-12">
+                <ul id="nav-slide">
+                    <li class="item-slide">
+                        <a class="link-slide" href="#ten-off" alt="Ten Off Slide"><img class="img-slide" src="{{ STATIC_URL }}community/evolution/how-to/off.png"/>Savings Card</a>
+                    </li>
+                    <li class="item-slide">
+                        <a class="link-slide" href="#smart-buys" alt="Smart Buys Slide"><img class="img-slide" src="{{ STATIC_URL }}community/evolution/how-to/smart.png"/>Smart Buys</a>
+                    </li>
+                    <li class="item-slide">
+                        <a class="link-slide" href="#ten-visits" alt="Ten Visits Slide"><img class="img-slide" src="{{ STATIC_URL }}community/evolution/how-to/visits.png"/>10 Visits</a>
+                    </li>
+                    <li class="item-slide">
+                        <a class="link-slide" href="#refer-friends" alt="Refer Friends Slide"><img class="img-slide" src="{{ STATIC_URL }}community/evolution/how-to/refer.png"/>Refer Friends</a>
+                    </li>
+                </ul>
+                <div style="color:#FFF; font-family:Arial, Helvetica, sans-serif; font-size:12px; margin-top:30px; margin-left:150px;">
+                    <div style="width:89px; height:34px; background-image:url({{ STATIC_URL }}community/evolution/how-to/devicesOrange.jpg)">
+                        <p style="padding-left:90px; padding-top:8px; width:150px;">Available on all devices</p>
+                    </div>
+                </div>                
+            </div>
+        </div>
+    </div>
+    <div class="bodyElement1 pure-g" id="ten-off">
+        <div class="slidedeal">
+            <figure class="pure-u-1-2">
+                <img src="{{ STATIC_URL }}community/evolution/how-to/phoneCard.png" height="481" width="481"
+                     alt="Detour Maps orange deals 10 off card.">
+            </figure>
+            <div class="pure-u-1-2">
+                <img class="icon-slide" src="{{ STATIC_URL }}community/evolution/how-to/10offWhite.jpg" height="69" width="72"
+                     alt="10 off logo.">
+
+                <h1 class="first">Take $10 off next time</h1>
+
+                <p style="color:#828282;">With our signature $10 savings card you can save ten dollars on your purchase
+                    instantly at participating locations. You have two ways to save!
+                </p>
+                <img class="images" src="{{ STATIC_URL }}community/evolution/how-to/waysToSave.jpg" height="114" width="244"
+                     alt="Two ways to save!">
+            </div>
+        </div>
+        <div class="slidedeal">
+            <div class="pure-u-1-2">
+                <h1 class="first" style="margin-top: 2em; text-align: center;">How to save $10</h1>
+
+                <p style="color:#828282;">To save $10, businesses require minimum
+                    purchases. Minimum purchases are easy
+                    to identify with our color coded dots
+                    (yellow, red, and blue). Businesses with a
+                    yellow dot require a minimum purchase
+                    of $30 purchase to save 10, red at least
+                    $40, and blue $50. Spot the dot and save!
+                </p>
+                <img class="images" src="{{ STATIC_URL }}community/evolution/how-to/how-savings.png" height="114" width="244" alt="">
+            </div>
+            <figure class="pure-u-1-2">
+                <img src="{{ STATIC_URL }}community/evolution/how-to/first-save.png" height="481" width="481"
+                     alt="Detour Maps orange deals 10 off card.">
+                <hr>
+                <p>
+                    <b>Spot the dot and save 10</b> Participating
+                    businesses are labelled with colored dot.
+                </p>
+            </figure>
+        </div>
+        <div class="slidedeal">
+            <div class="pure-u-1-2">
+                <h1 class="icon" style="margin-top: 2em; text-align: center;"><img class="icon-slide" src="{{ STATIC_URL }}community/evolution/how-to/web-savings.png"
+                                                  alt="how to web"/>Web</h1>
+
+                <p style="color:#828282;">Savings Cards can be found on our website
+                    under the deals page or on participating
+                    businesses Detour webpage. Once you click to
+                    get your deal you will log in to detourmaps.com
+                    or create an account with us. Once you sign in,
+                    click print and done. Present your savings card
+                    within 24 hours to the business that same day
+                    and instantly save $10.
+                </p>
+                <a href="">see mobile ></a>
+            </div>
+            <figure class="pure-u-1-2">
+                <img src="{{ STATIC_URL }}community/evolution/how-to/image-savings.png" height="481" width="481"
+                     alt="Detour Maps orange deals 10 off card.">
+            </figure>
+        </div>
+        <div class="slidedeal">
+            <div class="pure-u-1-2">
+                <h1 class="icon" style="margin-top: 2em; text-align: center;"><img class="icon-slide" src="{{ STATIC_URL }}community/evolution/how-to/mobile-savings.png"
+                                                  alt="how to web"/>Mobile</h1>
+                <p style="color:#828282;">
+                    Using our mobile site? No problem.
+                    Locate our menu and select deals.
+                    You can also browse $10 savings
+                    card deals through your phone and
+                    sign in. You can do this on the spot
+                    and present your phone with the
+                    savings card page open and redeem
+                </p>
+                <a href="">see print ></a>
+            </div>
+            <figure class="pure-u-1-2">
+                <img src="{{ STATIC_URL }}community/evolution/how-to/image-savings.png" height="481" width="481"
+                     alt="Detour Maps orange deals 10 off card.">
+            </figure>
+        </div>
+    </div>
+    <div class="bodyElement2 pure-g" id="smart-buys">
+        <div class="slidedeal">
+            <div class="pure-u-1-2">
+                <h1 class="icon" style="margin-top: 2em; text-align: center;"><img class="icon-slide" src="{{ STATIC_URL }}community/evolution/how-to/smartBuysWhite.jpg"
+                                                  alt="how to web"/>Smart Buys</h1>
+                <p style="color:#828282;">
+                    People usually look for coupons in
+                    the local newspapers or magazines
+                    hoping to get the discount they want
+                    or need. But with Detour Maps Smart
+                    Buys, we put together all the coupons
+                    & best deals from various restaurants,
+                    shopping stores and other places in
+                    your community.
+                </p>
+            </div>
+            <figure class="pure-u-1-2">
+                <img style="width: 75%;" src="{{ STATIC_URL }}community/evolution/how-to/smartBuysCouponsPicture.jpg" height="257" width="412" alt="Picture of Smart Buys coupons.">
+            </figure>
+        </div>
+        <div class="slidedeal">
+            <figure class="pure-u-1-2">
+                <img src="{{ STATIC_URL }}community/evolution/how-to/coupon-image.png" style="width: 70%"/>
+            </figure>
+            <div class="pure-u-1-2">
+                <h1 class="icon" style="margin-top: 2em; text-align: center;">Not your basic coupons</h1>
+                <p style="color:#828282;">
+                    With Smart Buys, you can find items &
+                    services from 10-50% of or even find
+                    something you want for free at your
+                    favorite local store. Every Smart Buys
+                    deal is unique so you are bound to find
+                    something you need or want.
+                </p>
+                <a href="">See How</a>
+            </div>
+        </div>
+        <div class="slidedeal">
+            <figure class="pure-u-1-2">
+                <img src="{{ STATIC_URL }}community/evolution/how-to/print-slide.png" style="width: 70%"/>
+            </figure>
+            <div class="pure-u-1-2">
+                <h1 class="icon" style="margin-top: 2em; text-align: center;">Need a deal now?</h1>
+                <p style="color:#828282;">
+                    Log in and search for smart buys under deals. Check out their deals and download coupons and print at home or use your mobile device. We partner with local businesses and organization to bring you exclusive deals.
+                </p>
+                <a href="">Back to Deals></a>
+            </div>
+        </div>
+    </div>
+    <div class="bodyElement3 pure-g" id="ten-visits">
+        <div class="slidedeal">
+            <figure class="pure-u-1-2">
+                <img src="{{ STATIC_URL }}community/evolution/how-to/loyalCustomer.png" alt="Detour Maps loyal customer image." style="width:70%;">
+            </figure>
+            <div class="pure-u-1-2">
+                <h1 class="icon" style="margin-top: 2em; text-align: center;"><img class="icon-slide" src="{{ STATIC_URL }}community/evolution/how-to/10visitsWhite.jpg" alt="10 visits logo.">Be rewarded for loyaly</h1>
+                <p style="color:#828282;">
+                    It's great to be rewarded for being a loyal customer. Visit participating businesses and make 10
+            purchases and get something free!
+                </p>
+            </div>
+        </div>
+        <div class="slidedeal">
+            <figure class="pure-u-1-2">
+                <img src="{{ STATIC_URL }}community/evolution/how-to/image-visits.png" alt="Detour Maps loyal customer image." style="width: 70%">
+            </figure>
+            <div class="pure-u-1-2">
+                <h1 class="icon" style="margin-top: 2em; text-align: center;">Track your visits</h1>
+                <p style="color:#828282;">
+                    Log in and go to the Orange deals section and under 10 visits, enter your email, receipt number, and date of purchase and hit submit.
+                </p>
+                <a>Rewards ></a>
+            </div>
+        </div>
+        <div class="slidedeal">
+            <figure class="pure-u-1-2">
+                <img src="{{ STATIC_URL }}community/evolution/how-to/image-continuing.png" alt="Detour Maps loyal customer image." style="width: 55%">
+            </figure>
+            <div class="pure-u-1-2">
+                <h1 class="icon" style="margin-top: 2em; text-align: center;">Continuing  Rewards</h1>
+                <p style="color:#828282;">
+                    Once you hit 10 visits get something for free and start again!
+                </p>
+                <a>Back to Deals ></a>
+            </div>
+        </div>
+    </div>
+    <div class="bodyElement4 pure-g" id="refer-friends">
+        <div class="slidedeal">
+            <div class="pure-u-1-2">
+                <h1 class="icon" style="margin-top: 2em; text-align: center;"><img class="icon-slide" src="{{ STATIC_URL }}community/evolution/how-to/5-25White.jpg"/>Tell your Friends</h1>
+                <p style="color:#828282;">
+                    Love one of your local businesses?
+STAND UP and support your favorite business and be rewarded for your efforts. Get 25* by telling your family and friends.
+                </p>
+            </div>
+            <figure class="pure-u-1-2">
+                <img src="{{ STATIC_URL }}community/evolution/how-to/refer-1-slide.png" alt="Detour Maps loyal customer image." style="width: 70%">
+            </figure>
+        </div>
+        <div class="slidedeal">
+            <figure class="pure-u-1-2">
+                <img src="{{ STATIC_URL }}community/evolution/how-to/refer-2-slide.png" alt="Detour Maps loyal customer image." style="width: 55%">
+            </figure>
+            <div class="pure-u-1-2">
+                <h1 class="icon" style="margin-top: 2em; text-align: center;">How it works</h1>
+                <p style="color:#828282;">
+                    When 5 friends make a purchase at your favorite  business and use your referral code you’ll recieve a $25*
+                </p>
+                <a>How to start ></a>
+            </div>
+        </div>
+        <div class="slidedeal">
+            <div class="verticalslide">
+                <div class="slidedeal">
+                    <figure class="pure-u-1-2">
+                        <img src="{{ STATIC_URL }}community/evolution/how-to/refer-2a-slide.png" alt="Detour Maps loyal customer image." style="width: 50%">
+                    </figure>
+                    <div class="pure-u-1-2">
+                        <h1 class="icon" style="margin-top: 2em; text-align: center;">Referring a Business</h1>
+                        <p style="color:#828282;">
+                            Log in and select the business your wish to refer. Under the 5=25 section in deals, enter your email, receipt number, and date of purchase and hit submit.
+                        </p>
+                    </div>
+                </div>
+                <div class="slidedeal">
+                    <figure class="pure-u-1-2">
+                        <img src="{{ STATIC_URL }}community/evolution/how-to/refer-2b-slide.png" alt="Detour Maps loyal customer image." style="width: 50%">
+                    </figure>
+                    <div class="pure-u-1-2">
+                        <h1 class="icon" style="margin-top: 2em; text-align: center;">Earning Referrals</h1>
+                        <p style="color:#828282;">
+                            Your friends recieve an email with your info and referral code. When they make a purchase at the participating business and present your code, you earn the referral.
+                        </p>
+                    </div>
+                </div>
+                <div class="slidedeal">
+                    <figure class="pure-u-1-2">
+                        <img src="{{ STATIC_URL }}community/evolution/how-to/refer-2c-slide.png" alt="Detour Maps loyal customer image." style="width: 50%">
+                    </figure>
+                    <div class="pure-u-1-2">
+                        <h1 class="icon" style="margin-top: 2em; text-align: center;">Get Rewards</h1>
+                        <p style="color:#828282;">
+                            And that’s it. Every time you get five referrals you’ll recieve $25* from the particpating business.
+                        </p>
+                        <a>Why refer ></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slidedeal">
+            <figure class="pure-u-1-2">
+                <img src="{{ STATIC_URL }}community/evolution/how-to/refer-3-slide.png" alt="Detour Maps loyal customer image.">
+            </figure>
+            <div class="pure-u-1-2">
+                <h1 class="icon" style="margin-top: 2em; text-align: center;">Sharing is caring</h1>
+                <p style="color:#828282;">
+                    Referring your friends helps local business and has a positive effect on your community. You care about your community and your family, local businesses in your community are like family.
+                </p>
+                <a href="/communities/registerUser">Sign Up for Orange Deals ></a>
+            </div>
+        </div>
+    </div>
+    <div class="bodyElement5">
+        <h1 style="margin-top:50px; font-size:50px; text-align:center;">Ready to save?</h1>
+
+        <div style="margin-left:auto; margin-right:auto; width:370px; height:50px; background-color:#F05A29;"><a
+                href="/communities/registerUser/" style="text-decoration:none;"><p
+                style="text-align:center; color:#FFF; font-size:24px; padding-top:10px; padding-bottom:10px;"><strong>Sign
+            Up for Orange Deals</strong>
+        </p></a></div>
+        <p style="text-align:center; color:#F05A29; margin-top:30px;"><a class="orange" href="/terms-conditions/">See Terms and Conditions for Orange Deals</a>
+        </p>
+    </div>
+    </div>
+{% endblock %}

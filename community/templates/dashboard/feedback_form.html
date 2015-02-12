@@ -1,0 +1,390 @@
+{% extends 'base-new.html' %}
+{% load thumbnail %}
+{% load queryset %}
+{% block title %}Dashboard{% endblock %}
+{% block head %}
+    <meta name="Description" content="{{ community.description }}">
+    <meta name="Keywords" content="{{ community.keywords }}">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}community/css/dtmfront-evolution.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}community/css/style_home.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}animation/style.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}web-icon/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}userdash/css/bootstrap.css" media="screen">
+    <link rel="stylesheet" href="{{ STATIC_URL }}userdash/css/bootswatch.min.css">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="../bower_components/html5shiv/dist/html5shiv.js"></script>
+      <script src="../bower_components/respond/dest/respond.min.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" href="{{ STATIC_URL }}custom-theme/jquery-ui-1.10.3.custom.css"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}modal/jquery.modal.css" type="text/css" media="screen"/>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=geometry"></script>
+    <style type="text/css">
+        <style type="text/css">
+        body {
+            background: #ffffff !important;
+        }
+
+        footer {
+            position: relative !important;
+            top: 0 !important;
+            margin: 0 !important;
+        }
+
+        input:focus {
+            background-color: #ffffff;
+        }
+
+        .overmenu {
+            z-index: 10000;
+        }
+
+        .menuJoin li {
+            width: 100%;
+        }
+
+        .menuJoin li a {
+            text-align: left !important;
+        }
+        ul.list_row{
+            overflow: hidden;
+        }
+        .list_row > li {
+            width: 24% !important;
+        }
+        .list_row ul li > ul li{
+            float: none !important;
+            margin: 0 !important;
+        }
+        .list_row ul li > ul li.social-icon{
+            float: none !important;
+            margin: 0 !important;
+        }
+        button#btnSuscribe{
+            color: #000 !important;
+        }
+    </style>
+{% endblock %}
+{% block bar-container %}{% endblock %}
+{% block content %}
+        <div class="container">
+            <div class="bs-component main-content-header">
+                <div class="jumbotron">
+                    <ul>
+                    	<li>
+                        	<img src="{{ STATIC_URL }}userdash/images/main-content-header-image.png" alt="orange deal dashboard" />
+                        </li>
+                    	<li>
+                        	<a href="{% url 'accountSettings' %}">
+                            	<span><img src="{{ STATIC_URL }}userdash/images/icons-home.png" alt="Home" width="61"></span>
+                                <span>Home</span>
+                            </a>
+                        </li>
+                        <li>
+                        	<a href="{% url 'settings_deals' %}">
+                            	<span><img src="{{ STATIC_URL }}userdash/images/icons-mydeals.png" alt="My Deals" width="61"></span>
+                                <span>My Deals</span>
+                            </a>
+                        </li>
+                        <li>
+                        	<a href="{% url 'settings_visits' %}">
+                            	<span><img src="{{ STATIC_URL }}userdash/images/icons-visits.png" alt="Visits" width="61"></span>
+                                <span>Visits</span>
+                            </a>
+                        </li>
+                        <li>
+                        	<a href="{% url 'settings_favorites' %}">
+                            	<span><img src="{{ STATIC_URL }}userdash/images/icons-favorities.png" alt="Favorities" width="61"></span>
+                                <span>Favorities</span>
+                            </a>
+                        </li>
+                        <li>
+                        	<a href="">
+                            	<span class="active"><img src="{{ STATIC_URL }}userdash/images/icons-feedback.png" alt="Feedback" width="61"></span>
+                                <span class="active">Feedback</span>
+                            </a>
+                        </li>
+                        <li>
+                        	<h4>My Account - {% if user.first_name %} {{ user.first_name }} {{ user.last_name }} {% else %} {{ user.username|arrobe }} {% endif %}</h4>
+                            <h6>Joined {{ user.date_joined|date:"M Y    " }}</h6>
+                            <h5>Culvers - Berwyn, IL</h5>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="row background-white">
+                    <div class="col-md-2 quick-scope">
+                        FEEDBACK
+                    </div>
+                </div>
+                
+               <div class="row">
+                    <div class="col-md-12 details-subpage_wrapper feedback-form-wrapper background-white">
+                    	<div class="row header-section">
+                        	<div class="col-md-8">
+                            	<p>Tell us about your recent visits, your honest feedback helps improve your local experinences.
+Your feedback is only shared privately between you and the business owner.</p>
+                            </div>
+                            <div class="col-md-4">
+                            	<img src="{{ STATIC_URL }}userdash/images/search_icon.png" />
+                                <span>Explore West Lawn</span>
+                            </div>
+                        </div>
+                        
+                        <div class="row recent-visit-wrapper">
+                        	<div class="col-md-12">
+                            	<div class="heading">
+                                	Recent Visits
+                                </div>
+                                
+                                <div class="row inner-form-wrapper">
+                                	<div class="col-md-6">
+                                    	<div class="row">
+                                        	<div class="col-md-6">
+                                            	<h4><b><a href="">Business</a> in Berwyn</b></h4>
+                                                <h5>6943 Roosevelt Rd Berwyn, IL 60402 (708) 788-8000</h5>
+                                                <a href="">view on map</a>
+                                            </div>
+                                            <div class="col-md-6">
+                                            	<table>
+                                                	<tr>
+                                                    	<td>Last Visit:</td>
+                                                        <td><b>March 25, 2014</b></td>
+                                                    </tr>
+                                                    <tr>
+                                                    	<td>Overall:</td>
+                                                        <td>
+                                                        	<select name="">
+                                                            	<option value="">Good</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                    	<td>Rating:</td>
+                                                        <td>
+                                                        	<img height="20" src="{{ STATIC_URL }}userdash/images/star-group.png">
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                	<div class="col-md-6">
+                                    	<textarea name="" placeholder="Tell us about your experience..."></textarea>
+                                        <p>
+                                        	<b>Privacy Terms:</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer faucibus, lacus ac molestie tincidunt, neque nisi luctus orci, non vestibulum sem tortor eget neque. Proin.
+                                        </p>
+                                        <div class="row">
+                                        	<div class="col-md-9">
+                                                <span>
+                                                	<input type="checkbox" name="" id="" value="">
+                                                </span>
+                                                <span>
+                                                	<p><b>Submit anonymous feedback</b><br/>Your name will not be provided with this feedback</p>
+                                                </span>
+                                                <div class="clear"></div>
+                                            </div>
+                                            <div class="col-md-3">
+                                            	<input type="submit" name="" id="" value="Submit">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row inner-form-wrapper">
+                                	<div class="col-md-6">
+                                    	<div class="row">
+                                        	<div class="col-md-6">
+                                            	<h4><b><a href="">Business</a> in Berwyn</b></h4>
+                                                <h5>6943 Roosevelt Rd Berwyn, IL 60402 (708) 788-8000</h5>
+                                                <a href="">view on map</a>
+                                            </div>
+                                            <div class="col-md-6">
+                                            	<table>
+                                                	<tr>
+                                                    	<td>Last Visit:</td>
+                                                        <td><b>March 25, 2014</b></td>
+                                                    </tr>
+                                                    <tr>
+                                                    	<td>Overall:</td>
+                                                        <td>
+                                                        	<select name="">
+                                                            	<option value="">Good</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                    	<td>Rating:</td>
+                                                        <td>
+                                                        	<img height="20" src="{{ STATIC_URL }}userdash/images/star-group.png">
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                	<div class="col-md-6">
+                                    	<textarea name="" placeholder="Tell us about your experience..."></textarea>
+                                        <p>
+                                        	<b>Privacy Terms:</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer faucibus, lacus ac molestie tincidunt, neque nisi luctus orci, non vestibulum sem tortor eget neque. Proin.
+                                        </p>
+                                        <div class="row">
+                                        	<div class="col-md-9">
+                                                <span>
+                                                	<input type="checkbox" name="" id="" value="">
+                                                </span>
+                                                <span>
+                                                	<p><b>Submit anonymous feedback</b><br/>Your name will not be provided with this feedback</p>
+                                                </span>
+                                                <div class="clear"></div>
+                                            </div>
+                                            <div class="col-md-3">
+                                            	<input type="submit" name="" id="" value="Submit">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+		<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+        <script src="{{ STATIC_URL }}userdash/js/jquery-ui-1.10.3.custom.min.js"></script>
+        <script src="{{ STATIC_URL }}userdash/js/bootstrap.min.js"></script>
+        <script src="{{ STATIC_URL }}userdash/js/bootswatch.js"></script>
+    	<script src="{{ STATIC_URL }}userdash/js/flot/jquery.flot.min.js"></script>
+		<script src="{{ STATIC_URL }}userdash/js/flot/jquery.flot.pie.min.js"></script>
+        <script src="{{ STATIC_URL }}userdash/js/flot/jquery.flot.resize.min.js"></script>
+        
+        <script type="text/javascript">
+			$(function() {
+			
+
+				$(".main-content-header ul li a").mouseover(function() {
+					$(this).find('span:first-child').css( "background", "#f39231" );
+					$(this).children().css( "color", "#f39231" );
+				});
+				
+				$(".main-content-header ul li a").mouseout(function() {
+					if($(this).find("span").hasClass("active") != true)
+					{
+						$(this).find('span:first-child').css( "background", "#fff" );
+						$(this).children().css( "color", "#fff" );
+					}
+				});
+			
+				var d1 = [];
+				for (var i = 0; i < Math.PI * 2; i += 0.5) {
+				  d1.push([i, Math.sin(i)]);
+				}
+			  
+				var d2 = [];
+				for (var i = 0; i < Math.PI * 2; i += 0.5) {
+				  d2.push([i, Math.cos(i)]);
+				}
+			  
+				var d3 = [];
+				for (var i = 0; i < Math.PI * 2; i += 0.2) {
+				  d3.push([i, Math.tan(i)]);
+				} 
+			 
+				var data = [
+					{ label: "10$ of Savings",  data: 30.7, color: "#40a7f4"},
+					{ label: "Smart Buys",  data: 24.5, color: "#fe1d25"},
+					{ label: "10 Visits Loyality",  data: 20.2, color: "#ff911e"},
+					{ label: "5=25 Referrals",  data: 16.6, color: "#7ac743"}
+				];
+				
+				var placeholder = $('#piechart-placeholder').css({'width':'90%' , 'min-height':'120px'});
+				
+				$.plot(placeholder, data, 
+				{
+					series: 
+					{
+						pie: 
+						{
+							show: true,
+							tilt:1.0,
+							highlight: 
+							{
+								opacity: 0.25
+							},
+							stroke: 
+							{
+								color: '#fff',
+								width: 2
+							},
+							startAngle: 2
+						}
+					},
+					legend: 
+					{
+						show: true,
+						position: "ne", 
+						labelBoxBorderColor: null,
+						margin:[-30,15]
+					},
+					grid: 
+					{
+						hoverable: true,
+						clickable: true
+					},
+					tooltip: true, //activate tooltip
+					tooltipOpts: 
+					{
+						content: "%s : %y.1",
+						shifts: 
+						{
+							x: -30,
+							y: -50
+						}
+					}
+				});
+				
+				var sales_charts = $('#sales-charts').css({'width':'100%' , 'height':'220px'});
+				
+				$.plot("#sales-charts", [
+					{ label: "Yellow", data: d1 },
+					{ label: "Blue", data: d2 },
+					{ label: "Red", data: d3 }
+				], 
+				{
+					hoverable: true,
+					shadowSize: 0,
+					series: 
+					{
+						lines: { show: true },
+						points: { show: true }
+					},
+					xaxis: 
+					{
+						tickLength: 0
+					},
+					yaxis: 
+					{
+						ticks: 10,
+						min: -2,
+						max: 2,
+						tickDecimals: 3
+					},
+					grid: 
+					{
+						backgroundColor: 
+						{ 
+							colors: [ "#fff", "#fff" ] 
+						},
+						borderWidth: 1,
+						borderColor:'#555'
+					}
+				});
+				
+			})
+		</script>
+{% endblock %}

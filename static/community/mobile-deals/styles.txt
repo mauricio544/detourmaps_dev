@@ -1,0 +1,35 @@
+Business name
+	Source Sans Pro Light #4D4D4D
+Business info
+	Source Sans Pro Light #666666
+Menu Icons
+	Arial Narrow #808082
+More
+	Arial Regular #808082
+All Access, Orange Deals, Savings Card
+	Source Sans Pro Light #808080
+	Line #808080
+Savings Card, Smart Buys, Loyalty Rewards, Refer Friends
+	Source Sans Pro regular #808080
+	Separation #808082
+10 Off Savings Card
+	Source Sans Pro Light #808080
+Button feedback 
+	background #999999 <business-name> IS NOT ACCEPTING Myriad Pro Bold #ffffff $10 SAVINGS CARD AT THIS TIME Myriad Pro regular #ffffff
+Good news
+	Source Sans Pro Regular #0071BC
+There’s Orange Deals available for Source Sans Pro Regular #0071BC <Business Name> Myriad Pro Italic
+
+Select from the following Orange Deals you would like this business to accept, the more requests each Orange Deal receives the sooner they will become available. 
+	Source Sans Pro Regular #666666
+Buttin Request Orange Deals
+	#ffffff Source Sans Pro regular
+	border #F15A24
+	background #F7931E #F15A24
+Want to Save $10 at <business-name>?
+	Source Sans Pro Regular #0071B4
+Use our free savings card to save $10 on your next visit, saving locally made easy.
+	Source Sans Pro Light #666666
+Learn more
+	Source Sans Pro Italic #0071B4
+	

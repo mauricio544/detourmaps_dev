@@ -1,0 +1,185 @@
+{% extends "base-new.html" %}
+{% block title %}{{ page.name|capfirst }}{% endblock %}
+{% block head %}
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}community/css/dtmfront-evolution.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}community/css/style_home.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}animation/style.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}web-icon/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="{{ STATIC_URL }}custom-theme/jquery-ui-1.10.3.custom.css"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}modal/jquery.modal.css" type="text/css" media="screen"/>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // US Phone Validation
+            $.validator.addMethod("phoneUS", function (phone_number, element) {
+                phone_number = phone_number.replace(/\s+/g, "");
+                return this.optional(element) || phone_number.length > 9 &&
+                        phone_number.match(/^(1-?)?(\([2-9]\d{2}\)|[2-9]\d{2})-?[2-9]\d{2}-?\d{4}$/);
+            }, "Please specify a valid phone number");
+            //ZIP
+            $.validator.addMethod("zipcode", function (zip, element) {
+                zip = zip.replace(/\s+/g, "");
+                return this.optional(element) || zip.length > 4 &&
+                        zip.match(/^\d{5}(-\d{4})?$/);
+            }, "Please specify a valid zip code");
+
+            $('#register').validate();
+        });
+    </script>
+    <style type="text/css">
+        body {
+            background: #fff !important;
+        }
+
+        .overmenu {
+            z-index: 10000;
+        }
+        form#register button{
+            background-color: #F48131;
+            border: none;
+            border-radius: 10px;
+            height: 25px;
+            width: 100px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            color: #333;
+            font-weight: 700;
+        }
+        form#register label{
+            color: #F48131;
+        }
+        blockquote {
+            color: #f48131;
+            font-size: 48px;
+            text-align: left;
+            line-height: 1;
+            margin-left: 50px;
+            font-family: 'Conv_LeagueGothic-Regular', san-serif;
+        }
+
+        blockquote span {
+            font-size: 36px;
+        }
+
+        .block p {
+            margin-left: 50px;
+            font-size: 24px;
+            color: #6d6e71;
+            font-family: 'Conv_MyriadPro-Regular', san-serif;
+        }
+
+        .block ul {
+            list-style-image: url({{ STATIC_URL }}web/img/list.png);
+            margin-left: 100px;
+            font-size: 24px;
+        }
+
+        .block ul li {
+            line-height: 38px;
+        }
+
+        ul.errorlist {
+            color: #ff4500;
+            font-size: 0.75em;
+        }
+
+        div.required span {
+            font-size: 0.8em;
+            font-weight: 300;
+        }
+
+        .help {
+            color: #a9a9a9;
+            font-size: 0.7em;
+        }
+
+        footer {
+            position: relative !important;
+            top: 0 !important;
+        }
+    </style>
+{% endblock %}
+{% block bar-container %}{% endblock %}
+{% block content %}
+    <div class="container banner-listing">
+
+    </div>
+    <div class="container">
+        <div class="row internal">
+            <div class="twocol"></div>
+            <div class="fivecol form">
+                {% if msg %}
+                    <h2>{{ msg }}</h2>
+                {% else %}
+                    <form id="register" action="" method="post" novalidate="novalidate">
+                        {% csrf_token %}
+                        <h2>Register your business</h2>
+                        {% if error %}
+                            <h3>{{ error }}</h3>
+                        {% endif %}
+                        <p>
+                            <label for="name">Name of Business</label>
+                            <input id="name" type="text" placeholder="e.g. Google *" name="name" maxlength="48"
+                                   class="required">
+                        </p>
+
+                        <p>
+                            <label for="address">Address</label>
+                            <input id="address" type="text"
+                                   placeholder="e.g. 1600 Amphitheatre Parkway, Mountain View, CA *" name="address"
+                                   maxlength="72" class="required">
+                        </p>
+
+                        <p>
+                            <label for="city">City / State</label>
+                            <input id="city" type="text" placeholder="e.g. Mountain View *" name="city" maxlength="36"
+                                   class="required">
+                        </p>
+
+                        <p>
+                            <label for="owner">Owner</label>
+                            <input id="owner" type="text" placeholder="e.g. John Doe *" name="owner" maxlength="36"
+                                   class="required">
+                        </p>
+
+                        <p>
+                            <label for="contact">Contact</label>
+                            <input id="contact" type="text" placeholder="e.g. Jane Doe *" name="contact" maxlength="36"
+                                   class="required">
+                        </p>
+
+                        <p>
+                            <label for="phone">Phone</label>
+                            <input type="text" placeholder="e.g. 999-999-9999 *" name="phone" id="phone"
+                                   class="required phoneUS">
+                        </p>
+
+                        <p>
+                            <label for="cell">Cell</label>
+                            <input id="cell" type="text" placeholder="e.g. 999-999-9999" name="cell" maxlength="36"
+                                   class="phoneUS">
+                        </p>
+
+                        <p>
+                            <label for="email">Email</label>
+                            <input type="email" placeholder=" *" name="email" id="email" class="required email">
+                        </p>
+
+                        <p>
+                            <label for="website">Website</label>
+                            <input type="text" placeholder="" name="website" id="website" class="url">
+                        </p>
+
+                        <p class="submit">
+                            <button>Sign Up</button>
+                        </p>
+                    </form>
+                {% endif %}
+            </div>
+            <div class="fivecol block text last">
+                {{ text.text|safe }}
+                <img src="{{ STATIC_URL }}community/elementos/logoCircle.png" width="75%" height="auto" style="margin-left:70px">
+            </div>
+        </div>
+    </div>
+{% endblock %}

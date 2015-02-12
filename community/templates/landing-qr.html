@@ -1,0 +1,1765 @@
+{% load queryset %}
+{% load thumbnail %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DetourMaps - {{ business.name }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords"
+          content="shop local, maps, map, explore your community, neighborhood, select your community, Berwyn, Cicero, archer heights, west lawn"/>
+    <meta name="description="
+          content="DetourMaps brings you closer to your neighborhood with the latest business promotions, events, and savings. Support your community while staying connected">
+    <link href='http://fonts.googleapis.com/css?family=Rambla|Text+Me+One|Roboto|Julius+Sans+One|Open+Sans|Open+Sans+Condensed:300|Source+Sans+Pro'
+          rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="{{ STATIC_URL }}community/css/styles-mobile.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}foundation/css/foundation.css"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}foundation/css/foundation-icons.css"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}messi/messi.min.css"/>
+    <!-- Important Owl stylesheet -->
+    <link rel="stylesheet" href="{{ STATIC_URL }}community/owl-carousel/owl.carousel.css">
+     
+    <!-- Default Theme -->
+    <link rel="stylesheet" href="{{ STATIC_URL }}community/owl-carousel/owl.theme.css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=true"></script>
+    <script src="{{ STATIC_URL }}messi/messi.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}community/js/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}community/js/css3-mediaqueries.js"></script>
+    <script src="{{ STATIC_URL }}foundation/js/vendor/modernizr.js"></script>    
+    <!-- Include js plugin -->
+    <script src="{{ STATIC_URL }}community/owl-carousel/owl.carousel.js"></script>
+    <script type="text/javascript">
+        var initialLocation;
+        var geo = '{{ business.geo }}' || undefined;
+        var r = geo.slice(7, geo.length - 1).split(' ') || [];
+
+        var latlngD = new google.maps.LatLng(parseFloat(r[1]), parseFloat(r[0]));
+        var directionsService = new google.maps.DirectionsService();
+        var browserSupportFlag = new Boolean();
+        var map;
+        var directionsDisplay;
+        var session_user = "{{ user }}";
+        function initialize() {
+            var myOptions = {
+                zoom: 14,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            map = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
+
+            // Try W3C Geolocation (Preferred)
+            if (navigator.geolocation) {
+                var timeoutVal = 10 * 1000 * 1000;
+                browserSupportFlag = true;
+                navigator.geolocation.getCurrentPosition(
+                    displayPosition,
+                    displayError,
+                    { enableHighAccuracy: true, maximumAge: 100, timeout: timeoutVal }
+                );
+            }
+            // Browser doesn't support Geolocation
+            else {
+                browserSupportFlag = false;
+                handleNoGeolocation(browserSupportFlag);
+            }
+
+            function handleNoGeolocation(errorFlag) {
+                if (errorFlag == true) {
+                    alert("Geolocation service failed.");
+                    initialLocation = latlngD;
+                } else {
+                    alert("Your browser doesn't support geolocation.");
+                    initialLocation = latlngD;
+                }
+                map.setCenter(initialLocation);
+            };
+            function displayPosition(position){
+                initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                map.setCenter(initialLocation);
+            };
+            function displayError(error) {
+              var errors = { 
+                1: 'Permission denied',
+                2: 'Position unavailable',
+                3: 'Request timeout'
+              };
+              alert("Error: " + errors[error.code]);
+            };
+        }
+        var directionDisplay;
+        var directionsService = new google.maps.DirectionsService();        
+        function initializer() {
+            directionsDisplay = new google.maps.DirectionsRenderer();
+            directionsDisplay.setMap(map);
+            directionsDisplay.setPanel(document.getElementById('directionsPanel'));
+            var marker = new google.maps.Marker({
+                position: latlngD,
+                map: map,
+                title: "{{ business.name }}"
+            });
+        }
+        function calcRoute() {            
+            var start = initialLocation;
+            var end = latlngD;
+            var waypoints = [];
+            if (end != "") {
+                // if waypoints (via) are set, add them to the waypoints array
+                waypoints.push({
+                    location: end,
+                    stopover: true
+                });
+            }
+            var request = {
+                origin: start,
+                destination: end,
+                waypoints: waypoints,
+                travelMode: google.maps.DirectionsTravelMode.DRIVING
+            };
+            directionsService.route(request, function (response, status) {
+                if (status == google.maps.DirectionsStatus.OK) {
+                    $('#directionsPanel').empty();
+                    directionsDisplay.setDirections(response);
+                } else {
+                    // alert an error message when the route could nog be calculated.
+                    if (status == 'ZERO_RESULTS') {
+                        alert('No route could be found between the origin and destination.');
+                    } else if (status == 'UNKNOWN_ERROR') {
+                        alert('A directions request could not be processed due to a server error. The request may succeed if you try again.');
+                    } else if (status == 'REQUEST_DENIED') {
+                        alert('This webpage is not allowed to use the directions service.');
+                    } else if (status == 'OVER_QUERY_LIMIT') {
+                        alert('The webpage has gone over the requests limit in too short a period of time.');
+                    } else if (status == 'NOT_FOUND') {
+                        alert('At least one of the origin, destination, or waypoints could not be geocoded.');
+                    } else if (status == 'INVALID_REQUEST') {
+                        alert('The DirectionsRequest provided was invalid.');
+                    } else {
+                        alert("There was an unknown error in your request. Requeststatus: nn" + status);
+                    }
+                }
+            });
+        }        
+        $(document).ready(function () {
+            initialize();
+            var scrollflag;
+            var owlcoupon = $("#couponatic");  
+            $("section#menu h4").addClass("secondary label").css("width", "100%");
+            $("section#menu ul li").find("img").hide();    
+            $("section#menu ul li").find("b").addClass("success round radius label").css("margin-left", "1em");
+            var $list = $("section#menu ul li");
+            if($list.length > 0){
+                for (var li=0; li<$list.length; li++){
+                    var $img = $($list[li]).find("img");
+                    if ($img.length > 0){
+                        $($list[li]).append("<div class='wrapmenu' style='display: none;'><div class='owl-carousel' id='owl" + li + "'></div></div>");
+                        $($list[li]).append("<i class='fi-photo pic'></i>");
+                        $img.clone().appendTo("#owl" + li).show();
+                    }                    
+                    $("#owl" + li).owlCarousel(
+                        {
+                            items : 1,
+                            itemsCustom : false,
+                            itemsDesktop : [1199,1],
+                            itemsDesktopSmall : [980,1],
+                            itemsTablet: [768,1],
+                            itemsTabletSmall: false,
+                            itemsMobile : [479,1],
+                            //Autoplay
+                            autoPlay : false,
+                            stopOnHover : false,
+
+                            // Navigation
+                            navigation : false,
+                            navigationText : ["prev","next"],
+                        }                    
+                    );
+                }            
+            }
+            $("section#menu ul li").click(function(){
+                $("section#menu ul li").find("div.wrapmenu").slideUp();
+                $(this).find("div.wrapmenu").slideDown();
+            });
+            owlcoupon.owlCarousel({
+                items : 1,
+                itemsCustom : false,
+                itemsDesktop : [1199,1],
+                itemsDesktopSmall : [980,1],
+                itemsTablet: [768,1],
+                itemsTabletSmall: false,
+                itemsMobile : [479,1],
+                //Autoplay
+                autoPlay : false,
+                stopOnHover : false,
+             
+                // Navigation
+                navigation : false,
+                navigationText : ["prev","next"],
+            });
+            $("#owl-gallery").owlCarousel({
+                items : 1,
+                itemsCustom : false,
+                itemsDesktop : [1199,1],
+                itemsDesktopSmall : [980,1],
+                itemsTablet: [768,1],
+                itemsTabletSmall: false,
+                itemsMobile : [479,1],
+                //Autoplay
+                autoPlay : false,
+                stopOnHover : false,
+             
+                // Navigation
+                navigation : true,
+                navigationText : ["prev","next"],
+            });
+            $("#couponaticajax").owlCarousel({
+                items : 1,
+                itemsCustom : false,
+                itemsDesktop : [1199,1],
+                itemsDesktopSmall : [980,1],
+                itemsTablet: [768,1],
+                itemsTabletSmall: false,
+                itemsMobile : [479,1],
+                //Autoplay
+                autoPlay : false,
+                stopOnHover : false,
+             
+                // Navigation
+                navigation : false,
+                navigationText : ["prev","next"],
+            });         
+            var owlcoupon = $("#couponaticajax").data('owlCarousel');         
+            $("#formsignin").validate({
+                rules: {    
+                    user_email: {
+                        required: true,
+                        email: true
+                    },
+                    user_password: {
+                        required: true,
+                        minlength: 6
+                    }
+                },
+                messages: {
+                    user_email: {
+                        required: "Please enter your email",
+                        email: "Please enter a valid email"
+                    },
+                    user_password: {
+                        required: "Please enter your password",
+                        minlength: "Your password must be a 6 characters"
+                    }
+                }
+            });
+            $("#formsignin").submit(function (e) {
+                e.preventDefault();
+                var form = $("#formsignin");
+                if (form.valid()) {
+                    $.post('{% url "userLoginAjax" %}', form.serialize(), function (data) {
+                        var evalData = eval('(' + data + ')');
+                        //$("#response-lista").html(evalData.msg);
+                        session_user = evalData.user;
+                        $("#panel-sign").foundation('reveal', 'close');
+                        var logout = '<li> \
+                        <a id="logout" href="/user/logout/{{ business.getUniqueCode }}" style="color: \
+                        #ee5a29;font-size: 2em;"> \
+                        <i class="fi-torso"></i> \
+                        </a> \
+                        </li>';
+                        $("nav#toolbar ul").append(logout);
+                        if($("#hidden_promo_login").val() != undefined || $("#hidden_promo_login").val() != null){
+                            $.post('{% url 'get-promotion' %}', {
+                                'id': $("#hidden_promo_login").val()
+                            }, function(data){
+                                var evalData = eval('(' + data + ')');
+                                $("#alwaysmessage").html(evalData.message);
+                                $("#alertmessage").show();
+                                var htmlslide = "<div class='slidecoupon small-12 columns' id='d" + evalData.voucher + "'><p>Must \present \mobile or print coupon at time of purchase \   </p><figure><img src='" + evalData.image + "' id='" + evalData.voucher + "'> \
+                                </figure> \
+                                <input type='hidden' name='coupon' id='" + evalData.voucher + "' value='" + evalData.voucher + "' /> \
+                                <button id='b" + evalData.voucher + "' class='redeemcoupon' idhidden='" + evalData.voucher + "'>Redeem Now</button></div>";
+                                owlcoupon.addItem(htmlslide);
+                                $("#smart-buys").slideUp();
+                                $("#smart-dashboard").slideDown();
+                            });                                    
+                        }
+                    });
+                }
+            });
+            $("#formsigninup").validate({
+                rules: {
+                    emailuserdeal: {
+                        required: true,
+                        email: true
+                    },
+                    firstname: {
+                        required: true                        
+                    },
+                    lastname: {
+                        required: true                        
+                    },
+                    terms: {
+                        required: true
+                    }
+                },
+                messages: {
+                    emailuserdeal: {
+                        required: 'This field is required',
+                        email: 'Please enter a valid email account'
+                    },
+                    firstname: {
+                        required: "Please enter your first name"                        
+                    },
+                    lastname: {
+                        required: "Please enter your lastname"                        
+                    },
+                    terms: {
+                        required: "Please check our terms and conditions"
+                    }
+                }
+            });
+            $("#formsigninup").submit(function (e) {
+                e.preventDefault();
+                var form = $("#formsigninup");
+                var button = $("#formsigninup button");
+                if (button.prop("disabled")) return;
+                if (form.valid()) {
+                    button.prop("disabled", true).html('Wait ...');
+                    $.post('{% url 'fakelogin' %}', form.serialize(), function (data) {
+                        var evalData = eval('(' + data + ')');              
+                        button.prop("disabled", false).html("Sign Up");
+                        //$("#user_id").val(evalData.code);
+                        //$('#passwordchange').foundation('reveal', 'open');
+                        session_user = evalData.session;
+                        $("#signup").foundation('reveal', 'close');                        
+                        var logout = '<li> \
+                        <a id="logout" href="/user/logout/{{ business.getUniqueCode }}" style="color: \
+                        #ee5a29;font-size: 2em;"> \
+                        <i class="fi-torso"></i> \
+                        </a> \
+                        </li>';
+                        $("nav#toolbar ul").append(logout);
+                        if($("#hidden_promo_sign").val() != undefined || $("#hidden_promo_sign").val() != null){
+                            $.post('{% url 'get-promotion' %}', {
+                                'id': $("#hidden_promo_sign").val()
+                            }, function(data){
+                                var evalData = eval('(' + data + ')');
+                                $("#alwaysmessage").html(evalData.message);
+                                $("#alertmessage").show();
+                                var htmlslide = "<div class='slidecoupon small-12 columns' id='d" + evalData.voucher + "'><p>Must \present \mobile or print coupon at time of purchase \   </p><figure><img src='" + evalData.image + "' id='" + evalData.voucher + "'> \
+                                </figure> \
+                                <input type='hidden' name='coupon' id='" + evalData.voucher + "' value='" + evalData.voucher + "' /> \
+                                <button id='b" + evalData.voucher + "' class='redeemcoupon' idhidden='" + evalData.voucher + "'>Redeem Now</button></div>";
+                                owlcoupon.addItem(htmlslide);
+                                $("#smart-buys").slideUp();
+                                $("#smart-dashboard").slideDown();
+                            });
+                        }
+                    });
+                }                
+            });
+            $("#passChange").validate({
+                rules: {
+                    old_password: {
+                        required: true,
+                        minlength: 6
+                    },
+                    new_password: {
+                        required: true,
+                        minlength: 8
+                    },
+                    reNewPass: {
+                        required: true,
+                        minlength: 8,
+                        equalTo: '#newPass'
+                    }
+                },
+                messages: {
+                    old_password: {
+                        required: 'This field is required',
+                        minlength: 'minimum 6'
+                    },
+                    new_password: {
+                        required: 'This field is required',
+                        minlength: 'minimum 6'
+                    },
+                    reNewPass: {
+                        required: 'This field is required',
+                        minlength: 'minimum 6',
+                        equalTo: 'No match with your new password'
+                    }
+                }
+            });
+            $("#passChange").submit(function (e) {
+                e.preventDefault();
+                var form = $("#passChange");
+                var button = $("#passChange button");
+                if (button.prop("disabled")) return;
+                if (form.valid()) {
+                    button.prop("disabled", true).html('Wait ...');
+                    $.post('/communities/register/confirm/ajax/' + $("#user_id").val(), form.serialize(), function (data) {
+                        var evalData = eval('(' + data + ')');
+                        //$("#response-lista").html(evalData.msg);                        
+                        button.prop("disabled", false).html("Save Password");
+                        $('#passwordchange').foundation('reveal', 'close');
+                        $("#panel-sign").foundation('reveal', 'open');
+                    });
+                }
+                else{
+                    new Messi("Please check your info!!", {title: 'Detour Maps - Response', modal: true});
+                }
+            });
+            $("button#request-deal").click(function(e){
+                e.preventDefault();
+                if(session_user != "False"){
+                    $("section#panel-request-ten").hide();
+                    $("section#panel-use-card").show();
+                }else{
+                    $("section#panel-sign").css("transform","translateX(0%)");
+                    scrollflag = document.documentElement.scrollTop || document.body.scrollTop;
+                    $("html, body").animate(
+                            {
+                                "scrollTop": 0
+                            }
+                    );
+                }
+            });
+            $("button#redeem-savings").click(function(e){
+                e.preventDefault();
+                $("section#panel-use-card").hide();
+                $("section#panel-redeemed-ten").show();
+                var months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+                var today = new Date();
+                var month = months[today.getMonth()];
+                var day = today.getDate();
+                var year = today.getFullYear();
+                var used = "USED " + month + " " + day + ", " + year;
+                $("div#used-redeem").html(used);
+            });
+            $("button#request-loyalty").click(function(e){
+                e.preventDefault();
+                if(session_user != "False"){
+
+                }else{
+                    $("section#panel-sign").css("transform","translateX(0%)");
+                    scrollflag = document.documentElement.scrollTop || document.body.scrollTop;
+                    $("html, body").animate(
+                            {
+                                "scrollTop": 0
+                            }
+                    );
+                }
+            });
+            $("button#request-friends").click(function(e){
+                e.preventDefault();
+                if(session_user != "False"){
+
+                }else{
+                    $("section#panel-sign").css("transform","translateX(0%)");
+                    scrollflag = document.documentElement.scrollTop || document.body.scrollTop;
+                    $("html, body").animate(
+                            {
+                                "scrollTop": 0
+                            }
+                    );
+                }
+            });
+            $("a.close-sign").click(function(e){
+                e.preventDefault();
+                $("#panel-sign").foundation('reveal', 'close');                
+            });
+            $("a.actPanel").click(function (e) {
+                e.preventDefault();
+                var id = $(this).attr("href");
+                var name = $(this).attr("idname");   
+                var attr = $(this).attr('idb');             
+                if (typeof attr !== typeof undefined && attr !== false) {
+                    $("section.row.orange-deals").slideDown();
+                    $("section#deals").animate({
+                        "bottom": 0
+                    }, 1000, function(){
+                        $("section#deals").show();
+                    });
+                    $("#pre-options").hide();
+                    $("section.row.pre").hide();
+                    $("#options").hide();
+                    $(".hidePanel").hide();
+                    $(".hideOptions").hide();
+                    $("#smart-buys").show();
+                    $("#backy").clone().appendTo("section.border").show();
+                }else{
+                    $("#pre-options").hide();
+                    $("#options").hide();
+                    $(".hidePanel").hide();
+                    $(".hideOptions").hide();
+                    //$(id + "-title").show();
+                    $("h2.h2pre").html('<a href="" class="back"><i class="fi-arrow-left size-36"></i></a> ' + name);
+                    $(id).show();
+                    if ($(this).hasClass('dir')) {
+                        initialize();
+                        initializer();
+                        calcRoute();
+                    }
+                    if ($(this).hasClass("add")) {
+                        $.getJSON('{% url "sessions" %}', function (data) {
+                            if (data.session) {
+                                var htmlReview = "<img src='" + data.gravatar + "' class='imgAvatar'/><div class='userAvatar'>" + data.username + "</div>";
+                                $("#userInformation").html(htmlReview);
+                                $("#reviewPanel").slideDown();
+                                $("#loginPanel").slideUp();
+                            }
+                            else {
+                                $("#loginPanel").slideDown();
+                                $("#reviewPanel").slideUp();
+                            }
+                        });
+                    }                    
+                }                                
+            });
+            $(document).on("click", "a.back", function (e) {
+                e.preventDefault();
+                $(".hidePanel").hide();
+                $(".hideOptions").hide();
+                $("section.hide-deal").hide();
+                $("#options").show();
+                $("h2.h2pre").html("All Access");
+                $("section#backy").hide();
+            });
+            $(document).on("click", "a.backy", function (e) {
+                e.preventDefault();
+                $(".hidePanel").hide();
+                $(".hideOptions").hide();
+                $("section.hide-deal").hide();
+                $("#options").show();
+                $("h2.h2pre").html("All Access");
+                $("section#backy").hide();
+                $("section#deals").hide().animate({
+                    "bottom": "-100%"
+                }, 1000);
+            });
+            $("a.back-more").click(function (e) {
+                $(".hidePanel").hide();
+                $("#more-title").show();
+                $(".hideOptions").hide();
+                $("#more").show();
+                e.returnValue = false;
+                return false;
+            });
+            $("a.back-parent").click(function (e) {
+                var parentDiv = $(this).attr("href");
+                $(".hidePanel").hide();
+                $(parentDiv + "-title").show();
+                $(".hideOptions").hide();
+                $(parentDiv).show();
+                e.returnValue = false;
+                return false;
+            });
+            $("#downloaddeal").click(function (e) {
+                e.preventDefault();
+                var tag = '{{ business.getUniqueCode }}';
+                window.location.href = '/communities/get/card?tag=' + tag + '&name=' + $("#nameBusinessField").val() + '&email=' + $("#emailBusinessField").val() + '&phone=' + $("#phoneBusinessField").val()
+            });
+            $("#printCoupon").click(function (e) {
+                e.preventDefault();
+                window.open(
+                        'http://{{ request.META.HTTP_HOST }}/communities/print/coupon?source=' + '{{ business.getUniqueCode }}',
+                        '_blank'
+                );
+            });            
+            $("a#show-menu").on("click",function(e){
+                e.preventDefault();
+                var body = document.body,
+                    html = document.documentElement;
+
+                var height = Math.max( body.scrollHeight, body.offsetHeight, 
+                       html.clientHeight, html.scrollHeight, html.offsetHeight );
+                $("section#panel-menu").css("transform","translateX(0)").css("height", height);
+            });
+            $("a#close-menu").click(function(e){
+                e.preventDefault();
+                $("section#panel-menu").css("transform","translateX(-100%)");
+            });
+            $("section.dealer").click(function(){
+                var imgdeal = $("section.dealer").find("img");
+                for(var x=0; x<imgdeal.length; x++){
+                    $(imgdeal[x]).attr("src", $(imgdeal[x]).attr("idinactive"));
+                }
+                $(this).find("img").attr("src", $(this).find("img").attr("idactive")); 
+                var id = $(this).attr("idb");
+                var name = $(this).attr("idname");
+                $("#pre-options").hide();
+                $("#options").hide();
+                $(".hidePanel").hide();
+                $("section.dealer label").not($(this).find("label")).removeClass("active");
+                $(this).find("label").addClass("active");
+                //$(id + "-title").show();
+                $("h2.h2pre").html('<a href="" class="back"><i class="fi-arrow-left size-36"></i></a> ' + name);
+                $("section.hide-deal").hide();
+                $("#"+id).show();
+                $("#backy").clone().appendTo("section.border").show();
+            });
+            $("section.row.more ul li a").on("click", function(e){
+                e.preventDefault();
+                $("section.row.more ul li a").not($(this)).removeClass("active");
+                $(this).addClass("active");
+                $("div.more-info").not($(this).next()).slideUp();
+                $(this).next().slideDown();
+            });                        
+            $("button.promocoupon").click(function(e){  
+                e.preventDefault();
+                var body = document.body,
+                    html = document.documentElement;
+
+                var height = Math.max( body.scrollHeight, body.offsetHeight, 
+                       html.clientHeight, html.scrollHeight, html.offsetHeight );
+                $("#hidden_promo_sign").val($($(this).attr("idhidden")).val());
+                $("#hidden_promo_login").val($($(this).attr("idhidden")).val());
+                if (session_user != "False"){
+                    $.post('{% url 'get-promotion' %}', {
+                        'id': $($(this).attr("idhidden")).val()
+                    }, function(data){
+                        var evalData = eval('(' + data + ')');
+                        $("#alwaysmessage").html(evalData.message);
+                        $("#alertmessage").show();
+                        var htmlslide = "<div class='slidecoupon small-12 columns' id='d" + evalData.voucher + "'><p>Must \present \mobile or print coupon at time of purchase \   </p><figure><img src='" + evalData.image + "' id='" + evalData.voucher + "'> \
+                        </figure> \
+                        <input type='hidden' name='coupon' id='" + evalData.voucher + "' value='" + evalData.voucher + "' /> \
+                        <button id='b" + evalData.voucher + "' class='redeemcoupon' idhidden='" + evalData.voucher + "'>Redeem Now</button></div>";
+                        owlcoupon.addItem(htmlslide);
+                        $("#smart-buys").slideUp();
+                        $("#smart-dashboard").slideDown();
+                    });
+                }else{                    
+                    $("#panel-sign").foundation('reveal', 'open');
+                }
+            }); 
+            $(document).on("click", "button.redeemcoupon", function(e){
+                e.preventDefault();
+                var _this = $(this);
+                $.post('{% url 'redeemed' %}', {
+                    voucher: $(this).attr("idhidden")
+                }, function(data){
+                    d = new Date();
+                    var evalData = eval('(' + data + ')');
+                    var months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+                    var today = new Date();
+                    var month = months[today.getMonth()];
+                    var day = today.getDate();
+                    var year = today.getFullYear();
+                    var used = "USED " + month + " " + day + ", " + year;
+                    var used_div = '<section class="small-12 columns"> \                                  <div id="used-redeem" class="used">' + used + '</div> \
+                        <ul class="row"><li class="small-6 columns"> \
+                        <img src="/static/community/mobile-evolution/app-store.png"></li><li \
+                        class="small-6 columns"> \
+                        <img src="/static/community/mobile-evolution/google-store.png"></li></ul> \
+                        </section>';
+                    $("img#" + _this.attr("idhidden")).attr("src", evalData.image + "?" + d.getTime());
+                    $("#d" + _this.attr("idhidden")).append(used_div);
+                    _this.hide();         
+                    console.log(used_div);
+                });
+            })           
+        });
+    </script>
+    <style>
+        .label{
+            white-space: normal;
+        }
+    </style>
+</head>
+<div id="fb-root"></div>
+<script>(function (d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "//connect.facebook.net/es_LA/all.js#xfbml=1&appId=238434222967585";
+    fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+<body>
+<section id="header">
+        <a id="home">
+            <img src="{{ STATIC_URL }}community/mobile-deals/logo.png"/>
+        </a>
+        <nav id="toolbar">
+            <ul>                
+                <li>
+                    <a id="bookmark">
+                        <img src="{{ STATIC_URL }}community/mobile-evolution/icon-bookmark.png"/>
+                    </a>
+                </li>
+                <li>
+                    <a id="show-menu">
+                        <img src="{{ STATIC_URL }}community/mobile-evolution/icon-toolbar.png"/>
+                    </a>
+                </li>
+                {% if request.session.user %}
+                    <li>
+                        <a id="logout" href="/user/logout/{{ business.getUniqueCode }}" style="color: #ee5a29;font-size: 2em;">
+                            <i class="fi-torso"></i>
+                        </a>
+                    </li>
+                {% endif %}                
+            </ul>
+        </nav>                    
+</section>
+<section class="figureheader">
+      <section class="imgheader">
+          <img src="{% thumbnail business.imagebusiness_set.all.0.img 1000x1000 crop %}" class="backimg" width="100%" />
+          <section id="deals">
+            <section class="row"><h1 class="titleorange">Orange Deals</h1></section>
+            <section class="row deals">           
+                <section class="small-3 columns dealer" idb="smart-buys" idname="Smart Buys">
+                    <img src="{{ STATIC_URL }}community/mobile-evolution/icon-smart-buys-active.png" idactive="{{ STATIC_URL }}community/mobile-evolution/icon-smart-buys-active.png" idinactive="{{ STATIC_URL }}community/mobile-evolution/icon-smart-buys.png"/>
+                    <label class="active">Smart Buys</label>
+                </section>
+                 <section class="small-3 columns dealer" idb="savings-card" idname="Savings Card">
+                    <img src="{{ STATIC_URL }}community/mobile-evolution/icon-ten-off.png" idactive="{{ STATIC_URL }}community/mobile-evolution/icon-ten-off-active.png" idinactive="{{ STATIC_URL }}community/mobile-evolution/icon-ten-off.png"/>
+                    <label>Savings Card</label>
+                </section>
+                <section class="small-3 columns dealer" idb="loyalty-rewards" idname="Loyalty Rewards">
+                    <img src="{{ STATIC_URL }}community/mobile-evolution/icon-ten-visits.png" idactive="{{ STATIC_URL }}community/mobile-evolution/icon-ten-visits-active.png" idinactive="{{ STATIC_URL }}community/mobile-evolution/icon-ten-visits.png"/>
+                    <label>Loyalty Rewards</label>
+                </section>
+                <section class="small-3 columns dealer" idb="refer-friends" idname="Refer Friends">
+                    <img src="{{ STATIC_URL }}community/mobile-evolution/icon-refer-friends.png" idactive="{{ STATIC_URL }}community/mobile-evolution/icon-refer-friends-active.png" idinactive="{{ STATIC_URL }}community/mobile-evolution/icon-refer-friends.png"/>
+                    <label>Refer Friends</label>
+                </section>
+            </section>
+        </section>
+      </section>      
+</section>
+<div data-alert class="alert-box secondary" id="alertmessage" style="display: none;">
+  <p id="alwaysmessage"></p>
+  <a href="#" class="close">&times;</a>
+</div>
+<section class="row">
+    <section class="small-12 columns border">
+        <h2 class="h2 text-center">{{ business.name }}</h2>
+        <h3 class="h3 text-center">            
+            <img src="{{ STATIC_URL }}community/mobile-evolution/icon-marker.png"/>{{ business.address }}
+        </h3>
+    </section>    
+</section>
+<section class="row pre">
+    <section class="small-12 column">
+        <h2 class="h2pre">All Access</h2>        
+    </section>
+</section>
+<div class="liner"></div>
+<section id="options" class="options">
+    <ul id="first-options">
+        <li><a href="#call" idname="Call" class="actPanel"><img src="{{ STATIC_URL }}community/mobile-evolution/icon-call.png"/>Call</a></li>
+        <li><a href="#deals" idname="Orange Deals" class="actPanel" idb="orange"><img src="{{ STATIC_URL }}community/mobile-evolution/icon-deals.png"/>Deals</a></li>
+        <li><a href="#menu" idname="Menu" class="actPanel"><img src="{{ STATIC_URL }}community/mobile-evolution/icon-menu.png"/>Menu</a></li>
+        <li><a href="#directions" idname="Location" class="actPanel dir"><img src="{{ STATIC_URL }}community/mobile-evolution/icon-location.png"/>Location</a>
+        </li>
+    </ul>
+    <div class="split"></div>
+    <ul id="second-options">
+        <li><a href="#email" idname="Email" class="actPanel"><img src="{{ STATIC_URL }}community/mobile-evolution/icon-email.png"/>Email</a>
+        </li>
+        <li><a href="#social" idname="Social" class="actPanel"><img src="{{ STATIC_URL }}community/mobile-evolution/icon-social.png"/>Social</a>
+        </li>
+        <li><a href="#video" idname="Video" class="actPanel"><img src="{{ STATIC_URL }}community/mobile-evolution/icon-video.png"/>Video</a>
+        </li>
+        <li><a href="#more" idname="More" class="actPanel"><img src="{{ STATIC_URL }}community/mobile-evolution/icon-more.png"/>More</a></li>
+    </ul>
+</section>
+<section id="call-title" class="headPanel hidePanel">
+    <h2><a href="" class="back"><img src="{{ STATIC_URL }}community/elementos/left-call.png"/> Call</a></h2>
+</section>
+<section id="call" class="content-qr hideOptions">
+    <ul>
+        <li><a href="tel:{{ business.phones }}">{{ business.phones }}<img
+                src="{{ STATIC_URL }}community/elementos/call-right.png"/></a></li>
+    </ul>
+</section>
+<section id="deals-title" class="headPanel hidePanel">
+    <h2><a href="" class="back"><img src="{{ STATIC_URL }}community/elementos/left-call.png"/> Call</a></h2>
+</section>
+<!-- savings card panel -->
+<section>
+    <section class="row hide-deal" id="savings-card">
+        <section class="small-12 columns panel-deal">
+            {% if business.local_deals %}
+                <section id="panel-request-ten" class="panel-deal">
+                    <h1>10 Of Savings Cards</h1>
+                    <figure>
+                        <img src="{{ STATIC_URL }}community/mobile-deals/saving-card.png"/>
+                    </figure>
+                    <h2>Want to Save $10 at {{ business.name }}?</h2>
+                    <p>
+                        Use our free savings card to save $10 on your
+                        next visit, saving locally made easy.
+                    </p>
+                    <a href="" class="learn-more">
+                        Learn more
+                    </a>
+                    <button id="request-deal" class="button-mobile">
+                        Request Card
+                    </button>
+                </section>
+                <section id="panel-use-card">
+                    <section class="row">
+                        <section class="small-12 columns">
+                            <figure>
+                                <img src="{{ STATIC_URL }}orange-deals.png"/>
+                            </figure>
+                            <h1>
+                                $10 Off $30 or more at
+                                {{ business.name }}’s Burgers
+                            </h1>
+                            <p>
+                                <b>Valid for the next 24 hrs.</b>
+                            </p>
+                            <p class="normal">
+                                Show your screen to redeem, or hit Use Later to
+                                redeem at another time.
+                            </p>
+                            <section class="row">
+                                <button class="button-mobile small-6 columns" id="redeem-savings">
+                                    Redeem Now
+                                </button>
+                                <button class="button-mobile small-6 columns" id="later-savings">
+                                    Use Later
+                                </button>
+                            </section>
+                            <p>
+                                <b>Terms of Use</b>
+                            </p>
+                        </section>
+                    </section>
+                </section>
+                <section id="panel-redeemed-ten" class="panel-deal">
+                    <section class="row">
+                        <section class="small-12 columns">
+                            <figure>
+                                <img src="{{ STATIC_URL }}orange-deals.png"/>
+                                <img src="{{ STATIC_URL }}community/mobile-deals/icon-redeemed.png" class="redeemed">
+                            </figure>
+                            <h1>
+                                $10 Off $30 or more at
+                                {{ business.name }}’s
+                            </h1>
+                            <p>
+                                <b>Valid for the next 24 hrs.</b>
+                            </p>
+                            <p class="normal">
+                                Show your screen to redeem, or hit Use Later to
+                                redeem at another time.
+                            </p>
+                            <section class="row">
+                                <section class="small-12 columns">
+                                    <div id="used-redeem" class="used"></div>
+                                </section>
+                            </section>
+                            <section class="row">
+                                <a href="" id="" class="small-12 columns">
+                                    <img src="{{ STATIC_URL }}community/mobile-deals/icon-share-orange-deal.png"/> Share orange deal with friends
+                                </a>
+                            </section>
+                            <section class="row">
+                                <a href="" id="" class="small-12 columns">
+                                    <img src="{{ STATIC_URL }}community/mobile-deals/icon-save-smart-buys.png"/> Browse more Savings Card
+                                </a>
+                            </section>
+                            <h2>
+                                Track and save deals on your mobile
+                                device. Download to detourmaps app
+                            </h2>
+                        </section>
+                    </section>
+                </section>
+            {% else %}
+                <h1>10 Of Savings Cards</h1>
+                <section class="row">
+                    <a href="" class="feedback-deal">
+                        <img src="{{ STATIC_URL }}community/mobile-deals/icon-feedback.png"/>
+                        <div>
+                             <b>$10 {{ business.name }} SAVINGS IS CARD NOT ACCEPTING</b>
+                             AT THIS TIME
+                        </div>
+                    </a>
+                </section>
+                <h2>Good News</h2>
+                <h3>There’s Orange Deals available for {{ business.name }}</h3>
+                <p>
+                    Select from the following Orange Deals you would like this
+                    business to accept, the more requests each Orange Deal
+                    receives the sooner they will become available.
+                </p>
+                <ul class="row list-input">
+                    <li class="small-3 columns">
+                        <img src="{{ STATIC_URL }}community/mobile-deals/icon-ten-off.png"/>
+                        <input type="checkbox" name="deal" value="1">
+                    </li>
+                    <li class="small-3 columns">
+                        <img src="{{ STATIC_URL }}community/mobile-deals/icon-smart-buys.png"/>
+                        <input type="checkbox" name="deal" value="1">
+                    </li>
+                    <li class="small-3 columns">
+                        <img src="{{ STATIC_URL }}community/mobile-deals/icon-ten-visits.png"/>
+                        <input type="checkbox" name="deal" value="1">
+                    </li>
+                    <li class="small-3 columns">
+                        <img src="{{ STATIC_URL }}community/mobile-deals/icon-refer-friends.png"/>
+                        <input type="checkbox" name="deal" value="1">
+                    </li>
+                </ul>
+                <button class="button-mobile" id="request-orange">
+                    Request Orange Deals
+                </button>
+            {% endif %}
+        </section>
+    </section>
+</section>
+<!-- smart buys panel -->
+<section>
+    <section class="row hide-deal" id="smart-buys">
+        <section class="panel-deal">
+            {% if business.cuponbusiness_set.all %}
+                <div class="slidecoupons row owl-carousel" id="couponatic">
+                {% for coupon in business.cuponbusiness_set.all %}   
+                    <div class="slidecoupon small-12 columns" id="">
+                        <h1>Smart Buys</h1>                        
+                        <h2>Not your ordinary coupons</h2>
+                        <p>
+                            Smart Buys* are exclusive offers, created by
+                            local businesses to offer you the best deals
+                            and discounts
+                        </p>
+                        <p class="small-only-text-center">
+                            <span class="secondary label">*Only one coupon/promo per customer per 7 days. Valid only with your name and voucher number</span>
+                        </p>
+                        <figure>
+                            <img src="/media/{{ coupon.coupon }}" id="imgcoupon{{ coupon.id }}"/>
+                            <section class="ddown">
+                                <a href="#" data-options="align:left" data-dropdown="drop{{ coupon.id }}"><img src="{{ STATIC_URL }}community/mobile-evolution/icon-menu-deals.png"/></a>
+                                <ul id="drop{{ coupon.id }}" class="tiny small medium large content f-dropdown" data-dropdown-content>
+                                  <li><a href="#">Save to Email</a></li>
+                                  <li><a href="#">Share</a></li>
+                                  <li><a href="#">Save to Deals</a></li>
+                                  <li><a href="#">Log In</a></li>
+                                  <li><a href="#">Sign Up</a></li>
+                                  <li><a href="#">Request</a></li>
+                                </ul>
+                            </section>
+                        </figure>
+                        <input type="hidden" name="coupon" id="c{{ coupon.id }}" value="{{ coupon.id }}" />
+                        <button class="promocoupon" idimg="imgcoupon{{ coupon.id }}" idhidden="#c{{ coupon.id }}" idslide="{{ forloop.counter0 }}">
+                            I want this promo
+                        </button>
+                    </div>
+                {% endfor %}                
+                </div>
+            {% else %}
+                <h1>Smart Buys</h1>
+                <section class="row">
+                    <a href="" class="feedback-deal">
+                        <img src="{{ STATIC_URL }}community/mobile-deals/icon-feedback.png"/>
+                        <div>
+                             <b>{{ business.name }} IS NOT ACCEPTING</b>
+                             THIS DEAL AT THIS TIME
+                        </div>
+                    </a>
+                </section>
+                <h2>Good News</h2>
+                <h3>There’s Orange Deals available for {{ business.name }}</h3>
+                <p>
+                    Select from the following Orange Deals you would like this
+                    business to accept, the more requests each Orange Deal
+                    receives the sooner they will become available.
+                </p>
+                <ul class="row list-input">
+                    <li class="small-3 columns">
+                        <img src="{{ STATIC_URL }}community/mobile-deals/icon-ten-off.png"/>
+                        <input type="checkbox" name="deal" value="1">
+                    </li>
+                    <li class="small-3 columns">
+                        <img src="{{ STATIC_URL }}community/mobile-deals/icon-smart-buys.png"/>
+                        <input type="checkbox" name="deal" value="1">
+                    </li>
+                    <li class="small-3 columns">
+                        <img src="{{ STATIC_URL }}community/mobile-deals/icon-ten-visits.png"/>
+                        <input type="checkbox" name="deal" value="1">
+                    </li>
+                    <li class="small-3 columns">
+                        <img src="{{ STATIC_URL }}community/mobile-deals/icon-refer-friends.png"/>
+                        <input type="checkbox" name="deal" value="1">
+                    </li>
+                </ul>
+                <button class="button-mobile" id="request-orange">
+                    Request Orange Deals
+                </button>
+            {% endif %}
+        </section>        
+    </section>   
+    <section id="smart-dashboard" class="row hide-deal">
+        <section class="panel-deal">  
+            {% if coupons %}
+            <div class="slidecoupons row owl-carousel" id="couponatics">
+                {% for coupon in coupons %}
+                    <div class="slidecoupon small-12 columns" id="">                            
+                        <p>
+                            Must present mobile or print coupon at time of purchase
+                        </p>
+                        <figure>
+                            <img src="/media/coupon/{{ coupon.coupon.getCode }}.jpg" id="imgcoupon{{ coupon.id }}">
+                        </figure>
+                        <input type="hidden" name="coupon" id="c{{ coupon.id }}" value="{{ coupon.id }}" />
+                        <button class="redeemcoupon" idimg="imgcoupon{{ coupon.id }}" idhidden="c{{ coupon.id }}" idslide="{{ forloop.counter0 }}">
+                            Redeem Now
+                        </button>
+                    </div>
+                {% endfor %}                                              
+            </div>
+            {% else %}
+            <div class="slidecoupons row owl-carousel" id="couponaticajax">
+
+            </div>        
+            {% endif %}                
+        </section>
+    </section> 
+</section>
+<!-- Loyalty Reward -->
+<section>
+    <section class="row hide-deal" id="loyalty-rewards">
+        <section class="small-12 columns panel-deal">
+            {% if business.ten_visits %}
+                <h1>Loyalty Rewards</h1>
+                <h2>Are you a local customer?</h2>
+                <p>
+                    Get rewarded for supporting your favorites.
+                </p>
+                <figure>
+                    <img src="/media/{{ ten_visits.image }}"/>
+                </figure>
+                <h2>
+                    Earn a {{ ten_visits.name }}
+                    After your 10th Visit!
+                </h2>
+                <p>
+                    Start earning visits now by entering
+                    your latest purchase
+                </p>
+                <a href="" class="learn-more">
+                    Learn more
+                </a>
+                <button id="request-loyalty" class="button-mobile" idvisits="{{ ten_visits.pk }}">
+                    Enter Purchase
+                </button>
+            {% else %}
+                <h1>Loyalty Rewards</h1>
+                <section class="row">
+                    <a href="" class="feedback-deal">
+                        <img src="{{ STATIC_URL }}community/mobile-deals/icon-feedback.png"/>
+                        <div>
+                             <b>{{ business.name }} IS NOT ACCEPTING</b>
+                             THIS DEAL AT THIS TIME
+                        </div>
+                    </a>
+                </section>
+                <h2>Good News</h2>
+                <h3>There’s Orange Deals available for {{ business.name }}</h3>
+                <p>
+                    Select from the following Orange Deals you would like this
+                    business to accept, the more requests each Orange Deal
+                    receives the sooner they will become available.
+                </p>
+                <ul class="row list-input">
+                    <li class="small-3 columns">
+                        <img src="{{ STATIC_URL }}community/mobile-deals/icon-ten-off.png"/>
+                        <input type="checkbox" name="deal" value="1">
+                    </li>
+                    <li class="small-3 columns">
+                        <img src="{{ STATIC_URL }}community/mobile-deals/icon-smart-buys.png"/>
+                        <input type="checkbox" name="deal" value="1">
+                    </li>
+                    <li class="small-3 columns">
+                        <img src="{{ STATIC_URL }}community/mobile-deals/icon-ten-visits.png"/>
+                        <input type="checkbox" name="deal" value="1">
+                    </li>
+                    <li class="small-3 columns">
+                        <img src="{{ STATIC_URL }}community/mobile-deals/icon-refer-friends.png"/>
+                        <input type="checkbox" name="deal" value="1">
+                    </li>
+                </ul>
+                <button class="button-mobile" id="request-orange">
+                    Request Orange Deals
+                </button>
+            {% endif %}
+        </section>
+    </section>
+</section>
+
+<!-- REFER FRIENDS -->
+<section>
+    <section class="row hide-deal" id="refer-friends">
+        <section class="small-12 columns panel-deal">
+            {% if business.ten_visits %}
+                <h1>Refer Friends</h1>
+                <h2>
+                    Earn a $25 Gift Certificate when you refer
+                    five friends
+                </h2>
+                <figure>
+                    <img src="{{ STATIC_URL }}community/mobile-deals/refer-friends.png"/>
+                </figure>
+                <hr>
+                <p>
+                    If they buy a product or service from that business you are
+                    that much closer to getting $25. Enter your friends info and
+                    we will send them an email with a code and your name.
+                </p>
+                <a href="" class="learn-more">
+                    Learn more
+                </a>
+                <button id="request-friends" class="button-mobile">
+                    Enter Purchase
+                </button>
+            {% else %}
+                <h1>Refer Friends</h1>
+                <section class="row">
+                    <a href="" class="feedback-deal">
+                        <img src="{{ STATIC_URL }}community/mobile-deals/icon-feedback.png"/>
+                        <div>
+                             <b>{{ business.name }} IS NOT ACCEPTING</b>
+                             THIS DEAL AT THIS TIME
+                        </div>
+                    </a>
+                </section>
+                <h2>Good News</h2>
+                <h3>There’s Orange Deals available for {{ business.name }}</h3>
+                <p>
+                    Select from the following Orange Deals you would like this
+                    business to accept, the more requests each Orange Deal
+                    receives the sooner they will become available.
+                </p>
+                <ul class="row list-input">
+                    <li class="small-3 columns">
+                        <img src="{{ STATIC_URL }}community/mobile-deals/icon-ten-off.png"/>
+                        <input type="checkbox" name="deal" value="1">
+                    </li>
+                    <li class="small-3 columns">
+                        <img src="{{ STATIC_URL }}community/mobile-deals/icon-smart-buys.png"/>
+                        <input type="checkbox" name="deal" value="1">
+                    </li>
+                    <li class="small-3 columns">
+                        <img src="{{ STATIC_URL }}community/mobile-deals/icon-ten-visits.png"/>
+                        <input type="checkbox" name="deal" value="1">
+                    </li>
+                    <li class="small-3 columns">
+                        <img src="{{ STATIC_URL }}community/mobile-deals/icon-refer-friends.png"/>
+                        <input type="checkbox" name="deal" value="1">
+                    </li>
+                </ul>
+                <button class="button-mobile" id="request-orange">
+                    Request Orange Deals
+                </button>
+            {% endif %}
+        </section>
+    </section>
+</section>
+
+<section id="directions-title" class="headPanel hidePanel">
+    <h2><a href="" class="back"><img src="{{ STATIC_URL }}community/elementos/left-call.png"/> Directions</a></h2>
+</section>
+<section id="directions" class="content-qr hideOptions">
+    <div id="map-canvas" style="width: 100%; height: 200px;"></div>
+    <div id="directionsPanel">
+    </div>
+</section>
+<section id="email-title" class="headPanel hidePanel">
+    <h2><a href="" class="back"><img src="{{ STATIC_URL }}community/elementos/left-call.png"/> Email</a></h2>
+</section>
+<section id="email" class="content-qr hideOptions">
+    <ul>
+        <li><a href="mailto:{{ business.email }}">{{ business.email }}<img
+                src="{{ STATIC_URL }}community/elementos/call-right.png"/></a></li>
+    </ul>
+</section>
+<section id="website-title" class="headPanel hidePanel">
+    <h2><a href="" class="back-more"><img src="{{ STATIC_URL }}community/elementos/left-call.png"/> Website</a></h2>
+</section>
+<section id="website" class="content-qr hideOptions">
+    <ul>
+        <li><a href="{{ business.site }}" target="_blank">{{ business.site }}<img
+                src="{{ STATIC_URL }}community/elementos/call-right.png"/></a></li>
+    </ul>
+</section>
+<section id="menu-title" class="headPanel hidePanel">
+    <h2><a href="" class="back"><img src="{{ STATIC_URL }}community/elementos/left-call.png"/>
+        Menu|Services|Products</a></h2>
+</section>
+<section id="menu" class="content-qr hideOptions">
+    {{ business.businessmenu_set.all.0.menu|safe }}
+</section>
+<section id="video-title" class="headPanel hidePanel">
+    <h2><a href="" class="back"><img src="{{ STATIC_URL }}community/elementos/left-call.png"/> Video</a></h2>
+</section>
+<section id="video" class="content-qr hideOptions">
+    <iframe width="100%" height="315" src="http://www.youtube.com/embed/{{ business.parseId }}" frameborder="0"
+            allowfullscreen></iframe>
+</section>
+<section id="social-title" class="headPanel hidePanel">
+    <h2><a href="" class="back"><img src="{{ STATIC_URL }}community/elementos/left-call.png"/> Social Media</a></h2>
+</section>
+<section id="social" class="content-qr hideOptions">
+    <h3>Visit our:</h3>
+    <ul>
+        <li><a href="{{ business.facebook }}" target="_blank">Facebook<img
+                src="{{ STATIC_URL }}community/elementos/call-right.png"/></a></li>
+        <li><a href="{{ business.twitter }}" target="_blank">Twitter<img
+                src="{{ STATIC_URL }}community/elementos/call-right.png"/></a></li>
+    </ul>
+    <h3>Share with:</h3>
+    <ul>
+        <li><a href="#" id="faceShare"><img src="{{ STATIC_URL }}community/elementos/Facebook.png"/><img
+                src="{{ STATIC_URL }}community/elementos/call-right.png"/></a></li>
+        <li><a href="" id="twitterShare"><img src="{{ STATIC_URL }}community/elementos/Twitter.png"/><img
+                src="{{ STATIC_URL }}community/elementos/call-right.png"/></a></li>
+        <li>
+            <a href="https://plus.google.com/share?url=http%3A%2F%2F{{ request.META.HTTP_HOST }}%2Fcommunities%2F{{ business.community.url_name }}%2Fmap%2Fbusiness%2F?name={{ business.url_name }}%26auth_code={{ business.getUniqueCode }}"
+               id="plusShare"
+               onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=100%');return false;"><img
+                    src="{{ STATIC_URL }}community/elementos/Google+.png"/><img
+                    src="{{ STATIC_URL }}community/elementos/call-right.png"/></a></li>
+    </ul>
+</section>
+<script type="text/javascript">
+    $(document).on("pageinit", function () {
+        $("#faceShare").click(function (e) {
+            e.preventDefault();
+            FB.init({appId: '238434222967585', status: true, cookie: true});
+            FB.ui(
+                    {
+                        method: 'feed',
+                        name: '{{ business.name|capfirst }}',
+                        link: 'http://{{ request.META.HTTP_HOST }}/communities/{{ business.community.url_name }}/qr/?name={{ business.url_name }}&auth_code={{ business.getUniqueCode }}',
+                        picture: 'http://detourmaps.com{{ MEDIA_URL }}{{ business.imagebusiness_set.all.0.img }}',
+                        caption: '{{ business.description }}',
+                        description: '{{ business.description }}',
+                        message: 'Discover all that you want in ' + '{{ business.name|capfirst }}',
+                        redirect_uri: 'http://detourmaps.com{{ business.get_absolute_url }}'
+                    }
+            );
+        });
+        $("#twitterShare").click(function (e) {
+            e.preventDefault();
+            window.open("https://twitter.com/share?url=" + "http%3A%2F%2F" + "{{ request.META.HTTP_HOST }}" + "%2Fcommunities%2F" + "{{ business.community.url_name }}" + "%2Fmap%2Fbusiness%2F?name={{ business.url_name }}%26auth_code={{ business.getUniqueCode }}&via=detourmap", "_blank");
+        });
+    });
+</script>
+<section id="more-title" class="headPanel hidePanel">
+    <h2><a href="" class="back"><img src="{{ STATIC_URL }}community/elementos/left-call.png"/> More</a></h2>
+</section>
+<section id="more" class="content-qr hideOptions">
+    <ul>
+        <li><a href="#services" class="actPanel">Services<img src="{{ STATIC_URL }}community/elementos/call-right.png"/></a>
+        </li>
+        <li><a href="#website" class="actPanel">Website<img
+                src="{{ STATIC_URL }}community/elementos/call-right.png"/></a></li>
+        <li><a href="#events" class="actPanel">Events<img src="{{ STATIC_URL }}community/elementos/call-right.png"/></a>
+        </li>
+        <li><a href="#savings" class="actPanel">Save $10<img src="{{ STATIC_URL }}community/elementos/call-right.png"/></a>
+        </li>
+        <li><a href="#reviews" class="actPanel">Reviews<img
+                src="{{ STATIC_URL }}community/elementos/call-right.png"/></a></li>
+    </ul>
+</section>
+<section id="services-title" class="headPanel hidePanel">
+    <h2><a href="" class="back-more"><img src="{{ STATIC_URL }}community/elementos/left-call.png"/> Services</a></h2>
+</section>
+<section id="services" class="content-qr hideOptions">
+    <ul>
+        {% for serv in business.tag_service.all %}
+            <li><a style="background: url('{{ MEDIA_URL }}{{ serv.icon }}') no-repeat; height: 14px; padding-left: 30px; padding-top: 14px;">{{ serv.name }}
+                <img src="{{ STATIC_URL }}community/elementos/call-right.png"/></a></li>
+        {% endfor %}
+    </ul>
+</section>
+<section id="reviews-title" class="headPanel hidePanel">
+    <h2><a href="" class="back-more"><img src="{{ STATIC_URL }}community/elementos/left-call.png"/> Reviews</a></h2>
+</section>
+<section id="reviews" class="content-qr hideOptions">
+    <ul>
+        {% for rev in business.review_set.all %}
+            <li>
+                <p id="star-{{ rev.id }}" class="stars">
+                </p>
+                <script type="text/javascript">
+                    $(document).on("pageinit", function () {
+                        var newStar = parseInt('{{ rev.stars }}');
+                        var i = "<i class='icon-star'></i>";
+                        for (var x = 0; x < newStar - 1; x++) {
+                            i += "<i class='icon-star'></i>";
+                        }
+                        $("#star-" + "{{ rev.id }}").html(i);
+                    });
+                </script>
+                {{ rev.comment }}<br>
+                <span>Posted by {{ rev.user.username|arrobe }} on {{ rev.date|date:"M d - Y" }}</span>
+            </li>
+        {% endfor %}
+    </ul>
+    <section>
+        <a href="#addReview" class="actPanel add">Add Review</a>
+        <a href="" id="moreReviews">View More</a>
+    </section>
+</section>
+<section id="addReview-title" class="headPanel hidePanel">
+    <h2><a href="#reviews" class="back-parent"><img src="{{ STATIC_URL }}community/elementos/left-call.png"/> Add Review</a>
+    </h2>
+</section>
+<section id="addReview" class="content-qr hideOptions">
+    <section id="reviewPanel" style="display: none;">
+        <div id="userInformation"></div>
+        <div class="rating">
+            <a href="" idb="5"><i class="icon-star-empty"></i></a>
+            <a href="" idb="4"><i class="icon-star-empty"></i></a>
+            <a href="" idb="3"><i class="icon-star-empty"></i></a>
+            <a href="" idb="2"><i class="icon-star-empty"></i></a>
+            <a href="" idb="1"><i class="icon-star-empty"></i></a>
+        </div>
+        <form style="padding: 20px;">
+            <textarea name="comment" id="commentReview">
+
+            </textarea>
+            <input type="hidden" name="rateCommentReview" id="rateBiz"/>
+            <input type="hidden" name="bizCommentReview" codeBiz="{{ business.getUniqueCode }}" id="codeBiz"/>
+            <button id="btnReviewBusiness">
+                Submit Review
+            </button>
+        </form>
+    </section>
+    <section id="loginPanel" style="display: none;">
+        <form id="frmlogin" method="POST" style="padding: 0 35px;" data-ajax="true">
+            <h3>Please log in:</h3>
+
+            <div style="display: block;">
+                <div>
+                    Email
+                </div>
+                <div>
+                    <input class="inputLogin" id="frmlogin_email" type="email" name="user_email">
+                </div>
+            </div>
+            </br>
+            <div style="display: block;">
+                <div>
+                    Password:
+                </div>
+                <div>
+                    <input class="inputLogin" id="frmlogin_password" type="password" name="user_password">
+                </div>
+            </div>
+            </br>
+            <div style="display: block;">
+                <div style="display: inline-block;text-align: center;">
+                    <button id='nativeLogin' style="width: 140px;padding-left:2px" data-role="button">
+                        Login
+                    </button>
+                </div>
+            </div>
+            </br>
+            <hr width=%50 align="center">
+            <p>Don't want to create account? No problem,</br>
+                Log in by using your social media account</p>
+
+            <div style="margin: auto; background-color: #3B5998; width: 100%;"><a id="logFacebook" href=""
+                                                                                  style="display: block; color: #fff !important; padding: 10px; text-align: center; font-size: 16px; margin-top: 10px;"><i
+                    class="icon-facebook"></i>acebook</a></div>
+        </form>
+        <script type="text/javascript">
+            $(document).on("pageinit", function () {
+                $("#logFacebook").click(function (e) {
+                    e.preventDefault();
+                    var href = "https://graph.facebook.com/oauth/authorize?client_id=540480642657288&scope=publish_stream,email&display=popup&redirect_uri=" + encodeURIComponent(window.location.href);
+                    document.location.href = href;
+                });
+                $("div.rating a").click(function (e) {
+                    var rate = $(this).attr("idb");
+                    $("#rateBiz").val(rate);
+                    new Messi("Thanks please now you do your comment!", {title: 'DetourMaps - Rate System', modal: true});
+                    e.returnValue = false;
+                    return false;
+                });
+                $("#btnReviewBusiness").click(function (e) {
+                    e.preventDefault();
+                    var tag = $("#codeBiz").attr("codeBiz");
+                    var rateBiz = $("#rateBiz").val();
+                    var commentBiz = $("#commentReview").val();
+                    $.getJSON('{% url "save_review" %}', {'tag': tag, 'commentBiz': commentBiz, 'rateBiz': rateBiz}, function (data) {
+                        new Messi(data.msg, {title: 'DetourMaps - Rate System', modal: true});
+                    });
+                });
+            })
+        </script>
+    </section>
+</section>
+<section id="coupons-title" class="headPanel hidePanel">
+    <h2><a href="" class="back"><img src="{{ STATIC_URL }}community/elementos/left-call.png"/> Coupon</a></h2>
+</section>
+<section id="coupons" class="content-qr hideOptions">
+    <section>
+        <a href="#shareOptions" class="actPanel">Share</a>
+        <a href="" id="printCoupon">Download</a>
+    </section>
+    <figure>
+        <img src="{{ MEDIA_URL }}{{ business.cuponbusiness_set.all.0.img }}"/>
+    </figure>
+</section>
+<section id="shareOptions-title" class="headPanel hidePanel">
+    <h2><a href="#coupons" class="back-parent"><img src="{{ STATIC_URL }}community/elementos/left-call.png"/> Back</a>
+    </h2>
+</section>
+<section id="shareOptions" class="content-qr hideOptions">
+    <section>
+        <h3>Share with:</h3>
+        <ul>
+            <li><a href="#" id="faceShareCoupon"><img src="{{ STATIC_URL }}community/elementos/Facebook.png"/><img
+                    src="{{ STATIC_URL }}community/elementos/call-right.png"/></a></li>
+            <li><a href="" id="twitterShareCoupon"><img src="{{ STATIC_URL }}community/elementos/Twitter.png"/><img
+                    src="{{ STATIC_URL }}community/elementos/call-right.png"/></a></li>
+            <li>
+                <a href="https://plus.google.com/share?url=http%3A%2F%2F{{ request.META.HTTP_HOST }}%2Fcommunities%2Fprint%2Fcoupon?source={{ business.getUniqueCode }}"
+                   id="plusShareCoupon"
+                   onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=100%');return false;"><img
+                        src="{{ STATIC_URL }}community/elementos/Google+.png"/><img
+                        src="{{ STATIC_URL }}community/elementos/call-right.png"/></a></li>
+        </ul>
+    </section>
+</section>
+<script type="text/javascript">
+    $(document).on("pageinit", function () {
+        $("#faceShareCoupon").click(function (e) {
+            e.preventDefault();
+            FB.init({appId: '238434222967585', status: true, cookie: true});
+            FB.ui(
+                    {
+                        method: 'feed',
+                        name: '{{ business.name|capfirst }}',
+                        link: 'http://{{ request.META.HTTP_HOST }}/communities/print/coupon?source=' + '{{ business.getUniqueCode }}',
+                        picture: 'http://detourmaps.com{{ MEDIA_URL }}{{ business.imagebusiness_set.all.0.img }}',
+                        caption: '{{ business.description }}',
+                        description: '{{ business.description }}',
+                        message: 'Discover all that you want in ' + '{{ business.name|capfirst }}',
+                        redirect_uri: 'http://detourmaps.com{{ business.get_absolute_url }}'
+                    }
+            );
+        });
+        $("#twitterShareCoupon").click(function (e) {
+            e.preventDefault();
+            window.open("https://twitter.com/share?url=" + "http%3A%2F%2F{{ request.META.HTTP_HOST }}%2Fcommunities%2Fprint%2Fcoupon?source=" + "{{ business.getUniqueCode }}&via=detourmap", "_blank");
+        });
+    });
+</script>
+<section id="savings-title" class="headPanel hidePanel">
+    <h2><a href="" class="back-more"><img src="{{ STATIC_URL }}community/elementos/left-call.png"/> Shop Local & Save
+        $10</a></h2>
+</section>
+<section id="savings" class="content-qr hideOptions">
+    <section>
+        <p>
+            With our color coded Savings Card you can save $10 on your next
+            purchase of <span class="thirty">$30</span> - <span class="fourty">$40</span> - <span
+                class="fifty">$50</span>
+        </p>
+
+        <p>
+            This free savings card is available with our printed maps and you can
+            also request one here. Just fill out the form below and download
+        </p>
+    </section>
+    <section>
+        <form id="formSavings" action="" method="post">
+            <input type="text" name="name" placeholder="Name*" id="nameBusinessField"/>
+            <input type="text" name="phone" placeholder="Phone*" id="emailBusinessField"/>
+            <input type="email" name="email" placeholder="Email*" id="phoneBusinessField"/>
+            <select name="community">
+                <option value="sel"> -- Choose a Community --</option>
+                {% for c in communities %}
+                    <option value="{{ c.url_name }}">{{ c.name }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    </section>
+    <section id="shared">
+        <a href="">Share</a>
+        <a href="" id="downloaddeal">Download</a>
+    </section>
+    <h4>Already have a card?</h4>
+    <section>
+        <p>
+            Check out where you can save $10
+        </p>
+        <ul>
+            <li><a>Participating Communities<img src="{{ STATIC_URL }}community/elementos/call-right.png"/></a></li>
+        </ul>
+    </section>
+</section>
+<section id="events-title" class="headPanel hidePanel">
+    <h2><a href="" class="back-more"><img src="{{ STATIC_URL }}community/elementos/left-call.png"/> Events</a></h2>
+</section>
+<section id="events" class="content-qr hideOptions">
+    <ul>
+        {% for event in events %}
+            <li><a href="{{ event.get_landing_event }}">{{ event.title }}<img src="{{ STATIC_URL }}community/elementos/call-right.png"/></a></li>
+        {% endfor %}
+    </ul>
+</section>
+<section class="row orange-deals">
+    <nav>
+        <ul>
+            <li id="save-li" class="small-12 column">
+                <a href="#save-to">Save To</a>
+            </li>
+            <li id="share-li" class="small-12 column">
+                <a href="#share">Share</a>
+            </li>
+            <li id="dashboard-li" class="small-12 column">
+                <a href="#dashboard">My Dashboard</a>
+            </li>
+            <li id="login-li" class="small-12 column">
+                <a href="#log-in">Log In</a>
+            </li>
+            <li id="signup-li" class="small-12 column">
+                <a href="#sign-up">Sign Up</a>
+            </li>
+            <li id="request-li" class="small-12 column">
+                <a href="#request">Request</a>
+            </li>
+        </ul>
+    </nav>
+</section>
+<section class="row more">
+    <ul>
+        <li class="small-12 column">
+            <a href="">What’s Popular</a>
+            <div class="more-info">
+                {{ business.description }}
+            </div>
+        </li>        
+        <li class="small-12 column">
+            <a href="">Gallery</a>
+            <div class="more-info">
+                <div id="owl-gallery" class="owl-carousel">
+                    {% for h in business.imagegallery_set.all %}
+                        <img src="/media/{{ h.img }}" class="thumb" alt="{{ h.name }}"/>
+                    {% endfor %}
+                </div>
+            </div>
+        </li>
+        <li class="small-12 column"><a href="">Events</a></li>
+        <li class="small-12 column"><a href="">Rank</a></li>
+    </ul>
+</section>
+<section class="row" id="footer">
+    <ul>
+        <li class="small-4 columns"><a href="">Terms</a></li>
+        <li class="small-4 columns"><a href="">Contact</a></li>
+        <li class="small-4 columns"><a href="">Promotions</a></li>
+    </ul>
+</section>
+<section class="row">
+    <p class="small-12 column pcopy">&copy; 2013 powered by Entire Marketing LLC, all rights reserved</p>
+</section>
+
+<!-- panel sign -->
+<section id="panel-sign" class="reveal-modal full" data-reveal>
+    <section id="signin">
+        <section class="row">                        
+            <section class="small-12 small-centered columns" id="wrapsign">
+                <h1><img src="{{ STATIC_URL }}community/mobile-evolution/icon-login.png" alt="Sign In" /></h1>
+                <section class="formsign">
+                    <form id="formsignin">
+                        <label for="user_email">Email</label>
+                        <input type="text" name="user_email" id="user_email"/>
+                        <label for="user_password">Password
+                        <a href="" class="forgot">
+                            Forgot Password?
+                        </a>
+                        </label>
+                        <input type="password" name="user_password" id="user_password"/>
+                        <input type="hidden" name="hidden_promo_login" id="hidden_promo_login">
+                        <ul class="inline row">
+                            <li class="small-6 columns">
+                                <button class="btnsign">
+                                    Sign In
+                                </button>
+                            </li>
+                            <li class="small-6 columns">
+                                <a href="#" data-reveal-id="signup">Create an account</a>
+                            </li>
+                        </ul>
+                    </form> 
+                    <section class="row">
+                        <h3 class="or">Or login with</h3>
+                        <ul class="row">
+                            <li class="small-6 columns">
+                                <a class="socialsign" href=""><img src="{{ STATIC_URL }}community/mobile-evolution/icon-facebook.png"/>Facebook</a>
+                            </li>
+                            <li class="small-6 columns">
+                                <a class="socialsign" href=""><img src="{{ STATIC_URL }}community/mobile-evolution/icon-google+.png"/>Google</a>
+                            </li>
+                        </ul>
+                    </section>                   
+                    <h3>
+                        <a href="" class="close-sign">Close</a>
+                    </h3>
+                </section>
+            </section>
+        </section>                
+    </section>    
+    <a class="close-reveal-modal">&#215;</a>
+</section>
+<section id="signup" class="reveal-modal full" data-reveal>
+    <section id="signedup">
+        <section class="row">
+        <section class="small-12 small-centered columns" id="wrapsignup">
+                <h1><img src="{{ STATIC_URL }}community/mobile-evolution/icon-login.png" alt="Sign In" /></h1>
+                <section class="formsign">
+                    <form id="formsigninup">
+                        <div class="row">
+                            <div class="large-12 small-12 columns">
+                                <label for="emailuserdeal">
+                                    Email                                    
+                                </label> 
+                                <input type="text" name="emailuserdeal" id="emailuserdeal"/>                       
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="large-6 small-6 columns">
+                                <label for="emailuserdeal">
+                                    First Name                                    
+                                </label>      
+                                <input type="text" name="firstname" id="firstname"/>                  
+                            </div>
+                            <div class="large-6 small-6 columns">
+                                <label for="emailuserdeal">
+                                    Last Name                                    
+                                </label>     
+                                <input type="text" name="lastname" id="lastname"/>   
+                                <input type="hidden" name="hidden_promo_sign" id="hidden_promo_sign">
+                            </div>
+                        </div>
+                        <ul class="inline row">
+                            <li class="small-12-columns">
+                                    By signing up, I agree to the <a href="">terms of service</a>
+                            </li>
+                            <li class="small-12 columns">
+                                <button class="btnsign">
+                                    Sign Up
+                                </button>
+                            </li>                            
+                        </ul>
+                        <div class="row">
+                            <p class="large-12 small-12 columns text-center"><span class="warning label">Check your e-mail for more information</span></p>
+                        </div>
+                    </form>                                                         
+                </section>
+            </section>
+        </section>
+    </section>
+    <a class="close-reveal-modal">&#215;</a>
+</section>
+<section id="passwordchange" class="reveal-modal full" data-reveal>
+    <div class="inside">
+        <p style="font-size:12px;">Please retrieve your temporary password from your
+            e-mail and change it</p>
+
+        <form id="passChange" action="" method="post">
+            <p>
+                <label for="oldPass">Temporary Password</label><br>
+                <input type="password" placeholder="" name="old_password" id="oldPass"
+                       class="required">
+            </p>
+
+            <p>
+                <label for="newPass">New Password</label><br>
+                <input type="password" placeholder="" name="new_password" id="newPass"
+                       class="required">
+            </p>
+
+            <p>
+                <label for="reNewPass">Re-type New Password</label><br>
+                <input type="password" placeholder="" name="reNewPass" id="reNewPass"
+                       class="required">
+            </p>
+            <input type="hidden" name="user_id" value="" id="user_id"/>
+            <p class="submit">
+                <button style="background-color:#2cadb0; border:none; border-radius:5px; cursor: pointer;
+color:#fff; font-weight:700; font-size:12px;">Save Password
+                </button>
+            </p>
+        </form>
+    </div>
+    <a class="close-reveal-modal">&#215;</a>
+</section>
+<!-- menu panel -->
+<section id="panel-menu">
+    <nav class="row">
+        <ul id="panel-list-menu">
+            <li>
+                <a href="" class="small-12 columns">
+                    Neighborhoods
+                    <i><img src="{{ STATIC_URL }}community/mobile-deals/icon-list-menu.png"/></i>
+                </a>
+            </li>
+            <li>
+                <a href="" class="small-12 columns">
+                    Orange Deals
+                    <i><img src="{{ STATIC_URL }}community/mobile-deals/icon-list-menu.png"/></i>
+                </a>
+            </li>
+            <li>
+                <a href="" class="small-12 columns">
+                    Sign In
+                    <i><img src="{{ STATIC_URL }}community/mobile-deals/icon-list-menu.png"/></i>
+                </a>
+            </li>
+            <li>
+                <a href="" class="small-12 columns">
+                    Events
+                    <i><img src="{{ STATIC_URL }}community/mobile-deals/icon-list-menu.png"/></i>
+                </a>
+            </li>
+            <li>
+                <a href="" class="small-12 columns">
+                    About
+                    <i><img src="{{ STATIC_URL }}community/mobile-deals/icon-list-menu.png"/></i>
+                </a>
+            </li>
+            <li>
+                <a href="" class="small-12 columns">
+                    Emergency Numbers
+                    <i><img src="{{ STATIC_URL }}community/mobile-deals/icon-list-menu.png"/></i>
+                </a>
+            </li>
+            <li>
+                <a href="" class="small-12 columns" id="close-menu">
+                    Close
+                    <i><img src="{{ STATIC_URL }}community/mobile-deals/icon-close-menu.png"/></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</section>
+<section id="backy" style="display:none;">
+    <a href="" class="backy">
+        <img src="{{ STATIC_URL }}community/mobile-evolution/back.jpg"/>
+    </a>
+</section>
+<section id="message">
+    <h2></h2>
+</section>
+<div id="myModal" class="reveal-modal full" data-reveal>
+  <h2></h2>
+  <p class="lead"></p>
+  <a class="close-reveal-modal">&#215;</a>  
+</div>
+  <script src="{{ STATIC_URL }}foundation/js/foundation.min.js"></script>
+  <script>
+    $(document).foundation();
+  </script>
+</body>
+</html>

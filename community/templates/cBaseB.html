@@ -1,0 +1,2612 @@
+{% extends 'base-new.html' %}
+{% load queryset %}
+{% load thumbnail %}
+
+{% block title %}{% if business %}{{ business.name|capfirst }}
+        {% else %}{{ community.name|capfirst }}{% endif %}{% endblock %}
+{% block head %}
+    <meta name="Description" content="{% if business %}{{ business.description }} - DetourMaps
+            {% else %}{{ community.description }} - DetourMaps{% endif %}">
+    <!--Dinamicos-->
+    <meta name="Keywords" content="{{ community.keywords }}">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}community/css/dtmfront-evolution.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}community/css/style_home.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}animation/style.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}web-icon/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="{{ STATIC_URL }}custom-theme/jquery-ui-1.10.3.custom.css"/>    
+    <link rel="stylesheet" href="{{ STATIC_URL }}community/nivo-slider/nivo-slider.css" type="text/css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}community/nivo-slider/themes/dark/dark.css" type="text/css" />
+    <script src="{{ STATIC_URL }}community/nivo-slider/jquery.nivo.slider.pack.js" type="text/javascript"></script>
+    <style>
+        body {
+            background: #fff !important;
+        }
+
+        .overmenu {
+            z-index: 10000;
+        }
+
+        .menuJoin {
+            display: none;
+        }
+
+        .menuJoin li {
+            width: 100%;
+        }
+
+        .menuJoin li a {
+            text-align: left !important;
+        }
+
+        .bars_container {
+            z-index: 1 !important;
+        }
+
+            /* Bootstrap Css Map Fix*/
+        #map img {
+            max-width: none;
+        }
+
+            /* Bootstrap Css Map Fix*/
+        #map label {
+            width: auto;
+            display: inline;
+        }        
+    </style><!--comment//-->    
+    <script src="/user/js/utils_sys" type="text/javascript"></script>
+    <script src="http://code.jquery.com/ui/1.8.23/jquery-ui.min.js" type="text/javascript"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>    
+    <script defer type="text/javascript" src="{{ STATIC_URL }}community/js/utils.js"></script>
+    <script defer type="text/javascript" src="{{ STATIC_URL }}community/js/jquery.validate.min.js"></script>    
+    <script src='http://connect.facebook.net/en_US/all.js'></script>
+    <script type="text/javascript">
+        var _pop = null;
+        var map = null;
+        var cmData = false;
+        var tab = {};
+        var coupons_flag = false;
+        var session = "{{ request.session.user }}";
+        {% if tab %}
+            {% if tab.subtab %}
+                tab['tab'] = '{{ tab.tab }}';
+                tab['subtab'] = '{{ tab.subtab }}';
+
+            {% else %}
+                tab['tab'] = '{{ tab.tab }}';
+                $("a#{{ tab.tab }}SubFooter").trigger("click");
+            {% endif %}
+        {% else %}
+            $("a#infoSubFooter").trigger("click");
+        {% endif %}
+        $.getJSON('{% url 'data' community.url_name %}', function (data) {
+            cmData = data;
+            $("#messageAjax").hide();
+            detourmaps['events'] = data.events;
+
+            detourmaps.events.sort(function (a, b) {
+                return (new Date(a.date.year, a.date.month, a.date.day)) - (new Date(b.date.year, b.date.month, b.date.day));
+            });
+            loadEvents();
+        });
+    </script>
+    <!--[if lt IE 9]>
+        <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}community/js/raphael-min.js"></script>
+    <![endif]-->
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}community/js/infobubble.js"></script>
+    <script defer type="text/javascript" src="{{ STATIC_URL }}community/js/richmarker.js"></script>
+    <script>
+        var mapConstructorURL = '{% url 'map' "replace" %}';
+        var curCommunity = '{{ community.name }}';
+        var communities = [
+            {% for c in communities %}
+                {
+                    name: '{{ c.name }}',
+                    url_name: '{{ c.url_name }}',
+                    geojson: {{ c.borders.geojson|safe }}
+                },
+            {% endfor %}
+        ];
+    </script>
+    <script type="text/javascript">
+        function setTabName(newParameter){
+            var text = location.href;
+            var newSrc = newParameter;
+            var newText = text.replace(/(tab=).*?(&)/,'$1' + newSrc + '$2');
+        };
+        function updateQueryStringParameter(uri, key, value) {
+          var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+          var separator = uri.indexOf('?') !== -1 ? "&" : "?";
+          if (uri.match(re)) {
+            return uri.replace(re, '$1' + key + "=" + value + '$2');
+          }
+          else {
+            return uri + separator + key + "=" + value;
+          }
+        };
+        function changeLocation(uri){
+            if (typeof window.history.pushState == 'function') {
+                window.history.replaceState({tab: uri, url: uri}, uri, uri);
+                //window.location.hash = "#!/" + urlPath;
+                window.history.pushState(uri, "Titulo", uri);
+            } else {
+                //window.location.hash = "#!/" + urlPath;
+                window.history.pushState(uri, "Titulo", uri);
+            }
+        }
+        function translape(index, lista, _this){
+            $("#wrapper-slide-deals").css("transform","translateX("+index * -25+"%)");
+            $("a.barNavDeals").not(_this.find("a")).removeClass('active');
+            _this.find("a").addClass('active');
+            for(var x=0; x<lista.length; x++){
+                $(lista[x]).find("img").attr("src", $(lista[x]).attr("inactive"));
+            }
+            var active = _this.find("a").attr("active");
+            _this.find("a").find("img").attr("src", active);
+            var tabNameDeals = _this.find("a").attr("name");
+            var uri = updateQueryStringParameter(location.href, "tab", "deals|" + tabNameDeals);
+            changeLocation(uri);
+        }
+        function showPanels(_this){
+            $("div#navigation ul li div.activeNav").not(_this.next()).hide();
+            _this.next().show();
+            var tabName = _this.attr("name");
+            var uri = updateQueryStringParameter(location.href, "tab", tabName);
+            changeLocation(uri);
+            var reference = _this.attr("href");
+            $(".panelBusiness").not($(reference)).hide();
+            $(reference).show();
+        }
+        $(document).ready(function(){
+            var linavdeal = $("a.barNavDeals");
+            var _hoverride = $(window).height();
+            var _realHOverride = _hoverride - (121+(340*0.2));
+            $("div#map").css({
+                height: _realHOverride
+            });
+            if ($.browser.msie) {
+                $('body').addClass('ie');
+                if ($.browser.version == 7) $('body').addClass('ie7');
+                if ($.browser.version == 8) $('body').addClass('ie8');
+                if ($.browser.version == 9) $('body').addClass('ie9');
+            }
+            if ($(window).width() <= 1400 && $(window).width() >= 1281) {
+                $("div#navigation ul li a").css("width", "74");
+                $("div#navigation ul li a label").css("font-size", "0.9em");
+            }
+            if ($(window).width() <= 1280 && $(window).width() >= 1025) {
+                $("div#navigation ul li a").css("width", "55");
+                $("div#navigation ul li a label").css("font-size", "0.8em");
+            }
+            if ($(window).width() <= 1024 && $(window).width() >= 800) {
+                $("div#navigation ul li a").css("width", "50");
+                $("div#navigation ul li a label").css("font-size", "0.75em");
+            }
+            $(window).resize(function (e) {
+                if ($(window).width() <= 1400 && $(window).width() >= 1281) {
+                    $("div#navigation ul li a").css("width", "74");
+                    $("div#navigation ul li a label").css("font-size", "0.9em");
+                }
+                if ($(window).width() <= 1280 && $(window).width() >= 1025) {
+                    $("div#navigation ul li a").css("width", "55");
+                    $("div#navigation ul li a label").css("font-size", "0.8em");
+                }
+                if ($(window).width() <= 1024 && $(window).width() >= 800) {
+                    $("div#navigation ul li a").css("width", "50");
+                    $("div#navigation ul li a label").css("font-size", "0.75em");
+                }
+            });
+            $(function () {
+                $("#datepicker").datepicker({
+                    dateFormat: "yy-mm-dd",
+                    onSelect: function (dataText, inst) {
+                        var getVal = $("#hideBizEvents").val();
+                        var getValSplit = getVal.split("/");
+                        var tag = getValSplit[1];
+                        ;
+                        $.getJSON('{% url 'get_events' %}', {'tag': tag, 'date': dataText}, function (data) {
+                            if (data.msg) {
+                                var allEvents = $("#allEventsByDateByBiz");
+                                allEvents.html("");
+                                for (var i = 0; i < data.lists.length; i++) {
+                                    var divEvent = "<div class='eventUnique'><h3>" + data.lists[i].date + ":" + data.lists[i].title + "</h3><p>" + data.lists[i].description + "</p><div class='tagInfoEvent'>" + data.lists[i].address + "</div><div class='tagInfoEvent'>Phone: " + data.lists[i].phone + "</div></div>";
+                                    allEvents.append(divEvent);
+                                }
+                            } else {
+                                new Messi(data.Q + ' Events for ' + data.biz, {title: 'DetourMaps - Events System', modal: true});
+                                var allEvents = $("#allEventsByDateByBiz");
+                                allEvents.html("");
+                            }
+                        });
+                    }
+                });
+                $("#datevist").datepicker({
+                    dateFormat: "yy-mm-dd"
+                });
+            });            
+            $('li.itemNavDeals, li#ten-off-ctrl, li#smart-buys-ctrl, li#ten-visits-ctrl, li#refer-friends-ctrl').click(function(e){
+                e.preventDefault();
+                translape($(this).index(), linavdeal, $(this));
+            });
+            $("#reviewPanelSubFooter h3").remove("span");
+            var listaBarNavigation = $("a.barNavigation");
+            $(listaBarNavigation[0]).next().show();
+            $("a.barNavigation, a#infoSubFooter, a#shareSubFooter, a#dealsSubFooter, a#directionSubFooter, a#menuSubFooter, a#videoSubFooter, a#eventSubFooter").click(function (e) {
+                showPanels($(this));
+                e.returnValue = false;
+                return false;
+            });
+        })
+    </script>
+    <script defer type="text/javascript" src="{{ STATIC_URL }}community/js/dtmfront.js"></script>
+
+{% endblock %}
+<script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-31412199-1']);
+    _gaq.push(['_setDomainName', 'detourmaps.com']);
+    _gaq.push(['_trackPageview']);
+
+    (function () {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+    })();
+</script>
+<div id="fb-root"></div>
+<script>(function (d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "//connect.facebook.net/es_LA/all.js#xfbml=1&appId=238434222967585";
+    fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+<!-- Container -->
+{% block general-header %}    
+    <header class="tbar"
+            style="height: 60px;background: #414042; border-bottom: 1px solid #ffffff; position: relative;">
+        <a class="logo" href="/"><img src="{{ STATIC_URL }}community/img/detour_logo.png" alt="detourMaps"/></a>
+
+        <div class="tmenu communities">
+            <h1>{{ community.name }}</h1>
+            <ul class="menu">
+                {% for c in communities %}
+                    <li><a href="{% url "map" c.url_name %}">{{ c.name }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="{% url "discover" community.url_name %}">Discover</a></li>
+                <li><a id="a_overSavings" href="{% url "deals" community.url_name %}">Deals</a></li>
+                <li>
+                    <a href="{% url "events" community.url_name %}">
+                        <div id="events_icon" style="margin-top: 25px;display: none;">
+                            <svg x="0px" y="0px" width="20px" height="20px" viewBox="0 0 30 30"
+                                 enable-background="new 0 0 30 30" xml:space="preserve">
+                                <circle fill="#F15A29" cx="14.761" cy="15.101" r="14.289"/>
+                                <path fill-rule="evenodd" clip-rule="evenodd" fill="#F8F4F6" d="M15.221,3.717c0.108,0.537-0.261,0.601-0.308,0.986c0.444-0.127,1.899-1.011,2.144,0c0.45-0.147,0.936-0.373,1.529-0.272c0.073,0.132,0.24,0.168,0.205,0.405c0.594-0.233,1.642-0.315,2.311-0.099c-0.259,0.227-0.652,0.32-0.951,0.509c0.278,0.244,0.682,0.362,0.749,0.816c-1.059-0.283-2.356,0.793-2.822,0.067c-0.502,0.15-1.68,1.304-1.835,0.103c-0.445,0.114-0.789,0.465-1.362,0.338c0,0.274,0,0.545,0,0.817c0.37,0.413,0.896,0.631,1.326,0.987c0.847,0.698,1.866,1.13,2.891,1.699c0.245,0.138,0.495,0.276,0.749,0.409c0.242,0.129,0.442,0.32,0.68,0.442c0.641,0.33,1.369,0.526,1.938,0.985c0.032,1.056-0.069,1.973-0.815,2.245c-0.059,2.155,0.015,3.9,0.51,5.439c0.229,0.724,0.48,1.408,0.713,2.076c-0.874,0.533-2.611,1.052-4.25,1.056c-0.641,0-1.768,0.104-2.21-0.105c-0.249-0.114-0.397-0.503-0.51-0.78c-0.656-0.138-1.551-0.038-2.312-0.067c-0.24,0.385-0.279,0.969-0.649,1.225c-0.67-0.163-1.361,0.151-2.041,0.101c-0.125-0.009-0.248-0.089-0.37-0.101c-0.778-0.085-1.563-0.074-2.279-0.205c-0.277-0.051-0.604-0.156-0.883-0.237c-0.295-0.086-0.627-0.168-0.854-0.273c-0.214-0.098-0.349-0.34-0.61-0.34c0.282-1.148,0.984-2.281,1.155-3.705c0.135-1.116,0.213-2.313,0.203-3.64c-1.052-0.251-0.927-1.584-0.814-2.79c2.813-1.258,5.428-2.708,7.722-4.488c0.052-0.932,0.055-1.912,0.134-2.822C13.254,4.08,14.735,2.802,15.221,3.717z M8.588,14.496"/>
+                            </svg>
+                        </div>
+                        Events
+                    </a>
+                </li>
+                <li id="partners">
+                    <a href="#">
+                        Community Partners
+                    </a>
+                    <ul class="menuJoin">
+                        {% list_partners community.id %}
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="user-set" name="perfiles">
+            <ul>
+                {% if request.session.user %}
+                    <li>
+                        <a href="" class="overLogin" name="perfiles"><span
+                                class="newLog">{{ request.session.user }}</span></a>
+                        <ul class="perfiles" id="">
+                            <li><a href="{% url 'profile_user' %}">Profile</a></li>
+                            <li><a href="{% url 'accountSettings' %}">Dashboard</a></li>
+                            <li><a href="{% url 'goodbye' %}">Log Out</a></li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li>
+                        <form id="barfakelogin">{% csrf_token %}<label><input type="email" placeholder="Enter email address" class="suscribe-field" name="emailuserdeal"/><button id="btnsignup">Sign Up</button></label></form>
+                    </li>
+                    <li>
+                        <a href="{% url 'loginUser' %}" class="account">Log in</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </header>
+{% endblock %}
+{% block bar-container %}
+    <div class="bars_container pure-g-r">
+    <div id="left_bar" show="true" class="pure-u-1-4">
+            <div class="show_hide">
+                <div class="wrap-search">
+                    <div class="text-search">Search</div>
+                </div>
+                <div class="search">
+                    <div>
+                        <label>
+                            <strong>Search:</strong>
+                            <input name="q" type="search" autocomplete="on" placeholder="e.g. Famous Dave's"/>
+                        </label>
+
+                        <div class="search-icon"><img src="{{ STATIC_URL }}community/img/icons/detoursearch.png"
+                                                      alt="search"/></div>
+                    </div>
+                </div>
+            </div>
+            <div class="cat-title"></div>
+            <div class="cat-content"></div>
+        </div>
+        <div class="pure-u-3-4">
+            <div id="categories">
+                <ul cellSpacing="0">
+                    {% for category in categories %}
+                        <li id="cat-{{ forloop.counter0 }}" class="cat">
+                            <div class="cat-title">
+                                <div class="img" style="background-image: url('/media/{{ category.icon }}')"></div>
+                                <div><span class="title">{{ category.name }}</span></div>
+                            </div>
+                            <div class="cat-content">
+                                <div class="cat-filter">
+                                    <form id="categories{{ category.id }}" action="#">
+                                        <span>Filter: </span>
+                                        {% listServiceByCategoryByBusiness community.id category.id %}
+                                    </form>
+                                </div>
+                                <div class="cat-list">
+                                    <ul>
+                                        {% list_business community.id category.id %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
+{% block content %}
+   
+    <div id="map">
+        <div id="messageAjax">
+            <i class="icon-cog icon-spin icon-large"></i> "Detourmaps, Building Communities"
+        </div>
+    </div>
+    <div id="track">
+        DON’T FORGET TO TRACK AND SAVE YOUR DEALS - {% if request.session.user %}<a href="{% url 'accountSettings' %}" class="linky">GO TO  MY DASHBOARD</a>{% else %}<a href="{% url 'loginUser' %}" class="linky">Sign In</a> or <a href="{% url 'registerUser' %}" class="linky">Sign Up</a>{% endif %}
+        <a href="" id="close_track"><img src="{{ STATIC_URL }}community/evolution/close-message.png"/></a>
+    </div>
+    <div id="greatFooter">
+    <div id="subFooter">
+    <div style="" id="headerSubFooter">
+        <div id="infoBizSubFooter">
+            <div id="nameSubFooter"></div>
+            <div id="addressSubFooter"></div>
+            <div id="rating">
+                <ul>
+                    <li></li>
+                </ul>
+            </div>
+        </div>
+        <div id="navigation">
+            <ul>
+                <li>
+                    <a id="infoSubFooter" href="#infoPanelSubFooter" class="barNavigation" getschedule="" name="info">
+                        <img src="{{ STATIC_URL }}community/evolution/bar/info.png"/>
+                        <label>Info</label>
+                    </a>
+
+                    <div class="activeNav">
+                    </div>
+                </li>
+                <li>
+                    <a id="dealsSubFooter" href="#dealsPanelSubFooter" class="barNavigation" name="deals">
+                        <img src="{{ STATIC_URL }}community/evolution/bar/deals.png"/>
+                        <label>Deals</label>
+                    </a>
+
+                    <div class="activeNav">
+                    </div>
+                </li>
+
+                <li>
+                    <a id="shareSubFooter" href="#sharePanelSubFooter" class="barNavigation" name="share">
+                        <img src="{{ STATIC_URL }}community/evolution/bar/share.png"/>
+                        <label>Share</label>
+                    </a>
+
+                    <div class="activeNav">
+                    </div>
+                </li>
+
+                <li>
+                    <a id="directionSubFooter" href="#directionPanelSubFooter" class="barNavigation" name="direction">
+                        <img src="{{ STATIC_URL }}community/evolution/bar/directions.png"/>
+                        <label>Directions</label>
+                    </a>
+
+                    <div class="activeNav">
+                    </div>
+                </li>
+                <li>
+                    <a id="menuSubFooter" href="#menuPanelSubFooter" class="barNavigation" getmenu="" name="menu">
+                        <img src="{{ STATIC_URL }}community/evolution/bar/menu.png"/>
+                        <label>Menu</label>
+                    </a>
+
+                    <div class="activeNav">
+                    </div>
+                </li>
+                <li>
+                    <a id="videoSubFooter" href="#videoPanelSubFooter" class="barNavigation" name="video">
+                        <img src="{{ STATIC_URL }}community/evolution/bar/videos.png"/>
+                        <label>Video</label>
+                    </a>
+
+                    <div class="activeNav">
+                    </div>
+                </li>
+                <li>
+                    <a id="eventSubFooter" href="#eventPanelSubFooter" class="barNavigation" name="event">
+                        <img src="{{ STATIC_URL }}community/evolution/bar/events.png"/>
+                        <label>Events</label>
+                    </a>
+
+                    <div class="activeNav">
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div id="infoPanelSubFooter" class="panelBusiness">
+        <div id="descSubFooter"></div>
+        <div id="contactSubFooter">
+            <div id="phoneBusiness" class="rowInfo">Phone
+                <div></div>
+            </div>
+            <div id="faxBusiness" class="rowInfo">Fax
+                <div></div>
+            </div>
+            <div id="websiteBusiness" class="rowInfo">Web<a href=""></a></div>
+        </div>
+        <div id="servicesSubFooter">
+            <h3>Services</h3>
+            <ul>
+
+            </ul>
+        </div>
+        <div id="scheduleSubFooter">
+            <div id="iconSchedule">
+                <img src="{{ STATIC_URL }}community/elementos/clock.png"/>
+                Hours
+            </div>
+            <div id="schedule"></div>
+        </div>
+    </div>
+    <div id="sharePanelSubFooter" class="panelBusiness">
+        <h3>Share this spot with friends & family</h3>
+
+        <div id="shareButtons">
+            <img src="{{ STATIC_URL }}community/elementos/network.png" usemap="#mapNetwork"/>
+
+            <div id="dynamicPanel">
+                <form>
+                    <input type="text" name="emailRssSuscription" id="emailRssSuscription" placeholder="Your Email"/>
+                    <button id="sendSuscription">
+                        Suscription
+                    </button>
+                    <a href="" id="closePanelRSS">
+                        Close
+                    </a>
+                    <input type="hidden" name="businessSuscription" id="businessSuscription"/>
+                </form>
+            </div>
+            <div id="dynamicPanelEmail">
+                <form>
+                    <input type="text" name="emailSharedSuscription" id="emailSharedSuscription"
+                           placeholder="Your shared email"/>
+                    <button id="sendEmail">
+                        Share EMail
+                    </button>
+                    <a href="" id="closeEmailPanelRSS">
+                        Close
+                    </a>
+                    <input type="hidden" name="businessemailShared" id="businessemailShared"/>
+                </form>
+            </div>
+            <map name="mapNetwork">
+                <area coords="30,30,100,97" href="" id="faceShare" target="_blank" name="" caption="" description=""
+                      img=""/>
+                <area coords="160,30,230,97"
+                      href="https://twitter.com/share?url=https%3A%2F%2Fdetourmaps.com&via=detourmaps"
+                      class="twitter-share-button" target="_blank" id="tweetShare"/>
+                <script>!function (d, s, id) {
+                    var js, fjs = d.getElementsByTagName(s)[0];
+                    if (!d.getElementById(id)) {
+                        js = d.createElement(s);
+                        js.id = id;
+                        js.src = "https://platform.twitter.com/widgets.js";
+                        fjs.parentNode.insertBefore(js, fjs);
+                    }
+                }(document, "script", "twitter-wjs");</script>
+                <area coords="290,30,370,97" href=""
+                      onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"
+                      id="plusShare"/>
+                <area coords="425,30,500,97" href="" id="rssShareIt"/>
+                <area coords="560,30,630,97" href="" id="emailShareIt"/>
+
+            </map>
+        </div>
+    </div>
+    <div id="reviewPanelSubFooter" class="panelBusiness">
+        <h3></h3>
+
+        <div id="stars"></div>
+        <form id="sendReviewBusiness">
+            <h4>
+                <div class="rating"><a href="" idb="5"><i class="icon-star-empty"></i></a><a href="" idb="4"><i
+                        class="icon-star-empty"></i></a><a href="" idb="3"><i class="icon-star-empty"></i></a><a href="" idb="2"><iclass="icon-star-empty"></i></a><a href="" idb="1"><i class="icon-star-empty"></i></a></div>
+                Rate your experience
+            </h4>
+            <textarea id="commentReview" name="commentReview">
+
+            </textarea>
+            <input type="hidden" name="bizCommentReview" codeBiz="" id="codeBiz"/>
+            <input type="hidden" name="rateCommentReview" id="rateBiz"/>
+
+            <div id="userInformation"></div>
+            <div id="bbar">
+                <div id="networkShare">
+                    share: <a href=""><i class="icon-hand-right"></i>like</a><a href=""><i
+                        class="icon-retweet">retweet</i></a>
+                </div>
+                <div id="btnTools">
+                    <button id="btnReviewBusiness">Submit Review</button>
+                </div>
+            </div>
+        </form>
+        <div id="totalReviews">
+            <div id="showTotal">
+                <span></span>
+                <a href="" class="orderreview">Date</a>
+                <a href="" class="orderreview">Rating</a>
+            </div>
+            <div id="allReviews"></div>
+        </div>
+    </div>
+    <div id="directionPanelSubFooter" class="panelBusiness">
+        <form id="getDirection">
+            <div class="searchDir">
+                <input type="text" name="fromDirection" class="to" placeholder="Starting Location" id="fromValue"/>
+            </div>
+            <div class="searchDir">
+                <input type="text" name="toDirection" class="from" placeholder=""/>
+            </div>
+            <div class="getDir">
+                <div>
+                    <a id="shareDirection"><i class="icon-envelope-alt"></i></a>
+                </div>
+            </div>
+            <div id="toolDirection">
+                <img src="{{ STATIC_URL }}community/elementos/icons-direction.png"/>
+                <button id="getDirectionBtn">Get Directions</button>
+            </div>
+            <input type="hidden" name="realTo" id="realTo"/>
+            <input type="hidden" name="bizAuth" id="bizAuth"/>
+
+            <div id="dialog-form" title="Share directions to this email" style="display: none;">
+                <p class="validateTips">All form fields are required.</p>
+
+                <form>
+                    <fieldset>
+                        <label for="email">Email</label>
+                        <input type="text" name="emailDirection" id="emailDirection" value=""
+                               class="text ui-widget-content ui-corner-all"/>
+                        <button id="shareEmailDirection">Send</button>
+                    </fieldset>
+                </form>
+            </div>
+        </form>
+        <div id="directionMapPanel">
+            <div id="directionsPanel"></div>
+        </div>
+    </div>
+    <div id="dealsPanelSubFooter" class="panelBusiness">
+        <nav id="navDeals">
+            <h1>Orange <span>Deals</span></h1>
+            <ul>
+                <li class="itemNavDeals" id="smart-buys-ctrl"><a name="smart-buys" href="#smart-buys" class="barNavDeals">Smart Buys</a></li>
+                <li class="itemNavDeals" id="ten-off-ctrl"><a name="ten-off" href="#ten-off" class="barNavDeals">$10 Off</a></li>
+                <li class="itemNavDeals" id="ten-visits-ctrl"><a name="ten-visits" href="#ten-visits" class="barNavDeals">10 Visits</a></li>
+                <li class="itemNavDeals" id="refer-friends-ctrl"><a name="refer-friends" href="#refer-friends" class="barNavDeals">5=25 Refer</a></li>
+            </ul>
+        </nav>
+        <div id="wrap-slide-deals">
+            <div id="wrapper-slide-deals">
+                <div id="smart-buys" class="panel">
+                    <section class="insidepanel">
+                        <section class="pure-g">
+                            <section class="pure-u-1-1">
+                                <div class="sideNav">
+                                    <ul>
+                                        <li><a class="sideNav1 menuinside" href="#{% if request.session.user %}savesmart{% else %}accountsmart{% endif %}" title="Save Deal to email"></a></li>
+                                        <li><a class="sideNav2 menuinside print" href="#{% if request.session.user %}printsmart{% else %}accountsmart{% endif %}" title="Print this Deal"></a></li>
+                                        <li><a class="sideNav3 <menuinside></menuinside>" href="#{% if request.session.user %}sharesmart{% else%}accountsmart{% endif %}" title="Share this Deal by email or social media"></a></li>
+                                        <li><a class="sideNav4 menuinside" href="#{% if request.session.user %}savesmart{% else %}accountsmart{% endif %}" title="Save Deal to your profile"></a></li>
+                                        <li><a class="sideNav5 menuinside" href="{% if request.session.user %}javascript: void(0);{% else %}#accountsmart{% endif %}" title="Log in to DetourMaps"></a></li>
+                                        <li><a class="sideNav6 menuinside" href="{% if request.session.user %}javascript: void(0);{% else %}#accountsmart{% endif %}" title="Sign up with DetourMaps"{% if request.session.user %}{% else %}{% endif %}></a></li>
+                                        <li><a class="sideNav7 menuinside" href="{% if request.session.user %}#requestsmart{% else %}#accountsmart{% endif %}" title="Request a Deal from this business"></a></li>
+                                        <li><a class="sideNav8 menuinside" href="{% if request.session.user %}#howsmart{% else %}#accountsmart{% endif %}" title="Show me more information"></a></li>
+                                    </ul>
+                                </div>
+                                <div class="subFooterContent nodealorone"><span><p style="margin:0;">Smart Buys - <span style="font-size:26px;">Not your ordinary coupons</span></p></span>
+
+                                    <p style="font-size:20px;">Smart Buys are exclusive offers, created by local businesses
+                                        to <br>
+                                        offer you the best deals and discounts </p>
+                                    <img src="" width="600" height="300">
+                                </div>
+                                <div class="subFooterContent yesdeal pure-u-1-2">
+                                    <p style="font-size:20px;">Smart Buys are exclusive offers, created by local businesses
+                                        to offer you the best deals and discounts </p>
+                                    <div class="couponcar nivoSlider theme-dark" id="slidercoupons"></div>
+                                </div>
+                                <div class="popup" id="accountsmart">
+                                    <div class="topBar">
+                                        <p class="noicon">Please Log In, or <a href="#signsmart" class="menuinside" style="color:#F26522;">Sign Up</a></p>
+                                    </div>
+                                    <div class="insideaccount">
+                                        <div><a href="#loginusersmart" class="menuinside"><img src="{{ STATIC_URL }}community/evolution/images/userOrange.png" width="45" height="49"><span>User</span></a></div>
+                                        <div><a href="#loginbusinesssmart" class="menuinside"><img src="{{ STATIC_URL }}community/evolution/images/businessOrange.png" width="50" height="54"><span>Business</span></a></div>
+                                        <div><a href="#loginorgsmart" class="menuinside"><img src="{{ STATIC_URL }}community/evolution/images/orgOrange.png" width="60" height="60"><span>Organization</span></a></div>
+                                    </div>
+                                </div>
+                                <div class="popup" id="savesmart">
+                                    <div class="topBar pure-g">
+                                        <div class="pure-u-1-4">
+                                            <img src="{{ STATIC_URL }}community/evolution/images/saveDashboard.png" width="35" height="35" style="padding-top:9px;">
+                                        </div>
+                                        <p class="pure-u-3-4">Save Deal to Dashboard</p>
+                                    </div>
+                                    <div class="insidesave">
+                                        <p style="text-align:center;">This Deal will now be saved to your
+                                    dashboard. You will have 24 hours to redeem it.
+                                        </p>
+                                        <p class="submit" style="text-align: center;">
+                                            <button class="pure-button pure-button-primary btnsavedash">Save to My Dashboard</button>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="popup" id="printsmart">
+                                    <div class="topBar pure-g">
+                                        <div class="pure-u-1-4 printer">                                            
+                                        </div>                          
+                                        <p class="pure-u-3-4">Print</p>              
+                                    </div>
+                                    <div class="insidesave">
+                                        <p style="text-align:center;">This coupon now be printed, You will have 24 hours to redeem it.
+                                        </p>
+                                        <p class="submit" style="text-align: center;">                                            
+                                            <a href="" target="_blank" class="pure-button pure-button-primary btnprint" style="color: #ffffff;">Print Coupon</a>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="popup" id="sharesmart">
+                                    <div class="topBar pure-g">
+                                        <div class="pure-u-1-4">
+                                            <img src="{{ STATIC_URL }}community/evolution/images/share.png" width="35" height="39" style="padding-top:7px;">
+                                        </div>
+                                        <p class="pure-u-3-4">Share this Deal</p>
+                                    </div>
+                                    <div class="insideshare">
+                                        <p style="text-align:center;">Want to share this deal with friends? Enter their
+                                            e-mail address(es) below, and we will send them a link to this Deal!
+                                        </p>
+
+                                        <form id="share" action="" method="post" novalidate="novalidate" class="pure-form pure-form-stacked">
+                                            <div class="pure-g">
+                                                <div class="pure-u-1">
+                                                    <label for="email">E-mail(s)</label>
+                                                    <input type="text" placeholder="Mulitple addresses seperated by comma"
+                                                           name="email" id="email" class="required">
+                                                    <input type="hidden" name="codebiz" id="codebiz">
+                                                </div>
+                                                <div class="pure-u-1">
+                                                    <p class="submit">
+                                                        <button class="pure-button pure-button-primary btnshare">Share
+                                                        </button>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="insidetoshare pure-g">
+
+                                        <p class="pure-u-1">Or share on social media</p>
+                                        <a href="#" id="btnsharefacebook"><img src="{{ STATIC_URL }}community/evolution/images/fbLogin.png" width="110" height="27"
+                                                         style="padding-right:20px;"></a><a href="#" id="btnsharetwitter"><img
+                                            src="{{ STATIC_URL }}community/evolution/images/twitter.png" width="110" height="27"></a>
+                                    </div>
+                                </div>
+                                <div class="popup" id="signsmart">
+                                    <div class="topBar">
+                                        <img src="{{ STATIC_URL }}community/evolution/images/userWhite.png" width="35" height="38" style="padding-top:7px;">
+                                        <p>Create an Account</p>
+                                    </div>
+                                    <div class="inside">
+                                        <form id="signUp" action="" method="post" class="pure-form pure-form-stacked">
+                                            <div class="pure-g">
+                                                <div class="pure-u-1-2">
+                                                    <label for="firstname">First Name</label>
+                                                    <input type="text" name="firstname" id="firstname" required>
+                                                </div>
+                                                <div class="pure-u-1-2">
+                                                    <label for="lastname">last Name</label>
+                                                    <input type="text" name="lastname" id="lastname" required>
+                                                </div>
+                                            </div>
+                                            <div class="pure-g">
+                                                <div class="pure-u-1">
+                                                    <label for="email">E-mail</label>
+                                                    <input type="email" placeholder="" name="emailuserdeal" id="email"
+                                                           class="required email">
+                                                </div>
+                                            </div>
+                                            <div class="pure-g">
+                                                <p class="pure-u-1">By signing up, I agree to the <a
+                                                        href="{% url 'terms' %}"
+                                                        target="_blank" style="text-decoration:underline;">terms of
+                                                    service</a>
+                                                </p>
+
+                                                <p class="submit pure-u-1">
+                                                    <button class="pure-button pure-button-primary btnsignup">Sign Up
+                                                    </button>
+                                                </p>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="inside2">
+                                        <p style="font-size:10px;margin: 0;">Check your e-mail to get
+                                            your temporary password</p>
+                                    </div>
+                                </div>
+                                <div class="popup" id="requestsmart">
+                                    <div class="topBar pure-g">
+                                        <div class="pure-u-1-4">
+                                            <img src="{{ STATIC_URL }}community/evolution/images/request.png" width="35" height="32" style="padding-top:12px;">
+                                        </div>
+                                        <p class="pure-u-3-4">Request Deals</p>
+                                    </div>
+                                    <div class="insiderequest">
+                                        <p style="text-align:center; font-size:14px;">Select from the following Orange
+                                            Deals you would like this
+                                            business to accept, the more requests each Orange Deal
+                                            receives the sooner they will become available
+                                        </p>
+                                        <div class="check_deal">
+                                            <ul>
+                                                <li>
+                                                    <label>
+                                                        <input name="deal[]" type="checkbox" value="S">
+                                                        <img src="{{ STATIC_URL }}community/evolution/images/smartBuys.png" width="45" height="32">
+                                                    </label>
+                                                </li>
+                                                <li>
+                                                    <label>
+                                                        <input name="deal[]" type="checkbox" value="T">
+                                                        <img src="{{ STATIC_URL }}community/evolution/images/10Off.png" width="32" height="32">
+                                                    </label>
+                                                </li>
+                                                <li>
+                                                    <label>
+                                                        <input name="deal[]" type="checkbox" value="V">
+                                                        <img src="{{ STATIC_URL }}community/evolution/images/10Visits.png" width="32" height="32">
+                                                    </label>
+                                                </li>
+                                                <li>
+                                                    <label>
+                                                        <input name="deal[]" type="checkbox" value="R">
+                                                        <img src="{{ STATIC_URL }}community/evolution/images/5-25.png" width="32" height="32">
+                                                    </label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <p class="submit" style="text-align: center;">
+                                            <input type="hidden" value="" id="hideDeal">
+                                            <button id="btnRequestDeal" class="pure-button pure-button-primary btnrequest">Request Deals
+                                            </button>
+                                        </p>
+                                        <p style="text-align:center; font-size:14px;">We will contact you as soon as
+                                            this business starts participating
+                                            Please provide the following</p>
+                                    </div>
+                                </div>
+                                <div class="popup" id="howsmart">
+                                    <div class="topBar pure-g">
+                                        <div class="pure-u-1-4">
+                                             <img src="{{ STATIC_URL }}community/evolution/images/howQR.png" width="32" height="40" style="padding-top:7px;">
+                                        </div>
+                                        <p class="pure-u-3-4">How QR Works</p>
+                                    </div>
+                                    <div class="inside">
+                                        <p>Every coupon has a QR Code to help you keep
+                                            the promotion on your device. If you would like
+                                            to see how to scan it, or would like to learn how
+                                            it works, click the following link.</p>
+
+                                        <img src="{{ STATIC_URL }}community/evolution/images/connectQR.png" width="35" height="35"><a href="#"><p
+                                            style="color:#2EACB0; font-size:14px; padding-top:10px; padding-bottom:15px;">
+                                        Connect with QR Codes</p></a>
+                                    </div>
+                                </div>
+                                <div class="popup" id="loginusersmart">
+                                    <div class="topBar">
+                                        <img src="{{ STATIC_URL }}community/evolution/images/userWhite.png" width="35" height="38" style="padding-top:7px;">
+
+                                        <p>User Log In</p>
+                                    </div>
+                                    <div class="inside">
+                                        <form id="loginuser" action="" class="loginfrm pure-form pure-form-stacked" method="post">
+                                            <div class="pure-g">
+                                                <div class="pure-u-1">
+                                                    <label for="email">E-mail</label>
+                                                    <input type="email" placeholder="" name="user_email" id="email"
+                                                           class="required email">
+                                                </div>
+                                                <div class="pure-u-1">
+                                                    <label for="password">Password<a href="#forgotsmart" class="menuinside"><span
+                                                        style="font-size:11px; color:#2cadb0; padding-left:10px;">Forgot Password?</span></a></label>
+                                                    <input type="password" placeholder="" name="user_password" id="password"
+                                                           class="required">
+                                                </div>
+                                            </div>
+                                            <ul class="submit pure-g">
+                                                <li class="pure-u-1-4">
+                                                    <button class="pure-button pure-button-primary btnlogin">Sign In
+                                                    </button>
+                                                </li>
+                                                <li class="pure-u-3-4">
+                                                    <span style="font-size:11px; margin:0; color:#2cadb0; text-align: center;">Not a member yet?</span>
+                                                    <button class="pure-button pure-button-primary btncreate">Create Account
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </form>
+
+                                    </div>
+                                    <div class="inside2">
+                                        <p>Or log in with</p>
+                                        <a href="#"><img src="{{ STATIC_URL }}community/evolution/images/fbLogin.png" width="110" height="27"
+                                                         style="padding-right:20px;"></a><a href="#"><img
+                                            src="{{ STATIC_URL }}community/evolution/images/g+Login.png" width="110" height="27"></a>
+                                    </div>
+                                </div>
+                                <div class="popup" id="loginbusinesssmart">
+                                    <div class="topBar">
+                                        <img src="{{ STATIC_URL }}community/evolution/images/businessWhite.png" width="35" height="38"
+                                             style="padding-top:7px;">
+
+                                        <p>Business Log In</p>
+                                    </div>
+                                    <div class="inside">
+                                        <form id="loginbiz" action="" method="post" class="loginfrm">
+                                            <p>
+                                                <label for="email">E-mail</label><br>
+                                                <input type="email" placeholder="" name="email" id="email"
+                                                       class="required email">
+                                            </p>
+
+                                            <p style="margin-bottom:0;">
+                                                <label for="password">Password</label><a href="#"><span
+                                                    style="font-size:11px; color:#2cadb0; padding-left:10px;">Forgot Password?</span></a><br>
+                                                <input type="password" placeholder="" name="password" id="password"
+                                                       class="required email">
+                                            </p>
+                                            <ul class="submit">
+                                                <li>
+                                                    <button style="background-color:#2cadb0; border:none; border-radius:5px; height:25px; width:110px; cursor: pointer;
+    color:#fff; font-weight:700; float:left; font-size:.70em;">Sign Up
+                                                    </button>
+                                                </li>
+                                                <li>
+                                                    <span style="font-size:11px; margin:0; color:#2cadb0; text-align: center;">Not a member yet?</span>
+                                                    <button style="background-color:#2cadb0; border:none; border-radius:5px; height:25px; width:110px; cursor: pointer;
+                color:#fff; font-weight:700; font-size:.70em;">Create Account
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </form>
+                                    </div>
+                                    <div class="inside2">
+                                        <p>Or log in with</p>
+                                        <a href="#"><img src="{{ STATIC_URL }}community/evolution/images/fbLogin.png" width="110" height="27"
+                                                         style="padding-right:20px;"></a><a href="#"><img
+                                            src="{{ STATIC_URL }}community/evolution/images/g+Login.png" width="110" height="27"></a>
+                                    </div>
+                                </div>
+                                <div class="popup" id="loginorgsmart">
+                                    <div class="topBar">
+                                        <img src="{{ STATIC_URL }}community/evolution/images/orgWhite.png" width="40" height="39" style="padding-top:7px;">
+
+                                        <p>Organization Log In</p>
+                                    </div>
+                                    <div class="inside">
+                                        <form id="loginorg" action="" method="post" class="loginfrm">
+                                            <p>
+                                                <label for="email">E-mail</label><br>
+                                                <input type="email" placeholder="" name="email" id="email"
+                                                       class="required email">
+                                            </p>
+
+                                            <p style="margin-bottom:0;">
+                                                <label for="password">Password</label><a href="#"><span
+                                                    style="font-size:11px; color:#2cadb0; padding-left:10px;">Forgot Password?</span></a><br>
+                                                <input type="password" placeholder="" name="password" id="password"
+                                                       class="required email">
+                                            </p>
+                                            <ul class="submit">
+                                                <li>
+                                                    <button style="background-color:#2cadb0; border:none; border-radius:5px; height:25px; width:110px; cursor: pointer;
+    color:#fff; font-weight:700; float:left; font-size:.70em;">Sign Up
+                                                    </button>
+                                                </li>
+                                                <li>
+                                                    <span style="font-size:11px; margin:0; color:#2cadb0; text-align: center;">Not a member yet?</span>
+                                                    <button style="background-color:#2cadb0; border:none; border-radius:5px; height:25px; width:110px; cursor: pointer;
+                color:#fff; font-weight:700; font-size:.70em;">Create Account
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </form>
+                                    </div>
+                                    <div class="inside2">
+                                        <p>Or log in with</p>
+                                        <a href="#"><img src="{{ STATIC_URL }}community/evolution/images/fbLogin.png" width="110" height="27"
+                                                         style="padding-right:20px;"></a><a href="#"><img
+                                            src="{{ STATIC_URL }}community/evolution/images/g+Login.png" width="110" height="27"></a>
+                                    </div>
+                                </div>
+                                <div class="popup" id="passwordsmart">
+                                    <div class="topBar">
+                                        <img src="{{ STATIC_URL }}community/evolution/images/userWhite.png" width="35" height="38" style="padding-top:7px;">
+                                        <p>Change Password</p>
+                                    </div>
+                                    <div class="inside">
+                                        <p style="font-size:12px;">Please retrieve your temporary password from your
+                                            e-mail and change it</p>
+
+                                        <form id="passChange" action="" method="post" class="loginfrm pure-form pure-form-stacked">                                           
+                                            <div class="pure-u-1">
+                                                <label for="oldPass">Temporary Password</label>
+                                                <input type="password" placeholder="" name="old_password" id="oldPass"
+                                                       class="required">
+                                            </div>
+                                            <div class="pure-u-1">
+                                                <label for="newPass">New Password</label>
+                                                <input type="password" placeholder="" name="new_password" id="newPass"
+                                                       class="required">
+                                            </div>
+
+                                            <div class="pure-u-1">
+                                                <label for="reNewPass">Re-type New Password</label>
+                                                <input type="password" placeholder="" name="reNewPass" id="reNewPass"
+                                                       class="required">
+                                            </div>
+                                            <input type="hidden" name="user_id" value="" id="user_id"/>
+                                            <p class="submit">
+                                                <button class="pure-button pure-button-primary btnpassword">Save Password
+                                                </button>
+                                            </p>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="popup" id="forgotsmart">
+                                    <div class="topBar">
+                                        <img src="{{ STATIC_URL }}community/evolution/images/userWhite.png" width="35" height="38" style="padding-top:7px;">
+
+                                        <p>Forgot Password</p>
+                                    </div>
+                                    <div class="inside">
+                                        <p style="font-size:12px;">Please insert your e-mail and receive an email with new temporary password</p>
+
+                                        <form id="forgotpass" action="" method="post" class="loginfrm pure-form pure-form-stacked">                                            
+                                            <div class="pure-u-1">
+                                                <label for="email">E-mail</label>
+                                                <input type="email" placeholder="" name="user_email" id="forgot_email"
+                                                       class="required email">
+                                            </div>                                            
+                                            <p class="submit">
+                                                <button class="pure-button pure-button-primary btnforgot">Send Password
+                                                </button>
+                                            </p>
+                                        </form>
+                                    </div>
+                                </div>
+                            </section>
+                            {% comment %}<section class="pure-u-1-2">
+                                <h3></h3>
+                                <p>
+                                    What’s a Smart Buy? It’s a unique ofer that can include anything from
+                                    a free product or service to half-of your purchase. Deep discounts for
+                                    you.
+                                    <a href="#how-it-works" class="worked">How it works.</a>
+                                </p>
+                                <div style="clear: both;"></div>
+                                <div>
+                                    <ul id="list-share-smart">
+                                        <li class="share-net"><a href="" idb="" id="share-smart"><i><img src="{{ STATIC_URL }}community/evolution/icon-share-bubble.png"/></i> share deal with friends</a></li>
+                                    </ul>
+                                </div>
+                                <div id="smartDeals">
+                                    <form id="formcoupon">
+                                        <input type="text" name="name" placeholder="Name*" id="nameUserField"/>
+                                        <input type="text" name="email" placeholder="Email*" id="emailUserField"/>
+                                        <input id="hiddenCoupon" value="" type="hidden"/>
+                                        <label>
+                                            How would you like to receive your Smart Buys?
+                                        </label>
+                                        <div id="toolsSmart">
+                                            <button id="printCoupon" disabled>Print</button><div class="splinter">-or-</div>
+                                            <button id="emailCoupon" disabled>Email</button>
+                                            {% if not request.session.user %}
+                                                <a href="{% url 'registerUser' %}">Need an account? sign up</a>
+                                            {% endif %}
+                                        </div>
+                                    </form>
+                                </div>
+                                <section class="nodeal">
+                                    <div class="wrapnodeal">
+                                        <a href="" class="launchdeal"></a>
+                                    </div>
+                                    <a href="" class="launchpopdeal">
+                                       Want to request Smart Buys and other Orange Deals
+                                       for Culver’s?
+                                    </a>
+                                </section>
+                            </section>
+                            <section class="pure-u-1-2">
+                                <section id="vertical-slider">
+                                    <section id="wrap-vertical-slider">
+
+                                    </section>
+                                </section>
+                            </section>{% endcomment %}
+                        </section>
+                    </section>
+                </div>
+            <div id="ten-off" class="panel">
+                    <section class="insidepanel">
+                        <section class="pure-g">
+                            <section class="pure-u-1-1">
+                                <div class="sideNav">
+                                    <ul>
+                                        <li><a class="sideNav1-10" href="#" title="Email to self"></a></li>
+                                        <li><a class="sideNav2-10" href="#" title="Print this Deal"></a></li>
+                                        <li><a class="sideNav3-10" href="#"
+                                               title="Share this Deal by email or social media"></a></li>
+                                        <li><a class="sideNav4-10" href="#" title="Save Deal to your profile"></a></li>
+                                        <li><a class="sideNav5-10" href="#" title="Log in to DetourMaps"></a></li>
+                                        <li><a class="sideNav6-10" href="#" title="Sign up with DetourMaps"></a></li>
+                                        <li><a class="sideNav7-10" href="#" title="Request a Deal from this business"></a>
+                                        </li>
+                                        <li><a class="sideNav8-10" href="#" title="Show me more information"></a></li>
+                                    </ul>
+                                </div>
+                                <div class="subFooterContent-10"><span><p style="margin:0;">$10 Off - <span
+                                        style="font-size:26px;">Save instantly on your purchase</span></p></span>
+
+                                    <p style="font-size:20px;">Use your $10 card with those particular orders. It's
+                                        easy! Just enter your <br>
+                                        info and you will be able to print it or send it to your mobile device </p>
+                                    <img src="{{ STATIC_URL }}community/css/images/placeholderCoupon_10Off.jpg" width="600" height="300">
+                                </div>
+                            </section>
+                            {% comment %}<section class="pure-u-2-3">
+                                <h3></h3>
+                                <p>
+                                    Use our free savings card to save $10 on your next visit, just enter the info below and we’ll send you one that you can use right away, print it out or use it on a mobile device.
+                                    <a href="#how-it-works" class="worked">How it works.</a>
+                                </p>
+                                <div style="clear: both;"></div>
+                                <div>
+                                    <ul id="list-share">
+                                        <li class="share-net"><a href="" id="share-deal" idb=""><i><img src="{{ STATIC_URL }}community/evolution/icon-share-bubble.png"/></i> share deal with friends</a></li>
+                                        <li class="share-net"><a href="" id="save-bookmark-deal" idb=""><i><img src="{{ STATIC_URL }}community/evolution/icon-bookmark-bubble.png"/></i> save to My Deals</a></li>
+                                    </ul>
+                                </div>
+                                <div id="formDeals">
+                                    <form class="formDeals">
+                                        <input type="text" name="name" placeholder="Name*" id="nameBusinessField"/>
+                                        <input type="text" name="email" placeholder="Email*" id="emailBusinessField"/>
+                                        <input type="hidden" name="targetdeal" value="" id="hiddenBusiness" nameBiz="">
+                                        <label>How would you like receive your card?</label>
+                                        <div id="toolDeals">
+                                            <button id="downloaddeal">Download</button>
+                                            <div class="splinter">-or-</div>
+                                            <button id="emaildeal">Email</button>
+                                            {% if not request.session.user %}
+                                                <a href="{% url 'registerUser' %}">Need an account? sign up</a>
+                                            {% endif %}
+                                        </div>
+                                    </form>
+                                </div>
+                                <section class="nodeal">
+                                    <div class="wrapnodeal">
+                                        <a href="" class="launchdeal"></a>
+                                    </div>
+                                    <a href="" class="launchpopdeal">
+                                       Want to request $10 Savings Card and other Orange Deals
+                                       for Culver’s?
+                                    </a>
+                                </section>
+                            </section>
+                            <section class="pure-u-1-3 inf">
+                                <img src="{{ STATIC_URL }}community/evolution/10-off-image.png" alt="Ten Off" class="imgtenoff"/>
+                                <section class="infotenoff">
+                                    <b>What’s with the dot?</b>
+                                    <hr>
+                                    <ul>
+                                        <li>
+                                            <div class="circleinfo yellow"></div>
+                                            <div class="textinfo">
+                                                This business requires a $30 minimum
+                                                purchase to use $10 Savings Card
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="circleinfo red"></div>
+                                            <div class="textinfo">
+                                                This business requires a $40 minimum
+                                                purchase to use $10 Savings Card
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="circleinfo blue"></div>
+                                            <div class="textinfo">
+                                                This business requires a $50 minimum
+                                                purchase to use $10 Savings Card
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="circleinfo gray"></div>
+                                            <div class="textinfo">
+                                                This business is not currently accepting
+                                                $10 Savings Cards
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </section>
+                                <section class="rounded"></section>
+                            </section>{% endcomment %}
+                        </section>
+                    </section>
+                </div>
+                <div id="ten-visits" class="panel">
+                    <section class="insidepanel">
+                        <section class="pure-g">
+                            <section class="pure-u-1-1">
+                                <div class="sideNav">
+                                    <ul>
+                                        <li><a class="sideNav1-v" href="#" title="Enter your visit"></a></li>
+                                        <li><a class="sideNav2-v" href="#" title="See your progress"></a></li>
+                                        <li><a class="sideNav3-v" href="#"
+                                               title="Share this Deal by email or social media"></a></li>
+                                        <li><a class="sideNav4-v" href="#" title="Save Deal to your profile"></a></li>
+                                        <li><a class="sideNav5-v" href="#" title="Log in to DetourMaps"></a></li>
+                                        <li><a class="sideNav6-v" href="#" title="Sign up with DetourMaps"></a></li>
+                                        <li><a class="sideNav7-v" href="#" title="Request a Deal from this business"></a>
+                                        </li>
+                                        <li><a class="sideNav8-v" href="#" title="Show me more information"></a></li>
+                                    </ul>
+                                </div>
+                                <div class="subFooterContent-v"><span><p style="margin:0;">10 Visits - <span
+                                        style="font-size:26px;">Get rewarded locally</span></p></span>
+
+                                    <p style="font-size:20px;">Receive a special treat for every 10 visits to your
+                                        favorite place. </p>
+                                    <img src="{{ STATIC_URL }}community/css/images/placeholderCoupon_10Visits.jpg" width="600" height="300">
+                                </div>
+                            </section>
+                            {% comment %}<section class="pure-u-1-2">
+                                <h3>Loyalty Rewards</h3>
+                                <p>
+                                    Are you a loyal customer? Get rewarded for supporting your favorite spot. Every
+                                    ten visits, you’ll receive something special as a sign of apprication.
+                                    <a href="#how-it-works" class="worked">How it works.</a>
+                                </p>
+                                <div style="clear: both;"></div>
+                                <div>
+                                    <ul id="list-share-ten-visits">
+                                        <li class="share-net"><a><i><img src="{{ STATIC_URL }}community/evolution/icon-share-bubble.png"/></i> share deal with friends</a></li>
+                                    </ul>
+                                </div>
+                                <form style="width: 70%;" id="form-ten-visits">
+                                    <h4>Enter visit here</h4>
+                                    <input type="text" name="name" placeholder="Name of employee (optional)" id="nameemployee"/>
+                                    <input type="text" name="receipt" placeholder="Receipt Number" id="receipt"/>
+                                    <input type="text" name="date" placeholder="Date" id="datevist"/>
+                                    <input type="hidden" name="visitshide" id="visitshide">
+                                    <div id="toolsSmart">
+                                        <button id="btn10Visits">Submit</button>
+                                        {% if not request.session.user %}
+                                            <a href="{% url 'registerUser' %}">Need an account? sign up</a>
+                                        {% endif %}
+                                    </div>
+                                </form>
+                                <section class="nodeal">
+                                    <div class="wrapnodeal">
+                                        <a href="" class="launchdeal"></a>
+                                    </div>
+                                    <a href="" class="launchpopdeal">
+                                       Want to request Ten Visits and other Orange Deals
+                                       for Culver’s?
+                                    </a>
+                                </section>
+                            </section>
+                            <section class="pure-u-1-2">
+                                <figure class="panel-right">
+                                    <img src=""/>
+                                </figure>
+                            </section>{% endcomment %}
+                        </section>
+
+                    </section>
+                </div>
+                <div id="refer-friends" class="panel">
+                    <section class="insidepanel">
+                        <section class="pure-g">
+                            <section class="pure-u-1-1">
+                                <div class="sideNav">
+                                    <ul>
+                                        <li><a class="sideNav1-r" href="#" title="Refer friends"></a></li>
+                                        <li><a class="sideNav2-r" href="#" title="See your progress"></a></li>
+                                        <li><a class="sideNav3-r" href="#"
+                                               title="Share this Deal by email or social media"></a></li>
+                                        <li><a class="sideNav4-r" href="#" title="Save Deal to your profile"></a></li>
+                                        <li><a class="sideNav5-r" href="#" title="Log in to DetourMaps"></a></li>
+                                        <li><a class="sideNav6-r" href="#" title="Sign up with DetourMaps"></a></li>
+                                        <li><a class="sideNav7-r" href="#" title="Request a Deal from this business"></a>
+                                        </li>
+                                        <li><a class="sideNav8-r" href="#" title="Show me more information"></a></li>
+                                    </ul>
+                                </div>
+                                <div class="subFooterContent-r"><span><p style="margin:0;">5=25 - <span
+                                        style="font-size:26px;">Get a $25 Gift Certificate with 5 referals</span>
+                                </p></span>
+
+                                    <p style="font-size:20px;">Refer friends or family members to a business. If they
+                                        purchase a <br>
+                                        product or service, you are that much closer to getting your 5 <br>
+                                        referals, earning you $25 </p>
+                                    <img src="{{ STATIC_URL }}community/css/images/placeholderCoupon_5-25.jpg" width="600" height="300">
+                                </div>
+                            </section>
+                            {% comment %}<section class="pure-u-1-2">
+                                <h3>Earn a $25 Gift Certificate when you refer five friends</h3>
+                                <p>
+                                    If they buy a product or service from that business you are that much closer
+                                    to getting $25. Enter your friends info and we will send them an email with a
+                                    code and your name.
+                                </p>
+                                <form id="form-refer-friends">
+                                    <h4>
+                                        Tell your friends
+                                    </h4>
+                                    <input type="text" name="email" placeholder="Enter friends email" id="emailfriends"/>
+                                    <textarea name="quickmessage" id="quickmessage" placeholder="Quick Message"></textarea>
+                                    <input type="hidden" name="referhide" id="referhide">
+                                    <div id="toolsSmart">
+                                        <button id="sendrefer">Send</button>
+                                        {% if not request.session.user %}
+                                            <a href="{% url 'registerUser' %}">Need an account? sign up</a>
+                                        {% endif %}
+                                    </div>
+                                </form>
+                                <section class="nodeal">
+                                    <div class="wrapnodeal">
+                                        <a href="" class="launchdeal"></a>
+                                    </div>
+                                    <a href="" class="launchpopdeal">
+                                       Want to request Refer Friends and other Orange Deals
+                                       for Culver’s?
+                                    </a>
+                                </section>
+                            </section>
+                            <section class="pure-u-1-2">
+                                <figure class="panel-right">
+                                    <img src="{{ STATIC_URL }}community/evolution/refer-image.png"/>
+                                </figure>
+                            </section>{% endcomment %}
+                        </section>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div id="menuPanelSubFooter" class="panelBusiness">
+        <h3></h3>
+        <div id="textMenu">
+
+        </div>
+        <div id="show-dish">
+
+        </div>
+        <div id="nav-dishes">
+            <a href="#" class="mnav left-nav-dish"><img src="{{ STATIC_URL }}community/evolution/icon-arrow-left.png"/></a>
+            <a href="#" class="mnav right-nav-dish"><img src="{{ STATIC_URL }}community/evolution/icon-arrow-right.png"/></a>
+        </div>
+    </div>
+    <div id="videoPanelSubFooter" class="panelBusiness">
+        <div id="videoPrincipalView">
+            <iframe id="ytVideo" width="480" height="315" src="" frameborder="0" allowfullscreen></iframe>
+        </div>
+        <div id="videoInfoView">
+            <h3></h3>
+
+            <p></p>
+
+            <div>
+                <img id="thumbnailV1" src=""/>
+                <img id="thumbnailV2" src=""/>
+                <img id="thumbnailV3" src=""/>
+            </div>
+        </div>
+    </div>
+    <div id="eventPanelSubFooter" class="panelBusiness">
+        <div id="datesPanel">
+            <div id="datepicker"></div>
+            <input type="hidden" id="hideBizEvents"/>
+        </div>
+        <div id="allEventsByDateByBiz">
+
+        </div>
+    </div>
+    <div id="modal" class="modal">
+        <div class="popup-modal">
+            <div class="topBar-modal">
+                <img src="{{ STATIC_URL }}community/evolution/images/userWhite.png" width="35" height="38" style="padding-top:7px;">                         <p>Attention</p>
+                <a class="close-modal">&#215;</a>
+            </div>
+            <div class="inside">
+                <p></p>
+            </div>
+        </div>
+        <div class="overlay"></div>
+    </div>    
+    </div>
+    <script type="text/javascript">
+    var directionsDisplay;
+    var directionsService = new google.maps.DirectionsService();
+    var latlng = new google.maps.LatLng(41.850033, -87.6500523);
+    function initialize() {
+        directionsDisplay = new google.maps.DirectionsRenderer();
+        directionsDisplay.setMap(map);
+        directionsDisplay.setPanel(document.getElementById('directionsPanel'));
+        var marker = new google.maps.Marker({
+            position: latlng,
+            map: map,
+            title: "Rodderhof, Oss"
+        });
+    }
+
+    function calcRoute() {
+        var start = document.getElementById('fromValue').value;
+        var end = document.getElementById('realTo').value;
+        var waypoints = [];
+        if (end != "") {
+            // if waypoints (via) are set, add them to the waypoints array
+            waypoints.push({
+                location: end,
+                stopover: true
+            });
+        }
+        var request = {
+            origin: start,
+            destination: end,
+            waypoints: waypoints,
+            travelMode: google.maps.DirectionsTravelMode.DRIVING
+        };
+        directionsService.route(request, function (response, status) {
+            if (status == google.maps.DirectionsStatus.OK) {
+                $('#directionsPanel').empty();
+                directionsDisplay.setDirections(response);
+                var newHeightFooterH = $(document).height();
+            } else {
+                // alert an error message when the route could nog be calculated.
+                if (status == 'ZERO_RESULTS') {
+                    alert('No route could be found between the origin and destination.');
+                } else if (status == 'UNKNOWN_ERROR') {
+                    alert('A directions request could not be processed due to a server error. The request may succeed if you try again.');
+                } else if (status == 'REQUEST_DENIED') {
+                    alert('This webpage is not allowed to use the directions service.');
+                } else if (status == 'OVER_QUERY_LIMIT') {
+                    alert('The webpage has gone over the requests limit in too short a period of time.');
+                } else if (status == 'NOT_FOUND') {
+                    alert('At least one of the origin, destination, or waypoints could not be geocoded.');
+                } else if (status == 'INVALID_REQUEST') {
+                    alert('The DirectionsRequest provided was invalid.');
+                } else {
+                    alert("There was an unknown error in your request. Requeststatus: nn" + status);
+                }
+            }
+        });
+    };
+
+    $(document).ready(function () {
+        $(document).on("click", "a.menuinside", function(e){
+            e.preventDefault();
+            var $target = $(this).attr("href");
+            if(coupons_flag){
+                $(".popup").not($($target)).hide();
+                $($target).show();
+                $(".subFooterContent").hide();
+                $(".menuinside").not($(this)).removeClass("active");
+                $(this).addClass("active");
+            }else{
+                if($target == "#"){}
+            }
+        });
+        $("button#emailCoupon").click(function (e) {
+            e.preventDefault();
+            if(session){
+                var link = "/communities/email/coupon?source=" + $("#hiddenCoupon").val() + "&coupon=" + window.localStorage["coupon"];
+                $.getJSON(link, function(data){
+                    if(data.state){
+                        new Messi(data.message, {title: 'DetourMaps - Email Coupon', modal: true});
+                    }else{
+                        new Messi("Please try it later!!!", {title: 'DetourMaps - Email Coupon', modal: true});
+                    }
+                });
+            }else{
+                $("#request_deal").show();
+                $("#dealer").hide();
+                $("#signer").show();
+                $("#logger").hide();
+                window.localStorage["emailcoupon"] = true;
+                window.localStorage["couponbiz"] = $("#hiddenCoupon").val();
+            }
+        });
+        $("button#printCoupon").click(function (e) {
+            e.preventDefault();
+            if(session){
+                window.open(
+                    'http://localhost:8000/communities/print/coupon?source=' + $("#hiddenCoupon").val() + '&coupon=' + window.localStorage["coupon"],
+                    '_blank'
+                );
+            }else{
+                $("#request_deal").show();
+                $("#dealer").hide();
+                $("#signer").show();
+                $("#logger").hide();
+                window.localStorage["printcoupon"] = true;
+                window.localStorage["couponbiz"] = $("#hiddenCoupon").val();
+            }
+
+        });
+        $("#shareDirection").click(function (e) {
+            $("#dialog-form").slideToggle();
+            e.returnValue = false;
+            return false;
+        });
+        $("#shareEmailDirection").click(function (e) {
+            e.preventDefault();
+            $.getJSON('{% url 'share_direction_by_email' %}', {'tag': $("#bizAuth").val(), 'saddr': $("#fromValue").val(), 'daddr': $("#realTo").val(), 'emailShared': $("#emailDirection").val()}, function (data) {
+                new Messi(data.msg, {title: 'DetourMaps - Share System', modal: true});
+            });
+        });
+
+        $("#getDirectionBtn").click(function (e) {
+            e.preventDefault();
+            initialize();
+            calcRoute();
+        });
+        $("#faceShare").click(function (e) {
+            e.preventDefault();
+            FB.init({appId: '238434222967585', status: true, cookie: true});
+            FB.ui(
+                    {
+                        method: 'feed',
+                        name: $(this).attr("name"),
+                        link: $(this).attr("href"),
+                        picture: 'http://detourmaps.com/static/community/img/detourOrange.png',
+                        caption: $(this).attr("caption"),
+                        description: $(this).attr("description"),
+                        message: '',
+                        redirect_uri: $(this).attr("href")
+                    }
+            );
+        });
+        $("#faceMenu").click(function (e) {
+            e.preventDefault();
+            var tag = $(this).attr("href");
+            $.getJSON('{% url 'shareMenu' %}', {'tag': tag}, function (data) {
+                FB.init({appId: '238434222967585', status: true, cookie: true});
+                FB.ui(
+                        {
+                            method: 'feed',
+                            name: data.name,
+                            link: data.url,
+                            picture: 'http://detourmaps.com/static/community/img/detourOrange.png',
+                            caption: data.name,
+                            description: data.description,
+                            message: '',
+                            redirect_uri: data.redirect
+                        });
+            });
+        });
+        $("#faceCoupon").click(function (e) {
+            e.preventDefault();
+            FB.init({appId: '238434222967585', status: true, cookie: true});
+            FB.ui(
+                    {
+                        method: 'feed',
+                        name: $(this).attr("name"),
+                        link: 'http://{{ request.META.HTTP_HOST }}/communities/print/coupon?source=' + $("#hiddenCoupon").val(),
+                        picture: 'http://www.hyperarts.com/external-xfbml/share-image.gif',
+                        caption: $(this).attr("caption"),
+                        description: $(this).attr("description"),
+                        message: '',
+                        redirect_uri: document.URL
+                    }
+            );
+        });
+        $("#twitterCoupon").click(function (e) {
+            e.preventDefault();
+            var source = $("#hiddenCoupon").val();
+            window.open("https://twitter.com/share?url=" + 'http%3A%2F%2F{{ request.META.HTTP_HOST }}%2Fcommunities%2Fprint%2Fcoupon?source=' + $("#hiddenCoupon").val() + "&via=detourmap", "_blank");
+        });
+        $("#tweetMenu").click(function (e) {
+            e.preventDefault();
+            var tag = $(this).attr("href");
+            $.getJSON('{% url 'shareMenu' %}', {'tag': tag}, function (data) {
+                window.open("https://twitter.com/share?url=" + data.url + "&via=detourmaps", "_blank");
+            });
+        });
+        function getUrlParameters(parameter, staticURL, decode){
+           /*
+            Function: getUrlParameters
+            Description: Get the value of URL parameters either from 
+                         current URL or static URL
+            Author: Tirumal
+            URL: www.code-tricks.com
+           */
+           var currLocation = (staticURL.length)? staticURL : window.location.search,
+               parArr = currLocation.split("?")[1].split("&"),
+               returnBool = true;
+
+           for(var i = 0; i < parArr.length; i++){
+                parr = parArr[i].split("=");
+                if(parr[0] == parameter){
+                    return (decode) ? decodeURIComponent(parr[1]) : parr[1];
+                    returnBool = true;
+                }else{
+                    returnBool = false;            
+                }
+           }
+
+           if(!returnBool) return false;  
+        };
+        $("#share").validate({
+            rules: {
+                email: {
+                    required: true 
+                }
+            },
+            messages: {
+                email: {
+                    required: 'This field is required'                    
+                }
+            }
+        });
+        $("#share").submit(function (e) {
+            e.preventDefault();
+            var codebiz = getUrlParameters("auth_code", document.URL, true);
+            $("#codebiz").val(codebiz);
+            var form = $("#share");
+            var button = $("#share button");
+            if (button.prop("disabled")) return;
+            if (form.valid()) {
+                button.prop("disabled", true).html('Wait ...');
+                $.post('{% url 'share_emails_buys' %}', form.serialize(), function (data) {
+                    var evalData = eval('(' + data + ')');
+                    //$("#response-lista").html(evalData.msg);
+                    $("#modal .inside p").html(evalData.message);
+                    $("#modal.modal").css({
+                        top: "50%",
+                        opacity: 1,
+                        visibility: "visible"
+                    }); 
+                    button.prop("disabled", false).html("Share");
+                });
+            }
+        });        
+        $("#btnsharefacebook").click(function (e) {
+            e.preventDefault();
+            FB.init({appId: '238434222967585', status: true, cookie: true});
+            FB.ui(
+                    {
+                        method: 'feed',
+                        name: document.title,
+                        link: document.URL,
+                        picture: 'http://detourmaps.com/static/community/img/detourOrange.png',
+                        caption: document.title,
+                        description: 'Smart Buys',
+                        message: '',
+                        redirect_uri: document.URL
+                    }
+            );
+        });
+        $("#btnsharetwitter").click(function (e) {
+            e.preventDefault();
+            var width  = 575,
+                height = 400,
+                left   = ($(window).width()  - width)  / 2,
+                top    = ($(window).height() - height) / 2,
+                url    = this.href,
+                opts   = 'status=1' +
+                         ',width='  + width  +
+                         ',height=' + height +
+                         ',top='    + top    +
+                         ',left='   + left;
+            window.open("https://twitter.com/share?url=" + encodeURIComponent(document.URL) + "&via=detourmaps", "_blank", 'Smart Buys', opts);
+        });
+        $("#rssShareIt").click(function (e) {
+            e.preventDefault();
+            var getMenu = $(this).attr("href");
+            var getMenuSplit = getMenu.split("/");
+            var tag = getMenuSplit[1];
+            $("#businessSuscription").val(tag);
+            $("#dynamicPanel").show();
+        });
+        $("#emailShareIt").click(function (e) {
+            e.preventDefault();
+            var getMenu = $(this).attr("href");
+            var getMenuSplit = getMenu.split("/");
+            var tag = getMenuSplit[1];
+            $("#businessemailShared").val(tag);
+            $("#dynamicPanelEmail").show();
+        });
+        $("#closePanelRSS").click(function (e) {
+            e.preventDefault();
+            $("#dynamicPanel").hide();
+        });
+        $("#closeEmailPanelRSS").click(function (e) {
+            e.preventDefault();
+            $("#dynamicPanelEmail").hide();
+        });
+        $("#sendEmail").click(function (e) {
+            e.preventDefault();
+            var tag = $("#businessemailShared").val();
+            var emailRSS = $("#emailSharedSuscription").val();
+            $.getJSON('{% url 'share_by_email' %}', {'tag': tag, 'emailShared': emailRSS}, function (data) {
+                new Messi(data.msg, {title: 'DetourMaps - Share System', modal: true});
+                $("#dynamicPanelEmail").hide();
+            });
+        });
+        $("#sendSuscription").click(function (e) {
+            e.preventDefault();
+            var tag = $("#businessSuscription").val();
+            var emailRSS = $("#emailRssSuscription").val();
+            $.getJSON('{% url 'save_suscription' %}', {'tag': tag, 'emailRSS': emailRSS}, function (data) {
+                new Messi(data.msg, {title: 'DetourMaps - RSS System', modal: true});
+                $("#dynamicPanel").hide();
+            });
+        });
+        $("#emaildeal").click(function (e) {
+            e.preventDefault();
+            var getVal = $("#hiddenBusiness").val();
+            var getValSplit = getVal.split("/");
+            var tag = getValSplit[1];
+            if(session){
+                $.getJSON('{% url 'card_email' %}', {'tag': tag}, function (data) {
+                    new Messi(data.msg, {title: 'DetourMaps - Deals System', modal: true});
+                });
+            }else{
+                $("#request_deal").show();
+                $("#dealer").hide();
+                $("#signer").show();
+                $("#logger").hide();
+                window.localStorage["tag"] = tag;
+            }
+
+        });
+        $("#downloaddeal").click(function (e) {
+            e.preventDefault();
+            var getVal = $("#hiddenBusiness").val();
+            var getValSplit = getVal.split("/");
+            var tag = getValSplit[1];
+            if(session){
+                window.open('http://localhost:8000/communities/get/card?tag=' + tag, '_blank');
+            }else{
+                $("#request_deal").show();
+                $("#dealer").hide();
+                $("#signer").show();
+                $("#logger").hide();
+                window.localStorage["tag"] = tag;
+            }
+        });
+        
+        $("#printDeal").click(function (e) {
+            e.preventDefault();
+            var getVal = $("#hiddenBusiness").val();
+            var getValSplit = getVal.split("/");
+            var tag = getValSplit[1];
+            window.open(
+                    'http://{{ request.META.HTTP_HOST }}/communities/print/card?tag=' + tag + '&name=' + $("#nameBusinessField").val() + '&email=' + $("#emailBusinessField").val() + '&phone=' + $("#phoneBusinessField").val(),
+                    '_blank'
+            );
+        });
+        $("#dealsSubFooter").click(function (e) {
+            e.preventDefault();
+            setTabName("menu");
+        });
+        $("div.rating a").click(function (e) {
+            var rate = $(this).attr("idb");
+            $("#rateBiz").val(rate);
+            new Messi("Thanks please now you do your comment!", {title: 'DetourMaps - Rate System', modal: true});
+            e.returnValue = false;
+            return false;
+        });
+        $("#reviewSubFooter").click(function (e) {
+            $.getJSON('{% url 'sessions' %}', function (data) {
+                if (data.session) {
+                    var htmlReview = "<img src='" + data.gravatar + "' class='imgAvatar'/><div class='userAvatar'>" + data.username + "</div>";
+                    $("#userInformation").html(htmlReview);
+                }
+            });
+            e.returnValue = false;
+            return false;
+        });
+        $("#eventSubFooter").click(function (e) {
+            var getVal = $("#hideBizEvents").val();
+            var getValSplit = getVal.split("/");
+            var tag = getValSplit[1];
+            $.getJSON('{% url 'get_events' %}', {'tag': tag}, function (data) {
+                if (data.msg) {
+                    var allEvents = $("#allEventsByDateByBiz");
+                    allEvents.html("");
+                    for (var i = 0; i < data.lists.length; i++) {
+                        var divEvent = "<div class='eventUnique'><h3>" + data.lists[i].date + ":" + data.lists[i].title + "</h3><p>" + data.lists[i].description + "</p><div class='tagInfoEvent'>" + data.lists[i].address + "</div><div class='tagInfoEvent'>Phone: " + data.lists[i].phone + "</div></div>";
+                        allEvents.append(divEvent);
+                    }
+                } else {
+                    new Messi('There are no events for ' + data.biz + ' at this time', {title: 'DetourMaps - Events System', modal: true});
+                    var allEvents = $("#allEventsByDateByBiz");
+                    allEvents.html("");
+                }
+            });
+            setTabName("events");
+            e.returnValue = false;
+            return false;
+        });
+        $(".closerequest_deal").click(function(e){
+            e.preventDefault();
+            $(this).parent().parent().parent().hide();
+        });
+        $("#btnRequestDeal").click(function(e){
+            e.preventDefault();
+            var listValues = new Array();
+            var biz = $("#hideDeal").val();
+            $("input[name='deal[]']:checked").each(function(){
+                listValues.push($(this).val());
+            });
+            if(session){
+                $.post("{% url 'saveFeedBack' %}", {
+                    "biz": biz,
+                    "listValues": listValues
+                }, function(data){
+                    var evalData = eval('(' + data + ')');
+                    if(evalData.response){
+                        new Messi("Thanks for your feedback!", {title: 'DetourMaps - Feedback Orange Deals', modal: true});
+                    }else{
+                        new Messi("Error in your feedback, try later!", {title: 'DetourMaps - Feedback Orange Deals', modal: true});
+                    }
+                });
+            }else{
+                $("#dealer").hide();
+                $("#signer").show();
+                $("#logger").hide();
+                window.localStorage['biz'] = biz;
+                window.localStorage['listValues'] = listValues;
+            }
+        });
+        $(".btnsavedash").click(function(e){
+            e.preventDefault();
+            var $this = $(this);
+            $this.prop("disabled", true).html("Wait ...");
+            $.post("{% url 'save-promo' %}", {
+                id: window.localStorage["coupon"]
+            }, function(data){
+                var evalData = eval('(' + data + ')');
+                $this.prop("disabled", false).html("Save to My Dashboard");
+                $("#modal .inside p").html(evalData.message);
+                $("#modal.modal").css({
+                    top: "50%",
+                    opacity: 1,
+                    visibility: "visible"
+                });                
+            });
+        });
+        $("button.btncreate").click(function(e){
+            e.preventDefault();
+            $("#loginusersmart").hide();
+            $("#signsmart").show();
+        });
+        $("a.close-modal").click(function(e){
+            e.preventDefault();
+            $("#modal.modal").css({
+                top: "-150%",
+                opacity: 0,
+                visibility: "hidden"
+            });
+        });
+        $("div.overlay").click(function(){            
+            $("#modal.modal").css({
+                top: "-150%",
+                opacity: 0,
+                visibility: "hidden"
+            });
+        });
+        $("#btn10Visits").click(function(e){
+            e.preventDefault();
+            if(session){
+                $.post("{% url 'save_ten_visits' %}", {
+                    "name": $("#form-ten-visits input[name='name']").val(),
+                    "receipt": $("#form-ten-visits input[name='receipt']").val(),
+                    "date": $("#form-ten-visits input[name='date']").val(),
+                    "biz_url": $("#form-ten-visits input[type='hidden']").val()
+                }, function(data){
+                    var evalData = eval('(' + data + ')');
+                    if(evalData.state){
+                        new Messi(evalData.message, {title: 'DetourMaps - Ten Visits Orange Deals', modal: true});
+                    }else{
+                        new Messi("Error in your transaction, try later!", {title: 'DetourMaps - Ten Visits Orange Deals', modal: true});
+                    }
+                });
+            }else{
+                $("#request_deal").show();
+                $("#dealer").hide();
+                $("#signer").show();
+                $("#logger").hide();
+                window.localStorage['employee'] = $("#form-ten-visits input[name='name']").val();
+                window.localStorage['date'] = $("#form-ten-visits input[name='date']").val();
+                window.localStorage['receipt'] = $("#form-ten-visits input[name='receipt']").val();
+                window.localStorage['biz_url'] = $("#form-ten-visits input[type='hidden']").val();
+            }
+        });
+        $("#sendrefer").click(function(e){
+            e.preventDefault();
+            console.log("asdasd");
+            if(session){
+                $.post("{% url 'save_refer_friends' %}", {
+                    "email": $("#form-refer-friends input[name='email']").val(),
+                    "quickmessage": $("#form-refer-friends textarea[name='quickmessage']").val(),
+                    "biz_url": $("#form-refer-friends input[type='hidden']").val()
+                }, function(data){
+                    var evalData = eval('(' + data + ')');
+                    if(evalData.state){
+                        new Messi(evalData.message, {title: 'DetourMaps - Refer Friends Orange Deals', modal: true});
+                    }else{
+                        new Messi("Error in your transaction, try later!", {title: 'DetourMaps - Refer Friends Orange Deals', modal: true});
+                    }
+                });
+            }else{
+                $("#request_deal").show();
+                $("#dealer").hide();
+                $("#signer").show();
+                $("#logger").hide();
+                window.localStorage['email'] = $("#form-refer-friends input[name='email']").val();
+                window.localStorage['quickmessage'] = $("#form-refer-friends textarea[name='quickmessage']").val();
+                window.localStorage['biz_url'] = $("#form-refer-friends input[type='hidden']").val();
+                window.localStorage['refer'] = true;
+            }
+        });
+        $("#btnSignIn").click(function(e){
+            e.preventDefault();
+            $("#dealer").hide();
+            $("#signer").hide();
+            $("#logger").show();
+        });
+        $(document).on("click", "a#share-deal", function(e){
+            e.preventDefault();
+            var biz_url = $(this).attr("idb");
+        });
+        $(document).on("click", "a.linkCoupon", function(e){
+            e.preventDefault();
+            var id = $(this).attr("idb");
+            if(session){
+                $.post('/communities/save-coupon/', {
+                    'id_coupon': id
+                }, function(data){
+                    var evalData = eval('(' + data + ')');
+                    if (evalData.state){
+                        new Messi(evalData.message, {title: 'Detour Maps - Response', modal: true});
+                    }else{
+                        new Messi(evalData.message, {title: 'Detour Maps - Error', modal: true});
+                    }
+                });
+            }else{
+                window.localStorage["save_coupon"] = id;
+                $("#request_deal").show();
+                $("#dealer").hide();
+                $("#signer").show();
+                $("#logger").hide();
+            }
+        });
+        $(document).on("click", "input.ckCoupon", function(e){
+            if($(this).prop("checked")){
+                $("button#printCoupon").removeAttr("disabled");
+                $("button#emailCoupon").removeAttr("disabled");
+                window.localStorage["coupon"] = $(this).val();
+            }else{
+                $("button#printCoupon").prop("disabled", true);
+                $("button#emailCoupon").prop("disabled", true);
+                window.localStorage["coupon"] = $(this).val();
+            }
+        });
+        $(document).on("click", "a#save-bookmark-deal", function(e){
+            e.preventDefault();
+            var biz_url = $(this).attr("idb");
+            if(session){
+                $.post('/communities/save-bookmark/', {
+                    'biz_url': biz_url
+                }, function(data){
+                    var evalData = eval('(' + data + ')');
+                    if (evalData.state){
+                        new Messi(evalData.message, {title: 'Detour Maps - Response', modal: true});
+                    }else{
+                        new Messi(evalData.message, {title: 'Detour Maps - Error', modal: true});
+                    }
+                });
+            }else{
+                window.localStorage["save_bookmark"] = biz_url;
+                $("#request_deal").show();
+                $("#dealer").hide();
+                $("#signer").show();
+                $("#logger").hide();
+            }
+        });
+    });
+    </script>
+    </div>
+    </div>
+    <div id="request_deal">
+        <section id="dealer">
+            <header>
+                <a href="" class="closerequest_deal">X</a>
+            </header>
+            <div>
+                <h2 class="requestH2">Good news</h2>
+                <h3 class="requestH3"></h3>
+                <p>
+                    Select from the following Orange Deals you would like this
+                    business to accept, the more requests each Orange Deal
+                    receives the sooner they will become available.
+                </p>
+                <div class="check_deal">
+                    <ul>
+                        <li>
+                            <label>
+                                <img src="{{ STATIC_URL }}community/evolution/ten-off-pop.png"/>
+                            </label>
+                            <input type="checkbox" name="deal[]" value="T">
+                        </li>
+                        <li>
+                            <label>
+                                <img src="{{ STATIC_URL }}community/evolution/smart-pop.png"/>
+                            </label>
+                            <input type="checkbox" name="deal[]" value="S">
+                        </li>
+                        <li>
+                            <label>
+                                <img src="{{ STATIC_URL }}community/evolution/ten-visits-pop.png"/>
+                            </label>
+                            <input type="checkbox" name="deal[]" value="V">
+                        </li>
+                        <li>
+                            <label>
+                                <img src="{{ STATIC_URL }}community/evolution/refer-pop.png"/>
+                            </label>
+                            <input type="checkbox" name="deal[]" value="R">
+                        </li>
+                    </ul>
+                </div>
+                <input type="hidden" value="" id="hideDeal">
+                <button id="btnRequestDeal">Request Orange Deals</button>
+            </div>
+        </section>
+        <section id="signer" style="display: none;">
+            <header>
+                <a href="" class="closerequest_deal">X</a>
+            </header>
+            <div>
+                <form id="formfakelogin">{% csrf_token %}
+                    <h2 class="requestH2">Sign up to complete request</h2>
+                    <p>
+                        Thank you for your request, please enter your name and
+                        email address so that we can alert you when Orange Deals
+                        become available.
+                    </p>
+                    <div class="check_deal">
+                        <input type="text" placeholder="Name*" name="nameuserdeal">
+                        <input type="email" placeholder="Email*" name="emailuserdeal">
+                    </div>
+                    <div class="terms"><label><input type="checkbox" name="ckterms" class="ckterms" value="1">I have read the Terms and Conditions</label><a href="">Learn More</a></div>
+                    <button id="btnSignDeal">Sign Up</button>
+                    <p>Already on Detour? <a href="" id="btnSignIn">Sign In</a></p>
+                </form>
+            </div>
+        </section>
+        <section id="logger" style="display: none;">
+            <header>
+                <a href="" class="closerequest_deal">X</a>
+            </header>
+            <div>
+                <form id="formfakeSign">
+                    <h2 class="requestH2">Sign in to complete request</h2>
+                    <p>
+                        Thank you for your request, please enter your name and
+                        email address so that we can alert you when Orange Deals
+                        become available.
+                    </p>
+                    <div class="check_deal">
+                        <input type="text" placeholder="User Name*" name="user_email">
+                        <input type="password" placeholder="Password*" name="user_password">
+                    </div>
+                    <button id="btnSignInDeal">Sign In</button>
+                </form>
+            </div>
+        </section>
+    </div>
+    {% spaceless %}
+        <section id="templates">
+            <article id="info-{{ b.hash }}" class="binfo">
+                <div class="lpanel">
+                    <div class="img-wrap"></div>
+                    <div class="l-nav"></div>
+                    <div class="r-nav"></div>
+                </div>
+                <div class="rpanel">
+                    <h3 style="margin-bottom: 0px;"></h3>
+                    <hr style="border-color: #f48131; margin-top: 0px;">
+                    <p class="des"></p>
+                    <p class="orange-deals"><i><img src="{{ STATIC_URL }}community/evolution/icon-orange-bubble.png"/></i> Orange Deals<br/><a href="#" class="show-more">see more <i class="icon-caret-down"></i></a></p>
+                    <address>
+                        <span class="address"></span><br/>
+                    <span class="social fb"><a href="" target="_blank">
+                        <img alt="facebook" src="{{ STATIC_URL }}community/evolution/icon-facebook-bubble.png"/>
+                    </a></span>
+                        <nobr></nobr>
+                    <span class="social tt"><a href="" target="_blank">
+                        <img alt="twitter" src="{{ STATIC_URL }}community/evolution/icon-twitter-bubble.png"/>
+                    </a></span>
+                    </address>
+                </div>
+            </article>
+            <div class="marker smaller" style="height: 8px; width: 8px; cursor: help;">
+                <svg width="10" height="10" xmlns="http://www.w3.org/2000/svg">
+                    <g>
+                        <title></title>
+                        <circle r="5" cy="5" cx="5" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null"
+                                stroke-width="0" fill="#f48131"/>
+                    </g>
+                </svg>
+            </div>
+            <div class="marker small" style="height: 16px; width: 16px; cursor: help;">
+                <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+                    <g>
+                        <title></title>
+                        <circle r="7" cy="8" cx="8" stroke-linejoin="round" stroke-dasharray="2,2" stroke-width="2"
+                                stroke="#f48131" fill="none"/>
+                        <circle r="5" cy="8" cx="8" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null"
+                                stroke-width="0" fill="#f48131"/>
+                    </g>
+                </svg>
+            </div>
+            <div class="marker big" style="height: 22px; width: 22px; cursor: help; position: relative;">
+                <svg width="22" height="22" xmlns="http://www.w3.org/2000/svg">
+                    <g>
+                        <title></title>
+                        <circle fill="#f48131" stroke-width="0" stroke-dasharray="null" stroke-linejoin="null"
+                                stroke-linecap="null" cx="11" cy="11" r="9.6066"/>
+                        <circle r="10.6066" cy="11" cx="11" stroke-linejoin="round" stroke-dasharray="2,2"
+                                stroke-width="2"
+                                stroke="#f48131" fill="none"/>
+                    </g>
+                </svg>
+                <div style="height: 15px; width: 15px; position: absolute; top: 3.5px; left: 3.5px; overflow: hidden;">
+                    <img src="http://detourmaps.com/media/categoryicons/restaurants.icon.flat.png"
+                         style="height: 33px; width: 18px; position: absolute; left: 0; top: -18px;"/>
+                </div>
+            </div>
+            <div class="overmap">
+                <div class="c">
+                    <img src="http://maps.gstatic.com/mapfiles/mv/imgs8.png"/>
+                </div>
+                <div class="m"></div>
+            </div>
+        </section>
+        <form id="formLogin" action="/user/login" method="POST" style="padding: 0 35px; display: none;">
+            <h3>Login with your account</h3>
+            <hr>
+            <div style="display: table-row;">
+                <div style="display: table-cell; text-align: right;font-size:1.5em;font-weight: bold;padding-right: 10px;">
+                    Email:
+                </div>
+                <div style="display: table-cell;"><input id="frmlogin_email" type="email" name="user_email"
+                                                         placeholder="Email" style="width: 211px;"></div>
+
+            </div>
+            <div style="display: table-row;">
+                <div style="display: table-cell; text-align: right;font-size:1.5em;font-weight: bold;padding-right: 10px;">
+                    Password:
+                </div>
+                <div style="display: table-cell;"><input type="password" name="user_password" placeholder="Password"
+                                                         style="width: 211px;"></div>
+                <button id="btnFrmLogin"
+                        style="display: table-cell;width: 65px;padding-left: 5px;padding-right: 5px;margin-left: 2px;margin-top: 0;padding-top: 6px;padding-bottom: 3px;">
+                    Sign in
+                </button>
+            </div>
+            <div style="display: table-row;">
+                <div style="display: table-cell; text-align: left;">
+                    <a id="new_passw" href="{% url 'reset_password' %}">Forgot Password?</a>
+                </div>
+                <div style="display: table-cell; text-align: right;">
+                    <a id="userRegister" href="{% url 'registerUser' %}">Not a member yet?</a>
+                </div>
+                <script type="text/javascript">
+                    $(document).ready(function () {
+                        $("#formfakelogin").validate({
+                            rules: {
+                                nameuserdeal: {
+                                    required: true
+                                },
+                                emailuserdeal: {
+                                    required: true,
+                                    email: true
+                                },
+                                ckterms: {
+                                    required: true
+                                }
+                            },
+                            messages: {
+                                nameuserdeal: {
+                                    required: 'This field is required'
+                                },
+                                emailuserdeal: {
+                                    required: 'This field is required',
+                                    email: 'Please enter a valid email account'
+                                }
+                            }
+                        });
+                        $("#formfakelogin").submit(function (e) {
+                            e.preventDefault();
+                            var form = $("#formfakelogin");
+                            var button = $("#formfakelogin button");
+                            if (button.prop("disabled")) return;
+                            if (form.valid()) {
+                                button.prop("disabled", true).html('<i class="icon-spinner icon-spin"></i>Sending');
+                                $.post('{% url 'fakelogin' %}', form.serialize(), function (data) {
+                                    var evalData = eval('(' + data + ')');
+                                    //$("#response-lista").html(evalData.msg);
+                                    new Messi(evalData.message, {title: 'Detour Maps - Response', modal: true});
+                                    button.prop("disabled", false).html("Sign Up");
+                                    $("#request_deal").hide();
+                                    if(window.localStorage["biz"] && window.localStorage["listValues"]){
+                                        $.post("{% url 'saveFeedBack' %}", {
+                                            "biz": window.localStorage['biz'],
+                                            "listValues": window.localStorage['listValues']
+                                        }, function(data){
+                                            var evalDataP = eval('(' + data + ')');
+                                            if(evalDataP.response){
+                                                new Messi("Thanks for your feedback!", {title: 'DetourMaps - Feedback Orange Deals', modal: true});
+                                                window.localStorage.removeItem("biz");
+                                                window.localStorage.removeItem("listValues");
+                                            }else{
+                                                new Messi("Error in your feedback, try later!", {title: 'DetourMaps - Feedback Orange Deals', modal: true});
+                                            }
+                                        });
+                                    }
+                                    if(window.localStorage["save_bookmark"]){
+                                        $.post('/communities/save-bookmark/', {
+                                            'biz_url': window.localStorage["save_bookmark"]
+                                        }, function(data){
+                                            var evalData = eval('(' + data + ')');
+                                            if (evalData.state){
+                                                new Messi(evalData.message, {title: 'Detour Maps - Response', modal: true});
+                                                window.localStorage.removeItem("save_bookmark");
+                                            }else{
+                                                new Messi(evalData.message, {title: 'Detour Maps - Error', modal: true});
+                                            }
+                                        })
+                                    }
+                                    if(window.localStorage["save_coupon"]){
+                                        $.post('/communities/save-coupon/', {
+                                            'id_coupon': window.localStorage["save_coupon"]
+                                        }, function(data){
+                                            var evalData = eval('(' + data + ')');
+                                            if (evalData.state){
+                                                new Messi(evalData.message, {title: 'Detour Maps - Response', modal: true});
+                                                window.localStorage.removeItem("save_coupon");
+                                            }else{
+                                                new Messi(evalData.message, {title: 'Detour Maps - Error', modal: true});
+                                            }
+                                        });
+                                    }
+                                    if(window.localStorage["receipt"]){
+                                        $.post("{% url 'save_ten_visits' %}", {
+                                            "name": window.localStorage["employee"],
+                                            "receipt": window.localStorage["receipt"],
+                                            "date": window.localStorage["date"],
+                                            "biz_url": window.localStorage['biz_url']
+                                        }, function(data){
+                                            var evalData = eval('(' + data + ')');
+                                            if(evalData.state){
+                                                new Messi(evalData.message, {title: 'DetourMaps - Ten Visits Orange Deals', modal: true});
+                                                window.localStorage.removeItem("employee");
+                                                window.localStorage.removeItem("receipt");
+                                                window.localStorage.removeItem("date");
+                                                window.localStorage.removeItem("biz_url");
+                                            }else{
+                                                new Messi("Error in your transaction, try later!", {title: 'DetourMaps - Ten Visits Orange Deals', modal: true});
+                                            }
+                                        });
+                                    }
+                                    if(window.localStorage['refer']){
+                                        $.post("{% url 'save_refer_friends' %}", {
+                                                "email": window.localStorage["email"],
+                                                "quickmessage": window.localStorage["quickmessage"],
+                                                "biz_url": window.localStorage["biz_url"]
+                                            }, function(data){
+                                                var evalData = eval('(' + data + ')');
+                                                if(evalData.state){
+                                                    new Messi(evalData.message, {title: 'DetourMaps - Refer Friends Orange Deals', modal: true});
+                                                    window.localStorage.removeItem("email");
+                                                    window.localStorage.removeItem("quickmessage");
+                                                    window.localStorage.removeItem("refer");
+                                                    window.localStorage.removeItem("biz_url");
+                                                }else{
+                                                    new Messi("Error in your transaction, try later!", {title: 'DetourMaps - Refer Friends Orange Deals', modal: true});
+                                                }
+                                            });
+                                    }
+                                    if(window.localStorage["tag"]){
+                                        window.open('http://localhost:8000/communities/get/card?tag=' + window.localStorage["tag"], '_blank');
+                                    }
+                                });
+                            }
+                        });
+                        $("#formfakeSign, #loginuser").validate({
+                            rules: {
+                                user_email: {
+                                    required: true
+                                },
+                                user_password: {
+                                    required: true,
+                                    minlength: 6
+                                }
+                            },
+                            messages: {
+                                user_email: {
+                                    required: "Please enter your username or your email"
+                                },
+                                user_password: {
+                                    required: "Please enter your password",
+                                    minlength: "Your password must be a 6 characters"
+                                }
+                            }
+                        });
+                        $("#loginuser").submit(function (e){
+                            e.preventDefault();
+                            var form = $("#loginuser");
+                            var button = $("#loginuser button.btnlogin");
+                            if (button.prop("disabled")) return;
+                            if (form.valid()) {
+                                button.prop("disabled", true).html('Wait ...');
+                                $.post('{% url 'userLoginAjax' %}', form.serialize(), function (data) {
+                                    var evalData = eval('(' + data + ')');
+                                    //$("#response-lista").html(evalData.msg);
+                                    $("#modal .inside p").html(evalData.msg);
+                                    $("#modal.modal").css({
+                                        top: "50%",
+                                        opacity: 1,
+                                        visibility: "visible"
+                                    }); 
+                                    if (evalData.confirm) {                                        
+                                        button.prop("disabled", false).html("Sign In");                                        
+                                        $("#savesmart").show();
+                                        $("#loginusersmart").hide();
+                                        $("#signsmart").hide();
+                                    }else{
+                                        button.prop("disabled", false).html("Sign In");
+                                    }
+                                });
+                            }
+                        });
+                        $("#signUp").validate({
+                            rules: {
+                                emailuserdeal: {
+                                    required: true,
+                                    email: true
+                                },
+                                agree: {
+                                    required: true
+                                }
+                            },
+                            messages: {
+                                emailuserdeal: {
+                                    required: 'This field is required',
+                                    email: 'Please enter a valid email account'
+                                }
+                            }
+                        });
+                        $("#signUp").submit(function (e) {
+                            e.preventDefault();
+                            var form = $("#signUp");
+                            var button = $("#signUp button");
+                            if (button.prop("disabled")) return;
+                            if (form.valid()) {
+                                button.prop("disabled", true).html('Wait ...');
+                                $.post('{% url 'fakelogin' %}', form.serialize(), function (data) {
+                                    var evalData = eval('(' + data + ')');
+                                    //$("#response-lista").html(evalData.msg);
+                                    $("#modal .inside p").html(evalData.message);
+                                    $("#modal.modal").css({
+                                        top: "50%",
+                                        opacity: 1,
+                                        visibility: "visible"
+                                    }); 
+                                    button.prop("disabled", false).html("Sign Up");
+                                    if(evalData.state){
+                                        $("#signsmart").hide();
+                                        $("#savesmart").show();
+                                    }else{
+                                        $("#signsmart").hide();
+                                        $("#loginusersmart").show();
+                                    }
+                                    //$(".popup").not($("#passwordsmart")).hide();
+                                    //$("#passwordsmart").show();
+                                });
+                            }
+                        });
+                        $("#passChange").validate({
+                            rules: {
+                                old_password: {
+                                    required: true,
+                                    minlength: 6
+                                },
+                                new_password: {
+                                    required: true,
+                                    minlength: 8
+                                },
+                                reNewPass: {
+                                    required: true,
+                                    minlength: 8,
+                                    equalTo: '#newPass'
+                                }
+                            },
+                            messages: {
+                                old_password: {
+                                    required: 'This field is required',
+                                    minlength: 'minimum 6'
+                                },
+                                new_password: {
+                                    required: 'This field is required',
+                                    minlength: 'minimum 6'
+                                },
+                                reNewPass: {
+                                    required: 'This field is required',
+                                    minlength: 'minimum 6',
+                                    equalTo: 'No match with your new password'
+                                }
+                            }
+                        });
+                        $("#passChange").submit(function (e) {
+                            e.preventDefault();
+                            var form = $("#passChange");
+                            var button = $("#passChange button");
+                            if (button.prop("disabled")) return;
+                            if (form.valid()) {
+                                button.prop("disabled", true).html('Wait ...');
+                                $.post('/communities/register/confirm/ajax/' + $("#user_id").val(), form.serialize(), function (data) {
+                                    var evalData = eval('(' + data + ')');
+                                    //$("#response-lista").html(evalData.msg);                                    
+                                    button.prop("disabled", false).html("Save Password");
+                                    $("#modal .inside p").html(evalData.message);
+                                    $("#modal.modal").css({
+                                        top: "50%",
+                                        opacity: 1,
+                                        visibility: "visible"
+                                    });
+                                    $("#passwordsmart").hide();
+                                    $("#savesmart").show();
+                                });
+                            }                            
+                        });
+                        $('#forgotpass').validate({
+                            rules: {
+                                user_email: {
+                                    required: true,
+                                    email: true
+                                    /*remote: {
+                                        url: '{% url "remote-confirm" %}',
+                                        type: "post",
+                                        data: {
+                                            username: function () {
+                                                return $("#forgot_email").val();
+                                            }
+                                        }
+                                    }*/
+                                },                                
+                            },
+                            messages: {
+                                user_email: {
+                                    email: "Not a valid email address"
+                                    /*remote: 'This account already exists. Do you wish ' +
+                                            '<a href="#loginusersmart" class="menuinside">enter</a>?'*/
+                                },                                
+                            }
+                        });
+                        $("#forgotpass").submit(function(e){
+                            e.preventDefault();
+                            var form = $("#forgotpass");
+                            var button = $("#forgotpass button");
+                            if (button.prop("disabled")) return;
+                            if (form.valid()) {
+                                button.prop("disabled", true).html('Wait ...');
+                                $.post('{% url 'forgot_password' %}', form.serialize(), function (data) {
+                                    var evalData = eval('(' + data + ')');
+                                    button.prop("disabled", false).html("Send Password");
+                                    $("#modal .inside p").html(evalData.message);
+                                    $("#modal.modal").css({
+                                        top: "50%",
+                                        opacity: 1,
+                                        visibility: "visible"
+                                    });
+                                    if(evalData.state){
+                                        $("#forgotsmart").hide();
+                                        $("#passwordsmart").show();
+                                        $("#user_id").val(evalData.code);
+                                    }
+                                });                                   
+                            }
+                        });
+                        $("#formfakeSign").submit(function (e) {
+                            e.preventDefault();
+                            var form = $("#formfakeSign");
+                            var button = $("#formfakeSign button");
+                            if (button.prop("disabled")) return;
+                            if (form.valid()) {
+                                button.prop("disabled", true).html('<i class="icon-spinner icon-spin"></i>Sending');
+                                $.post('{% url 'userLoginAjax' %}', form.serialize(), function (data) {
+                                    var evalData = eval('(' + data + ')');
+                                    //$("#response-lista").html(evalData.msg);
+                                    new Messi(evalData.msg, {title: 'Detour Maps - Response', modal: true});
+                                    if (evalData.confirm) {
+                                        $.modal.close();
+                                        button.prop("disabled", false).html("Sign In");
+                                        if(window.localStorage["biz"] && window.localStorage["listValues"]){
+                                            $.post("{% url 'saveFeedBack' %}", {
+                                                "biz": window.localStorage['biz'],
+                                                "listValues": window.localStorage['listValues']
+                                            }, function(data){
+                                                var evalDataP = eval('(' + data + ')');
+                                                if(evalDataP.response){
+                                                    new Messi("Thanks for your feedback!", {title: 'DetourMaps - Feedback Orange Deals', modal: true});
+                                                }else{
+                                                    new Messi("Error in your feedback, try later!", {title: 'DetourMaps - Feedback Orange Deals', modal: true});
+                                                }
+                                            });
+                                        }
+                                        if(window.localStorage["save_bookmark"]){
+                                            $.post('/communities/save-bookmark/', {
+                                                'biz_url': window.localStorage["save_bookmark"]
+                                            }, function(data){
+                                                var evalData = eval('(' + data + ')');
+                                                if (evalData.state){
+                                                    new Messi(evalData.message, {title: 'Detour Maps - Response', modal: true});
+                                                    window.localStorage.removeItem("save_bookmark");
+                                                }else{
+                                                    new Messi(evalData.message, {title: 'Detour Maps - Error', modal: true});
+                                                }
+                                            })
+                                        }
+                                        if(window.localStorage["save_coupon"]){
+                                            $.post('/communities/save-coupon/', {
+                                                'id_coupon': window.localStorage["save_coupon"]
+                                            }, function(data){
+                                                var evalData = eval('(' + data + ')');
+                                                if (evalData.state){
+                                                    new Messi(evalData.message, {title: 'Detour Maps - Response', modal: true});
+                                                    window.localStorage.removeItem("save_coupon");
+                                                }else{
+                                                    new Messi(evalData.message, {title: 'Detour Maps - Error', modal: true});
+                                                }
+                                            });
+                                        }
+                                        if(window.localStorage["receipt"]){
+                                            $.post("{% url 'save_ten_visits' %}", {
+                                                "name": window.localStorage["employee"],
+                                                "receipt": window.localStorage["receipt"],
+                                                "date": window.localStorage["date"],
+                                                "biz_url": window.localStorage['biz_url']
+                                            }, function(data){
+                                                var evalData = eval('(' + data + ')');
+                                                if(evalData.state){
+                                                    new Messi(evalData.message, {title: 'DetourMaps - Ten Visits Orange Deals', modal: true});
+                                                    window.localStorage.removeItem("employee");
+                                                    window.localStorage.removeItem("receipt");
+                                                    window.localStorage.removeItem("date");
+                                                    window.localStorage.removeItem("biz_url");
+                                                }else{
+                                                    new Messi("Error in your transaction, try later!", {title: 'DetourMaps - Ten Visits Orange Deals', modal: true});
+                                                }
+                                            });
+                                        }
+                                        if(window.localStorage['refer']){
+                                            $.post("{% url 'save_refer_friends' %}", {
+                                                    "email": window.localStorage["email"],
+                                                    "quickmessage": window.localStorage["quickmessage"],
+                                                    "biz_url": window.localStorage["biz_url"]
+                                                }, function(data){
+                                                    var evalData = eval('(' + data + ')');
+                                                    if(evalData.state){
+                                                        new Messi(evalData.message, {title: 'DetourMaps - Refer Friends Orange Deals', modal: true});
+                                                        window.localStorage.removeItem("email");
+                                                        window.localStorage.removeItem("quickmessage");
+                                                        window.localStorage.removeItem("refer");
+                                                        window.localStorage.removeItem("biz_url");
+                                                    }else{
+                                                        new Messi("Error in your transaction, try later!", {title: 'DetourMaps - Refer Friends Orange Deals', modal: true});
+                                                    }
+                                                });
+                                        }
+                                        if(window.localStorage["tag"]){
+                                            window.open('http://localhost:8000/communities/get/card?tag=' + window.localStorage["tag"], '_blank');
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    });
+                </script>
+            </div>
+            <h3>Or use your...</h3>
+            <hr>
+            <div style="margin: auto; background-color: #3B5998; width: 150px;"><a id="logFacebook" href="" style="display: block; color: #fff !important; padding: 10px; text-align: center; font-size: 16px; margin-top: 10px;"><i class="icon-facebook"></i>acebook</a></div>
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $("#logFacebook").click(function (e) {
+                        e.preventDefault();
+                        var href = "https://graph.facebook.com/oauth/authorize?client_id=540480642657288&scope=publish_stream,email&display=popup&redirect_uri=" + encodeURIComponent(window.location.href);
+                        document.location.href = href;
+                    })
+                })
+            </script>
+        </form>
+        
+    {% endspaceless %}
+    {% endblock %}

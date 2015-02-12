@@ -1,0 +1,482 @@
+{% extends 'base-new.html' %}
+{% load thumbnail %}
+{% load queryset %}
+{% block title %}Frequently Asked Questions (FAQ){% endblock %}
+{% block head %}
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}community/css/dtmfront-evolution.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}community/css/style_home.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}animation/style.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}web-icon/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="{{ STATIC_URL }}custom-theme/jquery-ui-1.10.3.custom.css"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}modal/jquery.modal.css" type="text/css" media="screen"/>
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}community/js/richmarker.js"></script>
+    <script>
+        var detourmaps = {
+            user: {
+                email: {}
+            }
+        };
+        var dtmStyle = [
+            {
+                featureType: "road",
+                elementType: "geometry",
+                stylers: [
+                    { hue: "#00ccff" },
+                    { saturation: -55 },
+                    { lightness: -35 },
+                    { gamma: 2 },
+                    { visibility: "simplified" }
+                ]
+            },
+            {
+                featureType: "road",
+                elementType: "labels",
+                stylers: [
+                    { hue: "#00ccff" },
+                    { saturation: -55 },
+                    { lightness: -5 },
+                    { gamma: 1 }
+                ]
+            },
+            {
+                featureType: "landscape",
+                stylers: [
+                    { lightness: 50 }
+                ]
+            },
+            {
+                featureType: "poi",
+                elementType: "labels",
+                stylers: [
+                    { visibility: "off" }
+                ]
+            },
+            {
+                featureType: "poi.park",
+                stylers: [
+                    { lightness: 10 },
+                    { saturation: 0 },
+                    { gamma: 1.5 }
+                ]
+            },
+            {
+                featureType: "poi.place_of_worship",
+                stylers: [
+                    { visibility: "off" }
+                ]
+            },
+            {
+                featureType: "landscape.man_made",
+                stylers: [
+                    { visibility: "off" }
+                ]
+            },
+            {
+                featureType: "administrative.neighborhood",
+                stylers: [
+                    { visibility: "off" }
+                ]
+            },
+            {
+                featureType: "administrative.locality",
+                stylers: [
+                    { visibility: "off" }
+                ]
+            }
+        ];
+        var cmData = false;
+        $.getJSON('{% url "alldata" %}', function (data) {
+            cmData = data;
+        });
+        $(document).ready(function () {
+            //$("#user_menu_login").hide();
+            var mapConstructorURL = '{% url "map" "replace" %}';
+            var communities = [
+                {% for c in communities %}
+                    {
+                        name: '{{ c.name }}',
+                        url_name: '{{ c.url_name }}',
+                        geojson: {{ c.borders.geojson|safe }}
+                    },
+                {% endfor %}
+            ];
+            var bounds = new google.maps.LatLngBounds();
+            var polygons = [];
+            var markers = [];
+            for (var j = 0; j < communities.length; j++) {
+                var pcoords = [];
+                var tmpBounds = new google.maps.LatLngBounds();
+                for (var k = 0; k < communities[j].geojson.coordinates[0][0].length; k++) {
+                    var coord = communities[j].geojson.coordinates[0][0][k];
+                    var latlng = new google.maps.LatLng(coord[1], coord[0]);
+                    pcoords.push(latlng);
+                    bounds.extend(latlng);
+                    tmpBounds.extend(latlng);
+                }
+                polygons.push(new google.maps.Polygon({
+                    paths: pcoords,
+                    strokeColor: "#f48131",
+                    strokeOpacity: 1,
+                    strokeWeight: 2,
+                    fillColor: "#f48131",
+                    fillOpacity: 0.1,
+                    url: communities[j].url_name
+                }));
+                latlng = tmpBounds.getCenter();
+                markers.push(new RichMarker({
+                    position: latlng,
+                    map: null,
+                    title: communities[j].name,
+                    content: '<h3 class="cmm-title" style="color #F48031 !important;">' + communities[j].name + '</h3>',
+                    flat: true,
+                    url: communities[j].url_name
+                }));
+            }
+            var map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 20,
+                center: latlng,
+                disableDefaultUI: false,
+                scrollwheel: false,
+                scaleControl: true,
+                zoomControl: true,
+                zoomControlOptions: {
+                    style: google.maps.ZoomControlStyle.SMALL
+                },
+                navigationControl: true,
+                navigationControlOptions: {
+                    style: google.maps.NavigationControlStyle.SMALL,
+                    position: google.maps.ControlPosition.RIGHT_CENTER
+                },
+                mapTypeControl: true,
+                mapTypeControlOptions: {
+                    style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+                    position: google.maps.ControlPosition.RIGHT_BOTTOM,
+                    mapTypeIds: [
+                        google.maps.MapTypeId.SATELLITE,
+                        google.maps.MapTypeId.HYBRID,
+                        google.maps.MapTypeId.TERRAIN,
+                        'dtm']
+                },
+                mapTypeId: 'dtm'
+            });
+            var dtmMapType = new google.maps.StyledMapType(dtmStyle, {
+                map: map,
+                name: "Map"
+            });
+            map.mapTypes.set('dtm', dtmMapType);
+            map.setMapTypeId('dtm');
+            map.fitBounds(bounds);
+            for (var n = 0; n < polygons.length; n++) {
+                polygons[n].setMap(map);
+                markers[n].setMap(map);
+                google.maps.event.addListener(polygons[n], 'click', function () {
+                    window.location.href = mapConstructorURL.replace('replace', this.url);
+                });
+                google.maps.event.addListener(polygons[n], 'mouseover', function () {
+                    this.setOptions({
+                        fillColor: "#ffffff",
+                        fillOpacity: 0.5
+                    });
+                });
+                google.maps.event.addListener(polygons[n], 'mouseout', function () {
+                    this.setOptions({
+                        fillColor: "#f48131",
+                        fillOpacity: 0.1
+                    });
+                });
+            }
+            $("div.faq h3").click(function (e) {
+                $("div.faq h3").find("img").attr("src", "{{ STATIC_URL }}community/elementos/plus-slide.png");
+
+                $("article.hideFAQ").slideUp();
+                var visibility = $(this).next().css("display");
+                if (visibility == "none") {
+                    $(this).next().slideDown();
+                    $(this).find("img").attr("src", "{{ STATIC_URL }}community/elementos/minus-slide.png");
+                }
+                e.returnValue = false;
+                return false;
+            });
+            $("li.slideList").click(function (e) {
+                $("li.slideList").find("p, ul").slideUp();
+                $("li.slideList i").find("img").attr("src", "{{ STATIC_URL }}community/elementos/plus-slide.png");
+                var visibility = $(this).find("p, ul").css("display");
+                if (visibility == "none") {
+                    $(this).find("p, ul").slideDown();
+                    $(this).find("img").attr("src", "{{ STATIC_URL }}community/elementos/minus-slide.png");
+                }
+                e.returnValue = false;
+                return false;
+            });
+        });
+    </script>
+    <style type="text/css">
+        body {
+            background: #ffffff !important;
+        }
+
+        footer {
+            position: relative !important;
+            top: 0 !important;
+            margin-top: 180px;
+        }
+
+        input:focus {
+            background-color: #ffffff;
+        }
+
+        .overmenu {
+            z-index: 10000;
+        }
+
+        .menuJoin li {
+            width: 100%;
+        }
+
+        .menuJoin li a {
+            text-align: left !important;
+        }
+
+        .pageContents {
+            min-width: 748px;
+            max-width: 1140px;
+            margin: 0 auto;
+            font-family: Verdana, Geneva, sans-serif;
+        }
+
+        .title {
+            color: #F26f31;
+            font-size: 1.3em;
+            font-weight: 700;
+        }
+
+        .title p {
+            margin: 0;
+            padding-top: 4px;
+        }
+
+        .bodyUl {
+            margin-left: 25px;
+            font-size: .9em;
+        }
+
+        .subUl {
+            font-size: .8em;
+        }
+
+        .para {
+            font-size: 14px;
+            width: 95%;
+            line-height: 1.5em;
+            padding-left: 30px;
+        }
+
+        .para span {
+            font-weight: bold;
+            font-size: 16px;
+            color: #666;
+        }
+
+        .misc {
+            padding-left: 25px;
+            color: #59595C;
+            background-color: #f2672c;
+            border-radius: 25px;
+            width: 87%;
+            padding-bottom: 4px;
+        }
+
+        .miscH1 {
+            color: #414042;
+            width: 100%;
+            padding-bottom: 4px;
+            font-size: 55px;
+        }
+    </style>
+{% endblock %}
+{% block bodyname %}faq-page{% endblock %}
+{% block bar-container %}{% endblock %}
+{% block content %}
+    <div id="map" style="position: relative; width: 100%; height: 300px;">
+
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="twocol">
+
+            </div>
+            <div class="eightcol faq">
+                <h1>Have these page contents replace what is currently being used as the contents on the faq page. Keep
+                    the map that is above the questions/answers</h1><br>
+                <br>
+
+                <div class="pageContents">
+                    <img src="{{ STATIC_URL }}community/css/images/privacy.png" width="55" height="55"
+                         style="float:left; padding-top:10px; padding-right:10px;">
+
+                    <h1 class="miscH1">Frequently Asked Questions</h1>
+
+                    <div class="title"><p>What are Orange Deals?</p></div>
+                    <p class="para">
+                        Orange Deals is a discount program provided by Detour Maps to give the community several deal
+                        options. Our deals are free and easy to use. Our deals include:
+                    <ul class="bodyUl">
+                        <li>Smart Buys</li>
+                        <br>
+                        <li>$10 Savings Card</li>
+                        <br>
+                        <li>10 Visits Loyalty Program</li>
+                        <br>
+                        <li>5=25 Referral Program</li>
+                        <br>
+                    </ul>
+                    </p>
+                    <div class="title"><p>What are Smart Buys?</p></div>
+                    <p class="para">
+                        Detour Maps Smart Buys are local business coupons and deals that created to make it easier for
+                        you to save. Smart buys are deals from various restaurants, shopping stores and other places in
+                        your community.
+                        With Smart Buys, you can find items & services from 10-50% off or even find something you want
+                        for free at your favorite local store. Every Smart Buys deal is unique so you are bound to find
+                        something you need or want. Smart Buys coupons are available in print (depending on community)
+                        and digital.
+                    </p>
+
+                    <div class="title"><p>What is a $10 Savings Card?</p></div>
+                    <p class="para">
+                        With our signature $10 savings card you can save ten dollars on your purchase instantly at
+                        participating locations. To save $10, businesses require a minimum purchase amount. Minimum
+                        purchases are easy to identify with our color coded dots (yellow, red, and blue). Businesses
+                        with a yellow dot,require a minimum purchase of $30 to save 10, red at least $40, and blue $50.
+                        Spot the dot and save! Our printed maps serve as a community resource, as well as an orange
+                        deals guide. Using the same color coded dots the map highlights participating businesses to help
+                        you locate deals. Savings card available in print and digital.
+                    </p>
+
+                    <div class="title"><p>What is the 10 Visits Reward Program?</p></div>
+                    <p class="para">
+                        Get rewarded for being a loyal customer. Visit participating businesses and make a certain
+                        amount of purchases and get something for free! Free item determined by participating business.
+                    </p>
+
+                    <div class="title"><p>What is the 5=25 Referral Program?</p></div>
+                    <p class="para">
+                        Get $25 by telling 5 friends or family members about your preferred business. If that person
+                        buys a product or service from that business and presents the referral code you earn referral
+                        points once business owner puts referral code in the system. Refer 5 people to visit a business
+                        and buy a product or service and you receive a $25 credit for that business.
+                    </p>
+
+                    <div class="title"><p>Where can I use Orange Deals?</p></div>
+                    <p class="para">
+                        You can use it in all participating locations in our Detour Maps Communities. To find a Detour
+                        Maps business near you that is participating, click <a href="http://www.detourmaps.com/deals">here</a>.
+                    </p>
+
+                    <div class="title"><p>Is membership required to use any of the Orange Deals?</p></div>
+                    <p class="para">
+                        Yes. You cannot print or download a coupon, nor redeem any business' offer unless you are a
+                        Detour Maps member. Membership to detourmaps.com is absolutely FREE. However, as a condition of
+                        membership you must agree to a <a href="http://www.detourmaps.com/terms-and-conditions">Member
+                        Terms of Service</a>.
+                    </p>
+
+                    <div class="title"><p>Is membership required to browse through Detour Maps website and deals?</p>
+                    </div>
+                    <p class="para">
+                        You are allowed to browse detourmaps.com as a guest and membership is not required. However,
+                        membership is required to use certain parts of detourmaps.com so it is strongly encouraged.
+                    </p>
+
+                    <div class="title"><p>How do I find Orange Deals?</p></div>
+                    <p class="para">
+                        Orange Deals can be found on our website under the deals page or on participating businesses
+                        Detour webpage. Once you click the deal you want to use you need to log in to detourmaps.com or
+                        create an account with us.
+                    </p>
+
+                    <div class="title"><p>How do I redeem Orange Deals?</p></div>
+                    <p class="para">
+                        Because there is more than one way to redeem a deal it all depends on the deal you are trying to
+                        redeem:
+                    <ul class="bodyUl">
+                        <li>Smart Buys & $10 Savings card: Once you sign in click the deal you want, print the deal and
+                            done. Present your Smart buys coupon or savings card to the business within 24 hours of
+                            downloading or printing and instantly save. Mobile version available
+                        </li>
+                        <br>
+                        <li>10 Visits Loyalty Program: Log in to detourmaps.com and go to the Orange deals, Regulars
+                            section on the business webpage and provide your email, receipt number, and date of purchase
+                            and hit submit. Once you hit submit you add a point to your dashboard. Once you hit the
+                            number of visits the business requests you will receive a voucher number through the email
+                            you provide us. Print that voucher out and present to the business and get your free item.
+                            Mobile version available
+                        </li>
+                        <br>
+                        <li>5=25 Referral Program: Log in to detourmaps.com or create your account to keep track of the
+                            friends you send invites and other Orange Deals promos. Fill in name of the person you are
+                            sending the information to, their email and phone number and Detour Maps will send them an
+                            email with a referral code and your name. If that person buys a product or service from that
+                            business and presents the referral code sent to them, you earn referral points once business
+                            owner puts referral code in the system.
+                        </li>
+                        <br>
+                    </ul>
+                    </p>
+                    <div class="title"><p>Where do I keep track of all the Orange Deals I have used?</p></div>
+                    <p class="para">
+                        When you create an account with Detour Maps you also create a profile known as the Dashboard. In
+                        the dashboard you can keep track of the coupons you have already used and how long you have to
+                        redeem it. Through the dashboard you can also keep track of the number of referrals you sent out
+                        and how many of those people actually visit the business as well as the number of visits you
+                        made at a participating business.
+                    </p>
+
+                    <div class="title"><p>Can I redeem Orange Deals through my mobile device?</p></div>
+                    <p class="para">
+                        Yes you can. Our website is mobile and you have access to your dashboard through your mobile
+                        device. Just log in like you normally do, then tap to select the reward you'd like to redeem.
+                        Show the screen to the cashier and enjoy your deals. Deals can only be redeemed at the same
+                        business where they were earned.
+                    </p>
+
+                    <div class="title"><p>Is there an expiration date to theses Orange Deals?</p></div>
+                    <p class="para">
+                        Expiration dates vary by the type of deal and also the business' discretion. Some deals run all
+                        year while others only last one to six months. Please read each business' deal for specific
+                        details or ask business for more details. <br>
+                        <br>
+
+                        When you download or print a Smart Buys coupon or $10 Savings Card the download lasts for 24
+                        hours. You must use the day of download or print. After the 24 hours are up, you must wait 7
+                        days after downloading to reuse a card or coupon promotion.
+                    </p>
+
+                    <div class="title"><p>What does Detour Maps do with my information when I register?</p></div>
+                    <p class="para">
+                        We take our customer's privacy very seriously, and your contact information will never be sold
+                        to a third party, a fourth party, or pirates. We will send weekly newsletters to the email you
+                        provide us about community events and special deals. In addition we will use the information you
+                        provide us during registration you help us find the best deals for you.<br>
+                        <br>
+                        For more information, please read our <a href="http://detourmaps.com/privacy-policy/">Privacy
+                        Policy</a>.
+                    </p>
+
+                    <div class="title"><p>Can I share an Orange deal I like?</p></div>
+                    <p class="para">
+                        Yes you can! We give the option to share a deal through our website from the business' Detour
+                        webpage. You can share through social media such as Facebook, Twitter, and Google+ or you can
+                        email the link directly to your friends and family.
+                    </p><br>
+                    <br>
+                </div>
+            </div>
+            <div class="twocol last">
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
