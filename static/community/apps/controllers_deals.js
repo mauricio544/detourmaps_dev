@@ -75,7 +75,7 @@ myApp.controller('bizCtrl', ['$scope', '$http', 'businessScope', function ($scop
     var isDevice = true;
     $scope.selectedCommunity = [];
     $scope.currentPage = 0;
-    $scope.pageSize = 8;
+    $scope.pageSize = 6;
     $scope.query = {}
     $scope.queryBy = '$'
     $scope.text = "";
@@ -185,7 +185,7 @@ myApp.controller('bizCtrl', ['$scope', '$http', 'businessScope', function ($scop
                         lat : parseFloat(r[1]),
                         lng : parseFloat(r[0])
                     },
-                    markerIcon : "/static/images/marker-green.png"
+                    markerIcon : "/static/images/Health_location-01.png"
                 };
                 $scope.props.push(dict_marker);
             });                           
@@ -1185,7 +1185,6 @@ myApp.controller('bizCtrl', ['$scope', '$http', 'businessScope', function ($scop
                     markerIcon : "/static/images/marker-green.png"
                 };
                 $scope.props.push(dict_marker);
-                console.log($scope.props.length);
             }               
         });        
         $scope.addMarkers($scope.props, $scope.map);

@@ -478,8 +478,8 @@
     display: block;
     width: 19px;
     height: 28px;
-    top: 15px;
-    left: 21px;
+    top: 7px;
+    left: 13px;
 }
 .logo.expanded a span.marker {
     color: #fff;
@@ -1973,6 +1973,21 @@ a.card ul.cardFeat li span, div.card ul.cardFeat li span {
 .summaryItem {
     margin-bottom: 20px;
 }
+    label.app-label-block {
+        display: block;
+        font-family: 'Open Sans', sans-serif;
+        color: #333333;
+    }
+    select.app-select {
+        border: 2px solid #d1d3d4;
+        outline: none;
+        width: 96%;
+        padding: 2% 2%;
+        color: #333;
+        font-family: 'Open Sans', sans-serif;
+        border-radius: 4px;
+        background: #ffffff;
+    }
 h1.pageTitle {
     margin: 0;
     padding: 0 0 5px 0;
