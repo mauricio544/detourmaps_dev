@@ -2114,6 +2114,50 @@ h1.pageTitle {
 .contactForm .cfItem:last-child {
     margin-bottom: 0;
 }
+#deals ul {
+    list-style: none;
+    overflow: hidden;
+    margin-left: -40px;
+}
+.app-biz {
+    width: 95%;
+    margin: 20px auto;
+    background: #fff;
+    padding: 0;
+}
+.app-biz a {
+    display: block;
+}
+.app-biz a figure img {
+    width: 100%;
+}
+.app-biz-info {
+    padding: 0 2%;
+}
+.app-biz-info h2 {
+    color: #333;
+    font-weight: bold;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1.25rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+.app-biz-info h3 {
+    color: #999;
+    font-weight: lighter !important;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1.2rem !important;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+    vertical-align: middle;
+}
+.app-biz-info ul.app-icon-list{
+    text-align: center;
+}
+.app-biz-info ul.app-icon-list img{
+    display: block;
+    margin: auto;
+}
 .description, .amenities, .share, .similar {
     padding: 20px 20px 0 20px;
 }

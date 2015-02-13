@@ -84,31 +84,34 @@
                 </div>
                 <div class="clearfix"></div>
                 <div id="deals">
-                    <ul style="padding: 0.5em 2.5em;">
+                    <ul>
                         <li class="col-xs-12 col-sm-12 col-md-6 col-lg-6 result" ng-repeat="biz in business | startFrom:currentPage*pageSize | limitTo:pageSize">
-                            <section>
+                            <section class="app-biz">
                                 <a href="[[ biz.url ]]">
                                     <figure>
                                         <img src="/media/[[ biz.image ]]" alt="[[ biz.name ]]"/>
                                     </figure>
                                 </a>
-                                <section class="" style="padding: 0;">
-                                    <h2>[[ biz.name ]] <div style="float: right;"><img src="{{ STATIC_URL }}community/evolution/icon-map-evolution.png"/> [[ biz.community_name ]]</div></h2>
-                                </section>
-                                <section class="pure-u-1-1" style="padding: 0;">
-                                    <div style="color:#f15a29; font-weight: bolder; float: left;width: 50%;"><img src="{{ STATIC_URL }}community/evolution/icon-orange.png"/> Orange Deals</div>
-                                    <a href="[[ biz.url ]]" style="color:#f15a29; font-weight: bolder; float: right;width: 50%;text-align: right;font-size: 0.9em;">More info <i><img src="{{ STATIC_URL }}community/evolution/icon-see-more-info.png"/></i></a>
+                                <section class="app-biz-info">
+                                    <h2>[[ biz.name ]]</h2>
+                                    <h3><img src="{{ STATIC_URL }}images/marker-icon.png" alt="Marker">[[ biz.address ]]</h3>
+                                    <ul class="list-inline app-icon-list">
+                                        <li><a href=""><img src="{{ STATIC_URL }}images/love-icon.png" alt="I love It">I love it</a></li>
+                                        <li><a href=""><img src="{{ STATIC_URL }}images/share-icon.png" alt="Share">Share</a></li>
+                                        <li><a href=""><img src="{{ STATIC_URL }}images/call-icon.png" alt="Call">Call</a></li>
+                                        <li><a href=""><img src="{{ STATIC_URL }}images/direction-icon.png" alt="Directions">Directions</a></li>
+                                    </ul>
                                 </section>
                             </section>
                         </li>
                     </ul>
                     <div class="clearfix"></div>
-                    <section>
-                        <button class="retroceso" ng-disabled="currentPage == 0" ng-click="currentPage=currentPage-1">
+                    <section style="margin: 20px 0 20px 20px;">
+                        <button class="btn btn-default" ng-disabled="currentPage == 0" ng-click="currentPage=currentPage-1">
                             Previous
                         </button>
                         [[currentPage+1]]/[[numberOfPages()]]
-                        <button style="background: #F05A29; color: #fff; padding: 5px 10px; border: none; box-shadow: 0 0 4px #000;" class="avance" ng-disabled="currentPage >= business.length/pageSize - 1" ng-click="currentPage=currentPage+1">
+                        <button class="btn btn-primary" ng-disabled="currentPage >= business.length/pageSize - 1" ng-click="currentPage=currentPage+1">
                             Next
                         </button>
                     </section>

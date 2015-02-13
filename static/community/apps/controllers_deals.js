@@ -1164,8 +1164,7 @@ myApp.controller('bizCtrl', ['$scope', '$http', 'businessScope', function ($scop
         $scope.props = [];
         angular.forEach($scope.businesstmp, function(bizitem) {
             searchText = val.toLowerCase();            
-            if( bizitem.name.toString().toLowerCase().search(searchText) >= 0){
-                console.log(bizitem);
+            if(bizitem.name.toString().toLowerCase().search(searchText) >= 0){
                 tmpBiz.push(bizitem);
                 var geo = bizitem.geo || undefined;
                 var r = geo.slice(7, geo.length - 1).split(' ') || [];
