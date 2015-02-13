@@ -1181,7 +1181,7 @@ myApp.controller('bizCtrl', ['$scope', '$http', 'businessScope', function ($scop
                         lat : parseFloat(r[1]),
                         lng : parseFloat(r[0])
                     },
-                    markerIcon : "/static/images/marker-green.png"
+                    markerIcon : "/static/images/Auto_location-01.png"
                 };
                 $scope.props.push(dict_marker);
             }               
