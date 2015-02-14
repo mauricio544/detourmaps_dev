@@ -140,7 +140,7 @@ myApp.controller('bizCtrl', ['$scope', '$http', 'businessScope', function ($scop
                                     '<div class="clearfix"></div>' +
                                     '<div class="infoButtons">' +
                                         '<a class="btn btn-sm btn-round btn-gray btn-o closeInfo">Close</a>' +
-                                        '<a href="single.html" class="btn btn-sm btn-round btn-green viewInfo">View</a>' +
+                                        '<a href="' + prop.view + '" class="btn btn-sm btn-round btn-green viewInfo" target="_blank">View</a>' +
                                     '</div>' +
                                  '</div>';
 
@@ -187,6 +187,7 @@ myApp.controller('bizCtrl', ['$scope', '$http', 'businessScope', function ($scop
                     title : bizmarker.name,
                     image : '/media/' + bizmarker.image,
                     type : bizmarker.category,
+                    view: bizmarker.url,
                     price : '$1,550,000',
                     address : bizmarker.address,
                     bedrooms : '3',
@@ -1197,6 +1198,7 @@ myApp.controller('bizCtrl', ['$scope', '$http', 'businessScope', function ($scop
                     type : bizitem.category,
                     price : '$1,550,000',
                     address : bizitem.address,
+                    view: bizitem.url,
                     bedrooms : '3',
                     bathrooms : '2',
                     area : '3430 Sq Ft',
