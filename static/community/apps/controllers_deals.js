@@ -169,7 +169,18 @@ myApp.controller('bizCtrl', ['$scope', '$http', 'businessScope', function ($scop
             $scope.placeholder_nosearch = "Search for pizza, hair salons, mexican food ...";            
     
             angular.forEach($scope.businesstmp, function(bizmarker){
-
+                var marker_icon;
+                if (bizmarker.category === "Lodging and Travel"){
+                    marker_icon = "/static/images/Auto_location-01.png";
+                }else if(bizmarker.category === "Health and Medical"){
+                    marker_icon = "/static/images/Health_location-01.png";
+                }else if(bizmarker.category === "Beauty and Spas"){
+                    marker_icon = "/static/images/Beauty_location-01.png";
+                }else if(bizmarker.category === "Restaurants"){
+                    marker_icon = "/static/images/Food_location-01.png";
+                }else{
+                    marker_icon = "/static/images/Services_location-01.png";
+                }
                 var geo = bizmarker.geo || undefined;
                 var r = geo.slice(7, geo.length - 1).split(' ') || [];
                 var dict_marker = {
@@ -185,7 +196,7 @@ myApp.controller('bizCtrl', ['$scope', '$http', 'businessScope', function ($scop
                         lat : parseFloat(r[1]),
                         lng : parseFloat(r[0])
                     },
-                    markerIcon : "/static/images/Health_location-01.png"
+                    markerIcon : marker_icon
                 };
                 $scope.props.push(dict_marker);
             });                           
@@ -1163,7 +1174,19 @@ myApp.controller('bizCtrl', ['$scope', '$http', 'businessScope', function ($scop
         var tmpBiz = [];
         $scope.props = [];
         angular.forEach($scope.businesstmp, function(bizitem) {
-            searchText = val.toLowerCase();            
+            searchText = val.toLowerCase();
+            var marker_icon;
+            if (bizitem.category === "Lodging and Travel"){
+                marker_icon = "/static/images/Auto_location-01.png";
+            }else if(bizitem.category === "Health and Medical"){
+                marker_icon = "/static/images/Health_location-01.png";
+            }else if(bizitem.category === "Beauty and Spas"){
+                marker_icon = "/static/images/Beauty_location-01.png";
+            }else if(bizitem.category === "Restaurants"){
+                marker_icon = "/static/images/Food_location-01.png";
+            }else{
+                marker_icon = "/static/images/Services_location-01.png";
+            }
             if(bizitem.name.toString().toLowerCase().search(searchText) >= 0){
                 tmpBiz.push(bizitem);
                 var geo = bizitem.geo || undefined;
@@ -1181,7 +1204,7 @@ myApp.controller('bizCtrl', ['$scope', '$http', 'businessScope', function ($scop
                         lat : parseFloat(r[1]),
                         lng : parseFloat(r[0])
                     },
-                    markerIcon : "/static/images/Auto_location-01.png"
+                    markerIcon : marker_icon
                 };
                 $scope.props.push(dict_marker);
             }               

@@ -1543,7 +1543,7 @@
             <a href="">Gallery</a>
             <div class="more-info">
                 <div id="owl-gallery" class="owl-carousel">
-                    {% for h in business.imagegallery_set.all %}
+                    {% for h in business.imagebusiness_set.all %}
                         <img src="/media/{{ h.img }}" class="thumb" alt="{{ h.name }}"/>
                     {% endfor %}
                 </div>
