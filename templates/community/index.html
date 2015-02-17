@@ -66,15 +66,17 @@
                                     <div class="row">
                                         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
                                             <label for="" class="app-label-block">Search by Community</label>
-                                               <select name="app-community" id="app-community" class="app-select" ng-model="community" ng-options="community as community.name for community in communities track by community.id" ng-change="getCommunityUnique()">
+                                               <select name="app-community" id="app-community" class="app-select" ng-model="community" ng-options="community as community.name for community in communities" ng-change="getCommunityUnique()">
+                                               <option value="">-- Community --</option>
                                                </select>
                                         </div>
                                         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-                                            <label for="" class="app-label-block">Search by Deal</label><select name="app-deal" id="app-deal" class="app-select">
-                                                <option value="" ng-click="smart_buys()">Smart Buys</option>
-                                                <option value="" ng-click="ten_off()">$10 Off</option>
-                                                <option value="" ng-click="ten_visits()">10 Visits</option>
-                                                <option value="" ng-click="refer_friends()">5=25 Refer</option>
+                                            <label for="" class="app-label-block">Search by Deal</label><select name="app-deal" id="app-deal" class="app-select" ng-model="deal" ng-change="get_deal()">
+                                                <option value="">-- Deal --</option>
+                                                <option value="1">Smart Buys</option>
+                                                <option value="2">$10 Off</option>
+                                                <option value="3">10 Visits</option>
+                                                <option value="4">5=25 Refer</option>
                                             </select>
                                         </div>
                                     </div>

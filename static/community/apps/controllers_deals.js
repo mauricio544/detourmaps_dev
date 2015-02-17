@@ -73,7 +73,7 @@ myApp.controller('bizCtrl', ['$scope', '$http', 'businessScope', function ($scop
     var contentHeight;
     var contentWidth;
     var isDevice = true;
-    $scope.selectedCommunity = [];
+    $scope.selectedCommunity = null;
     $scope.currentPage = 0;
     $scope.pageSize = 6;
     $scope.query = {}
@@ -685,6 +685,17 @@ myApp.controller('bizCtrl', ['$scope', '$http', 'businessScope', function ($scop
         }
         return $scope.business;
     };
+    $scope.get_deal = function(){
+        if(this.deal === "1"){
+            $scope.smart_buys();
+        }else if(this.deal === "2"){
+            $scope.ten_off();
+        }else if(this.deal === "3"){
+            $scope.ten_visits();
+        }else{
+            $scope.refer_friends();
+        }
+    };
     $scope.ten_off = function(){
         var tmpBiz = [];
         $scope.visits = false;
@@ -692,29 +703,25 @@ myApp.controller('bizCtrl', ['$scope', '$http', 'businessScope', function ($scop
         $scope.buys = false;
         $scope.off = true;
         $scope.currentPage = 0;
-        if($scope.selectedCommunity.length > 0){
+        if($scope.selectedCommunity !== null){
             if($scope.getcat != 0){
-                angular.forEach($scope.selectedCommunity, function(cid){
-                    angular.forEach($scope.businesstmp, function(bizitem){
-                        if(angular.equals(bizitem.community, cid)){
-                            if(angular.equals(bizitem.category, $scope.getcat)){
-                                if(angular.equals(bizitem.ten_off, true)){
-                                    tmpBiz.push(bizitem);
-                                }
-                            }
-                        }
-                    });
-                });
-                $scope.business = tmpBiz;
-            }else{
-                angular.forEach($scope.selectedCommunity, function(cid){
-                    angular.forEach($scope.businesstmp, function(bizitem){
-                        if(angular.equals(bizitem.community, cid)){
+                angular.forEach($scope.businesstmp, function(bizitem){
+                    if(angular.equals(bizitem.community, $scope.selectedCommunity)){
+                        if(angular.equals(bizitem.category, $scope.getcat)){
                             if(angular.equals(bizitem.ten_off, true)){
                                 tmpBiz.push(bizitem);
                             }
                         }
-                    });
+                    }
+                });
+                $scope.business = tmpBiz;
+            }else{
+                angular.forEach($scope.businesstmp, function(bizitem){
+                    if(angular.equals(bizitem.community, $scope.selectedCommunity)){
+                        if(angular.equals(bizitem.ten_off, true)){
+                            tmpBiz.push(bizitem);
+                        }
+                    }
                 });
                 $scope.business = tmpBiz;
             }
@@ -746,29 +753,25 @@ myApp.controller('bizCtrl', ['$scope', '$http', 'businessScope', function ($scop
         $scope.refer = false;
         $scope.buys = true;
         $scope.off = false;
-        if($scope.selectedCommunity.length > 0){
+        if($scope.selectedCommunity !== null){
             if($scope.getcat != 0){
-                angular.forEach($scope.selectedCommunity, function(cid){
-                    angular.forEach($scope.businesstmp, function(bizitem){
-                        if(angular.equals(bizitem.community, cid)){
-                            if(angular.equals(bizitem.category, $scope.getcat)){
-                                if(angular.equals(bizitem.smart_buys, true)){
-                                    tmpBiz.push(bizitem);
-                                }
-                            }
-                        }
-                    });
-                });
-                $scope.business = tmpBiz;
-            }else{
-                angular.forEach($scope.selectedCommunity, function(cid){
-                    angular.forEach($scope.businesstmp, function(bizitem){
-                        if(angular.equals(bizitem.community, cid)){
+                angular.forEach($scope.businesstmp, function(bizitem){
+                    if(angular.equals(bizitem.community, $scope.selectedCommunity)){
+                        if(angular.equals(bizitem.category, $scope.getcat)){
                             if(angular.equals(bizitem.smart_buys, true)){
                                 tmpBiz.push(bizitem);
                             }
                         }
-                    });
+                    }
+                });
+                $scope.business = tmpBiz;
+            }else{
+                angular.forEach($scope.businesstmp, function(bizitem){
+                    if(angular.equals(bizitem.community, $scope.selectedCommunity)){
+                        if(angular.equals(bizitem.smart_buys, true)){
+                            tmpBiz.push(bizitem);
+                        }
+                    }
                 });
                 $scope.business = tmpBiz;
             }
@@ -800,29 +803,25 @@ myApp.controller('bizCtrl', ['$scope', '$http', 'businessScope', function ($scop
         $scope.refer = false;
         $scope.buys = false;
         $scope.off = false;
-        if($scope.selectedCommunity.length > 0){
+        if($scope.selectedCommunity !== null){
             if($scope.getcat != 0){
-                angular.forEach($scope.selectedCommunity, function(cid){
-                    angular.forEach($scope.businesstmp, function(bizitem){
-                        if(angular.equals(bizitem.community, cid)){
-                            if(angular.equals(bizitem.category, $scope.getcat)){
-                                if(angular.equals(bizitem.ten_visits, true)){
-                                    tmpBiz.push(bizitem);
-                                }
-                            }
-                        }
-                    });
-                });
-                $scope.business = tmpBiz;
-            }else{
-                angular.forEach($scope.selectedCommunity, function(cid){
-                    angular.forEach($scope.businesstmp, function(bizitem){
-                        if(angular.equals(bizitem.community, cid)){
+                angular.forEach($scope.businesstmp, function(bizitem){
+                    if(angular.equals(bizitem.community, $scope.selectedCommunity)){
+                        if(angular.equals(bizitem.category, $scope.getcat)){
                             if(angular.equals(bizitem.ten_visits, true)){
                                 tmpBiz.push(bizitem);
                             }
                         }
-                    });
+                    }
+                });
+                $scope.business = tmpBiz;
+            }else{
+                angular.forEach($scope.businesstmp, function(bizitem){
+                    if(angular.equals(bizitem.community, $scope.selectedCommunity)){
+                        if(angular.equals(bizitem.ten_visits, true)){
+                            tmpBiz.push(bizitem);
+                        }
+                    }
                 });
                 $scope.business = tmpBiz;
             }
@@ -854,29 +853,25 @@ myApp.controller('bizCtrl', ['$scope', '$http', 'businessScope', function ($scop
         $scope.refer = true;
         $scope.buys = false;
         $scope.off = false;
-        if($scope.selectedCommunity.length > 0){
+        if($scope.selectedCommunity !== null){
             if($scope.getcat != 0){
-                angular.forEach($scope.selectedCommunity, function(cid){
-                    angular.forEach($scope.businesstmp, function(bizitem){
-                        if(angular.equals(bizitem.community, cid)){
-                            if(angular.equals(bizitem.category, $scope.getcat)){
-                                if(angular.equals(bizitem.refer_friends, true)){
-                                    tmpBiz.push(bizitem);
-                                }
-                            }
-                        }
-                    });
-                });
-                $scope.business = tmpBiz;
-            }else{
-                angular.forEach($scope.selectedCommunity, function(cid){
-                    angular.forEach($scope.businesstmp, function(bizitem){
-                        if(angular.equals(bizitem.community, cid)){
+                angular.forEach($scope.businesstmp, function(bizitem){
+                    if(angular.equals(bizitem.community, $scope.selectedCommunity)){
+                        if(angular.equals(bizitem.category, $scope.getcat)){
                             if(angular.equals(bizitem.refer_friends, true)){
                                 tmpBiz.push(bizitem);
                             }
                         }
-                    });
+                    }
+                });
+                $scope.business = tmpBiz;
+            }else{
+                angular.forEach($scope.businesstmp, function(bizitem){
+                    if(angular.equals(bizitem.community, $scope.selectedCommunity)){
+                        if(angular.equals(bizitem.refer_friends, true)){
+                            tmpBiz.push(bizitem);
+                        }
+                    }
                 });
                 $scope.business = tmpBiz;
             }
@@ -1030,6 +1025,7 @@ myApp.controller('bizCtrl', ['$scope', '$http', 'businessScope', function ($scop
     $scope.getCommunityUnique = function(){
         $scope.deleteMarkers(null);
         var id = this.community.id;
+        $scope.selectedCommunity = id;
         var tmpBiz = [];
         $scope.props = [];
         $scope.currentPage = 0;
@@ -1081,14 +1077,10 @@ myApp.controller('bizCtrl', ['$scope', '$http', 'businessScope', function ($scop
     $scope.getCommunity = function(){
         var id = this.community.id;
         $scope.currentPage = 0;
-        if(_.contains($scope.selectedCommunity, id)){
-            $scope.selectedCommunity = _.without($scope.selectedCommunity, id)
-        }else{
-            $scope.selectedCommunity.push(id);
-        }
+        $scope.selectedCommunity = id;
         var tmpBiz = [];
         if($scope.getcat != 0){
-            if($scope.selectedCommunity.length > 0){
+            if($scope.selectedCommunity !== null){
                 if($scope.off){
                     angular.forEach($scope.selectedCommunity, function(id){
                         angular.forEach($scope.businesstmp, function(bizitem){
