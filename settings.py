@@ -6,7 +6,7 @@ import django.template
 django.template.add_to_builtins('django.templatetags.future')
 basedir = dirname(__file__)
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 ALLOWED_HOSTS = ['*']
 ADMINS = (
@@ -14,19 +14,10 @@ ADMINS = (
 )
 
 MANAGERS = ADMINS
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'dev_geo_detour', # Or path to database file if using sqlite3.
-        'USER': 'postgres', # Not used with sqlite3.
-        'PASSWORD': '04718802', # Not used with sqlite3.
-        'HOST': 'localhost', # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '5432', # Set to empty string for default. Not used with sqlite3.
-    }
-}
-
+try:
+    from database_settings import *
+except ImportError:
+    pass
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -63,7 +54,7 @@ MEDIA_URL = '/media/'
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = '%s/static/' % basedir
+#STATIC_ROOT = os.path.join(basedir, "static")
 #STATIC_ROOT = '/home/detourmaps/community/static/'
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -86,8 +77,12 @@ STATICFILES_DIRS = (
     #'/media/mauricio/Archivos/detourweb/static/community/static/',
     #/home/detourmaps/community/static/',
     #'/home/detourmaps/web/static/',
-    os.path.join(basedir, "static"),
-    '/media/mauricio/Archivos/detourweb/static/',
+    #os.path.join(basedir, "static"),
+    #'/home/env-detour/detourweb/static/',
+    os.path.join(
+        os.path.dirname(__file__),
+        'static',
+    ),
 )
 
 # List of finder classes that know how to find static files in
@@ -153,9 +148,6 @@ INSTALLED_APPS = (
     'django.contrib.gis',
     'django.contrib.webdesign',	
     'easy_thumbnails',
-    #'admin_tools.theming',
-    #'admin_tools.menu',
-    #'admin_tools.dashboard',
     'community',
     'mariustest',
     'web',
@@ -186,51 +178,9 @@ LOGGING = {
     }
 }
 
-#AUTH_PROFILE_MODULE = 'web.UserProfile'
-
-#only for a action in register business 'publisg register business'
-GOOGLE_MAPS_API_KEY = 'ABQIAAAAMRdj9lILtQvXkiEUNZPsEBTVYn4XUlNVbaXmPTyyPkab5qqNZRQXIeTJetmIkh3Bi3s3lm0489i9hg'
-
-GEOS_LIBRARY_PATH = '/usr/local/lib/libgeos_c.so'
-#GEOS_LIBRARY_PATH='c:\Python27\DLLs\geos_c.dll'
-GDAL_LIBRARY_PATH = '/usr/local/lib/libgdal.so'
-#GDAL_DATA='C:\OSGeo4W\share\gdal'
-#EMAIL_USE_TLS = True
-#EMAIL_HOST = 'smtp.gmail.com'
-#EMAIL_HOST_USER = 'cs.detourmaps@gmail.com'
-#EMAIL_HOST_PASSWORD = 'detour6463'
-#EMAIL_PORT = 587
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_HOST_USER = 'detourmaps'
-EMAIL_HOST_PASSWORD = '04718802'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-
-FACEBOOK_APP_ID = "540480642657288"
-FACEBOOK_APP_SECRET = "8b78af3f834230b2a40ad7dd6e981a14"
-FACEBOOK_REDIRECT_URI = "http://detourmaps.com/communities/loginUser/"
-
-#settings facebook localhost
-#FACEBOOK_APP_ID = "238417312930434"
-#FACEBOOK_APP_SECRET = "ed30953e52e55db8227f0d7e23d37d6d"
-#FACEBOOK_REDIRECT_URI = "http://localhost:8000/communities/loginUser/"
-
-#settings Twitter oAuth
-CONSUMER_KEY = 'FgpSGwxZL1eapBqUNMmg'
-CONSUMER_SECRET = 'bUFhudjFJaXhWYvhOA6Q2PpYqB5FSrXFxJ4yiXDyw'
-REQUEST_TOKEN_URL = 'https://api.twitter.com/oauth/request_token'
-AUTHENTICATE_URL = "https://api.twitter.com/oauth/authenticate?oauth_token="
-ACCESS_TOKEN_URL = "https://api.twitter.com/oauth/access_token"
-
-TWITTER_REDIRECT_URL = 'http://detourmaps.com/communities/loginUser/'
-ACCESS_TOKEN = '102799398-NxV01tbTqfx8nXJbGTmBgSThyaRG0asAtZzYX2yj'
-ACCESS_TOKEN_SECRET = 'VkdzWaq37X9a73Qs3MmwkOC84Uf8HlGD5uaj1zfGT8'
-
-AUTHORIZE_URL = 'https://api.twitter.com/oauth/authorize'
-OAUTH_TOKEN = '1301570935-EyodbGPYng21DIJTVRe5uIfX92IH5DwMCnaltRj'
-OAUTH_SIGNATURE = 'H3RjEtsBaV8J30tvr2G0CbWoac8%3D'
-
-
-#settings Google oauth
-GOOGLE_CLIENT_ID = "532813113917-t1fpu1n46412c7bves9ompkgbucsejtm.apps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET = "MqwIM6VHlkYGwIOpLlkbiCYI"
+try:
+    from gis_settings import *
+    from email_settings import *
+    from social_settings import *
+except ImportError:
+    pass

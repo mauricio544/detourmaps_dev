@@ -1,3 +1,4 @@
+{% load staticfiles %}
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -31,12 +32,12 @@
 
 		<!--=============== css  ===============-->
 
-		<link href="{{ STATIC_URL }}css/font-awesome.css" rel="stylesheet">
-        <link href="{{ STATIC_URL }}css/simple-line-icons.css" rel="stylesheet">
-        <link href="{{ STATIC_URL }}css/jquery-ui.css" rel="stylesheet">
-        <link href="{{ STATIC_URL }}css/datepicker.css" rel="stylesheet">
-        <link href="{{ STATIC_URL }}css/bootstrap.css" rel="stylesheet">
-        <link href="{{ STATIC_URL }}css/app.css" rel="stylesheet">
+		<link href="{% static 'css/font-awesome.css' %}" rel="stylesheet">
+        <link href="{% static 'css/simple-line-icons.css' %}" rel="stylesheet">
+        <link href="{% static 'css/jquery-ui.css' %}" rel="stylesheet">
+        <link href="{% static 'css/datepicker.css' %}" rel="stylesheet">
+        <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet">
+        <link href="{% static 'css/app.css' %}" rel="stylesheet">
 
 			<!--=============== ie styles  ===============-->
 				<!--[if lt IE 9]>
@@ -171,7 +172,7 @@
             <nav class="leftNav scrollable">
                 <div class="search">
                     <span class="searchIcon icon-magnifier"></span>
-                    <input type="text" placeholder="Search for houses, apartments...">
+                    <input type="text" placeholder="[[ placeholder_nosearch ]]" ng-model="search" ng-change="searchtext(search)">
                     <div class="clearfix"></div>
                 </div>
                 <ul>

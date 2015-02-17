@@ -5229,7 +5229,7 @@ blockquote {
         transition: none;
     }
     #header {
-        background-color: #0eaaa6;
+        background-color: #404042;
         height: 50px;
     }
     .search {
@@ -5248,11 +5248,13 @@ blockquote {
         height: 50px;
     }
     .logo a span.marker, .logo.expanded a span.marker {
-        left: 0;
-        top: 10px;
+        left: 18px;
         -webkit-transition: none;
         -o-transition: none;
         transition: none;
+    }
+    .logo a span.marker img{
+        display: block;
     }
     .no-touch .logo a:hover span.marker, .no-touch .logo.expanded a:hover span.marker {
         color: rgba(255, 255, 255, 1);
@@ -5313,7 +5315,7 @@ blockquote {
         padding-top: 8px;
         height: 50px;
         width: 50px;
-        color: #fff;
+        color: #fff !important;
     }
     a.mapHandler {
         display: block;

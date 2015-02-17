@@ -1,4 +1,4 @@
-import Image, ImageDraw, ImageFont, time, re
+import PIL.Image, PIL.ImageDraw, PIL.ImageFont, time, re
 import datetime
 import random
 import simplejson
