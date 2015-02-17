@@ -1027,6 +1027,57 @@ myApp.controller('bizCtrl', ['$scope', '$http', 'businessScope', function ($scop
         });
         return communityName;
     };
+    $scope.getCommunityUnique = function(){
+        $scope.deleteMarkers(null);
+        var id = this.community.id;
+        var tmpBiz = [];
+        $scope.props = [];
+        $scope.currentPage = 0;
+        angular.forEach($scope.businesstmp, function(bizitem){
+            var marker_icon;
+            if (bizitem.category === "Lodging and Travel"){
+                marker_icon = "/static/images/Auto_location-01.png";
+            }else if(bizitem.category === "Health and Medical"){
+                marker_icon = "/static/images/Health_location-01.png";
+            }else if(bizitem.category === "Beauty and Spas"){
+                marker_icon = "/static/images/Beauty_location-01.png";
+            }else if(bizitem.category === "Restaurants"){
+                marker_icon = "/static/images/Food_location-01.png";
+            }else{
+                marker_icon = "/static/images/Services_location-01.png";
+            }
+            if(angular.equals(bizitem.community, id)){
+                tmpBiz.push(bizitem);
+                var geo = bizitem.geo || undefined;
+                var r = geo.slice(7, geo.length - 1).split(' ') || [];
+                var dict_marker = {
+                    title : bizitem.name,
+                    image : '/media/' + bizitem.image,
+                    type : bizitem.category,
+                    price : '$1,550,000',
+                    address : bizitem.address,
+                    view: bizitem.url,
+                    bedrooms : '3',
+                    bathrooms : '2',
+                    area : '3430 Sq Ft',
+                    position : {
+                        lat : parseFloat(r[1]),
+                        lng : parseFloat(r[0])
+                    },
+                    markerIcon : marker_icon
+                };
+                $scope.props.push(dict_marker);
+            }
+        });
+        $scope.addMarkers($scope.props, $scope.map);
+        var limits = new google.maps.LatLngBounds();
+        $.each($scope.markers, function (index, marker){
+            limits.extend(marker.position);
+        });
+        $scope.map.fitBounds(limits);
+        $scope.business = tmpBiz;
+        return $scope.business;
+    };
     $scope.getCommunity = function(){
         var id = this.community.id;
         $scope.currentPage = 0;
