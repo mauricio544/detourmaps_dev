@@ -9,9 +9,9 @@ catctr.controller('categoryController', function($scope, $http){
     $scope.orderProp = 'name';
 });*/
 
-var myApp = angular.module('catApp', []);
+var myApp = angular.module('catApp', ['ngRoute']);
 
-myApp.controller('bizCtrl', ['$scope', '$http', 'businessScope', function ($scope, $http, businessScope) {
+myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'businessScope', function ($scope, $route, $routeParams, $http, businessScope) {
     var options = {
             zoom : 14,
             mapTypeId : 'Styled',
@@ -20,7 +20,8 @@ myApp.controller('bizCtrl', ['$scope', '$http', 'businessScope', function ($scop
                 mapTypeIds : [ 'Styled' ]
             }
         };
-    
+    $scope.$route = $route;
+    $scope.$routeParams = $routeParams;
     var styles = [{
         stylers : [ {
             hue : "#cccccc"
@@ -88,6 +89,9 @@ myApp.controller('bizCtrl', ['$scope', '$http', 'businessScope', function ($scop
     $scope.addMarkers;
     $scope.placeholder_nosearch = "Loading Businesses, please wait ...";
     
+    $scope.setWindowTitle = function( title ) {
+        $scope.windowTitle = title;
+    };
     // Eliminar los marcadores del mapa y limpiar array de marcadores
     $scope.deleteMarkers = function(map){
         for (var i = 0; i < $scope.markers.length; i++) {
@@ -140,7 +144,7 @@ myApp.controller('bizCtrl', ['$scope', '$http', 'businessScope', function ($scop
                                     '<div class="clearfix"></div>' +
                                     '<div class="infoButtons">' +
                                         '<a class="btn btn-sm btn-round btn-gray btn-o closeInfo">Close</a>' +
-                                        '<a href="' + prop.view + '" class="btn btn-sm btn-round btn-green viewInfo" target="_blank">View</a>' +
+                                        '<a href="#/' + prop.title + '" class="btn btn-sm btn-round btn-green viewInfo" target="_self">View</a>' +
                                     '</div>' +
                                  '</div>';
 
@@ -184,6 +188,7 @@ myApp.controller('bizCtrl', ['$scope', '$http', 'businessScope', function ($scop
                 var geo = bizmarker.geo || undefined;
                 var r = geo.slice(7, geo.length - 1).split(' ') || [];
                 var dict_marker = {
+                    id: bizmarker.id,
                     title : bizmarker.name,
                     image : '/media/' + bizmarker.image,
                     type : bizmarker.category,
@@ -1848,7 +1853,9 @@ myApp.controller('bizCtrl', ['$scope', '$http', 'businessScope', function ($scop
     }
 }]);
 
-
+myApp.controller('bizonectrl', ['$scope', '$routeParams', function($scope, $routeParams){
+    $scope.bizId = $routeParams.bizId;
+}])
 
 myApp.filter('startFrom', function() {
     return function(input, start) {
@@ -1913,3 +1920,38 @@ myApp.factory('Biz', function($http){
     };
     return Biz;
 });
+
+myApp.config(
+    function ($routeProvider) {
+        // Typically, when defining routes, you will map the
+        // route to a Template to be rendered; however, this
+        // only makes sense for simple web sites. When you
+        // are building more complex applications, with
+        // nested navigation, you probably need something more
+        // complex. In this case, we are mapping routes to
+        // render "Actions" rather than a template.
+        $routeProvider
+            .when(
+                "/", {
+                    action: "home.default",
+                    templateUrl: '/marius/deals/',
+                    controller: 'bizCtrl'
+                }
+            )
+            .when(
+                "/:bizId", {
+                    templateUrl: '/marius/business/',
+                    controller: 'bizonectrl'
+                }
+            )
+            .when(
+                "/contact/:username", {
+                    action: "contact.form"
+                }
+            )
+            .otherwise({
+                redirectTo: "/",
+                controller: 'bizCtrl'
+            });
+    }
+);
