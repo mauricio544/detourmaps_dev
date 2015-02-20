@@ -144,7 +144,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                                     '<div class="clearfix"></div>' +
                                     '<div class="infoButtons">' +
                                         '<a class="btn btn-sm btn-round btn-gray btn-o closeInfo">Close</a>' +
-                                        '<a href="#/' + prop.title + '" class="btn btn-sm btn-round btn-green viewInfo" target="_self">View</a>' +
+                                        '<a href="#/' + prop.url + '" class="btn btn-sm btn-round btn-green viewInfo" target="_self">View</a>' +
                                     '</div>' +
                                  '</div>';
 
@@ -190,6 +190,8 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                 var dict_marker = {
                     id: bizmarker.id,
                     title : bizmarker.name,
+                    url: bizmarker.slug + '/' + bizmarker.code,
+                    code: bizmarker.code,
                     image : '/media/' + bizmarker.image,
                     type : bizmarker.category,
                     view: bizmarker.url,
@@ -732,7 +734,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                                 var geo = bizitem.geo || undefined;
                                 var r = geo.slice(7, geo.length - 1).split(' ') || [];
                                 var dict_marker = {
+                                    id: bizitem.id,
                                     title : bizitem.name,
+                                    url: bizitem.slug + '/' + bizitem.code,
+                                    code: bizitem.code,
                                     image : '/media/' + bizitem.image,
                                     type : bizitem.category,
                                     price : '$1,550,000',
@@ -773,7 +778,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                             var geo = bizitem.geo || undefined;
                             var r = geo.slice(7, geo.length - 1).split(' ') || [];
                             var dict_marker = {
+                                id: bizitem.id,
                                 title : bizitem.name,
+                                url: bizitem.slug + '/' + bizitem.code,
+                                code: bizitem.code,
                                 image : '/media/' + bizitem.image,
                                 type : bizitem.category,
                                 price : '$1,550,000',
@@ -814,8 +822,11 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                             tmpBiz.push(bizitem);
                             var geo = bizitem.geo || undefined;
                             var r = geo.slice(7, geo.length - 1).split(' ') || [];
-                            var dict_marker = {
+                            var dict_markebizitemr = {
+                                id: bizitem.id,
                                 title : bizitem.name,
+                                url: bizitem.slug + '/' + bizitem.code,
+                                code: bizitem.code,
                                 image : '/media/' + bizitem.image,
                                 type : bizitem.category,
                                 price : '$1,550,000',
@@ -854,7 +865,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                         var geo = bizitem.geo || undefined;
                         var r = geo.slice(7, geo.length - 1).split(' ') || [];
                         var dict_marker = {
+                            id: bizitem.id,
                             title : bizitem.name,
+                            url: bizitem.slug + '/' + bizitem.code,
+                            code: bizitem.code,
                             image : '/media/' + bizitem.image,
                             type : bizitem.category,
                             price : '$1,550,000',
@@ -914,7 +928,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                                 var geo = bizitem.geo || undefined;
                                 var r = geo.slice(7, geo.length - 1).split(' ') || [];
                                 var dict_marker = {
+                                    id: bizitem.id,
                                     title : bizitem.name,
+                                    url: bizitem.slug + '/' + bizitem.code,
+                                    code: bizitem.code,
                                     image : '/media/' + bizitem.image,
                                     type : bizitem.category,
                                     price : '$1,550,000',
@@ -955,7 +972,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                             var geo = bizitem.geo || undefined;
                             var r = geo.slice(7, geo.length - 1).split(' ') || [];
                             var dict_marker = {
+                                id: bizitem.id,
                                 title : bizitem.name,
+                                url: bizitem.slug + '/' + bizitem.code,
+                                code: bizitem.code,
                                 image : '/media/' + bizitem.image,
                                 type : bizitem.category,
                                 price : '$1,550,000',
@@ -997,7 +1017,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                             var geo = bizitem.geo || undefined;
                             var r = geo.slice(7, geo.length - 1).split(' ') || [];
                             var dict_marker = {
+                                id: bizitem.id,
                                 title : bizitem.name,
+                                url: bizitem.slug + '/' + bizitem.code,
+                                code: bizitem.code,
                                 image : '/media/' + bizitem.image,
                                 type : bizitem.category,
                                 price : '$1,550,000',
@@ -1036,7 +1059,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                         var geo = bizitem.geo || undefined;
                         var r = geo.slice(7, geo.length - 1).split(' ') || [];
                         var dict_marker = {
+                            id: bizitem.id,
                             title : bizitem.name,
+                            url: bizitem.slug + '/' + bizitem.code,
+                            code: bizitem.code,
                             image : '/media/' + bizitem.image,
                             type : bizitem.category,
                             price : '$1,550,000',
@@ -1096,7 +1122,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                                 var geo = bizitem.geo || undefined;
                                 var r = geo.slice(7, geo.length - 1).split(' ') || [];
                                 var dict_marker = {
+                                    id: bizitem.id,
                                     title : bizitem.name,
+                                    url: bizitem.slug + '/' + bizitem.code,
+                                    code: bizitem.code,
                                     image : '/media/' + bizitem.image,
                                     type : bizitem.category,
                                     price : '$1,550,000',
@@ -1137,7 +1166,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                             var geo = bizitem.geo || undefined;
                             var r = geo.slice(7, geo.length - 1).split(' ') || [];
                             var dict_marker = {
+                                id: bizitem.id,
                                 title : bizitem.name,
+                                url: bizitem.slug + '/' + bizitem.code,
+                                code: bizitem.code,
                                 image : '/media/' + bizitem.image,
                                 type : bizitem.category,
                                 price : '$1,550,000',
@@ -1179,7 +1211,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                             var geo = bizitem.geo || undefined;
                             var r = geo.slice(7, geo.length - 1).split(' ') || [];
                             var dict_marker = {
+                                id: bizitem.id,
                                 title : bizitem.name,
+                                url: bizitem.slug + '/' + bizitem.code,
+                                code: bizitem.code,
                                 image : '/media/' + bizitem.image,
                                 type : bizitem.category,
                                 price : '$1,550,000',
@@ -1218,7 +1253,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                         var geo = bizitem.geo || undefined;
                         var r = geo.slice(7, geo.length - 1).split(' ') || [];
                         var dict_marker = {
+                            id: bizitem.id,
                             title : bizitem.name,
+                            url: bizitem.slug + '/' + bizitem.code,
+                            code: bizitem.code,
                             image : '/media/' + bizitem.image,
                             type : bizitem.category,
                             price : '$1,550,000',
@@ -1278,7 +1316,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                                 var geo = bizitem.geo || undefined;
                                 var r = geo.slice(7, geo.length - 1).split(' ') || [];
                                 var dict_marker = {
+                                    id: bizitem.id,
                                     title : bizitem.name,
+                                    url: bizitem.slug + '/' + bizitem.code,
+                                    code: bizitem.code,
                                     image : '/media/' + bizitem.image,
                                     type : bizitem.category,
                                     price : '$1,550,000',
@@ -1319,7 +1360,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                             var geo = bizitem.geo || undefined;
                             var r = geo.slice(7, geo.length - 1).split(' ') || [];
                             var dict_marker = {
+                                id: bizitem.id,
                                 title : bizitem.name,
+                                url: bizitem.slug + '/' + bizitem.code,
+                                code: bizitem.code,
                                 image : '/media/' + bizitem.image,
                                 type : bizitem.category,
                                 price : '$1,550,000',
@@ -1361,7 +1405,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                             var geo = bizitem.geo || undefined;
                             var r = geo.slice(7, geo.length - 1).split(' ') || [];
                             var dict_marker = {
+                                id: bizitem.id,
                                 title : bizitem.name,
+                                url: bizitem.slug + '/' + bizitem.code,
+                                code: bizitem.code,
                                 image : '/media/' + bizitem.image,
                                 type : bizitem.category,
                                 price : '$1,550,000',
@@ -1400,7 +1447,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                         var geo = bizitem.geo || undefined;
                         var r = geo.slice(7, geo.length - 1).split(' ') || [];
                         var dict_marker = {
+                            id: bizitem.id,
                             title : bizitem.name,
+                            url: bizitem.slug + '/' + bizmarker.code,
+                            code: bizitem.code,
                             image : '/media/' + bizitem.image,
                             type : bizitem.category,
                             price : '$1,550,000',
@@ -1580,7 +1630,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                 var geo = bizitem.geo || undefined;
                 var r = geo.slice(7, geo.length - 1).split(' ') || [];
                 var dict_marker = {
+                    id: bizitem.id,
                     title : bizitem.name,
+                    url: bizitem.slug + '/' + bizitem.code,
+                    code: bizitem.code,
                     image : '/media/' + bizitem.image,
                     type : bizitem.category,
                     price : '$1,550,000',
@@ -1769,7 +1822,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                 var geo = bizitem.geo || undefined;
                 var r = geo.slice(7, geo.length - 1).split(' ') || [];
                 var dict_marker = {
+                    id: bizitem.id,
                     title : bizitem.name,
+                    url: bizitem.slug + '/' + bizitem.code,
+                    code: bizitem.code,
                     image : '/media/' + bizitem.image,
                     type : bizitem.category,
                     price : '$1,550,000',
@@ -1853,9 +1909,19 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
     }
 }]);
 
-myApp.controller('bizonectrl', ['$scope', '$routeParams', function($scope, $routeParams){
-    $scope.bizId = $routeParams.bizId;
-}])
+myApp.controller('bizonectrl', ['$scope', '$routeParams',  '$http', 'businessOneScope',function($scope, $routeParams, $http, businessOneScope){
+    $scope.bizName = $routeParams.bizName;
+    $scope.bizCode = $routeParams.bizCode;
+    $scope.bizInfo;
+    $scope.getItem = function(){
+        businessOneScope.getAllItem($scope.bizCode).then(function(data){
+            $scope.bizInfo = data;
+        }, function(errorMessage){
+            $scope.error = errorMessage;
+        });
+    };
+    $scope.getItem();
+}]);
 
 myApp.filter('startFrom', function() {
     return function(input, start) {
@@ -1871,6 +1937,25 @@ myApp.filter('matchName', function() {
       return biz.name.indexOf(query) !== -1;
     });
   };
+});
+
+myApp.factory('businessOneScope', function($http, $q){
+    return {
+        apiPath: '/communities/business-one/',
+        getAllItem: function (code) {
+            var deferred = $q.defer();
+            $http.get(this.apiPath, {
+                params: {
+                    biz_code: code
+                }
+            }).success(function (data) {
+                deferred.resolve(data);
+            }).error(function () {
+                deferred.reject("An error occured while fetching items");
+            });
+            return deferred.promise;
+        }
+    }
 });
 
 myApp.factory('businessScope', function($http, $q){
@@ -1939,7 +2024,7 @@ myApp.config(
                 }
             )
             .when(
-                "/:bizId", {
+                "/:bizName/:bizCode", {
                     templateUrl: '/marius/business/',
                     controller: 'bizonectrl'
                 }

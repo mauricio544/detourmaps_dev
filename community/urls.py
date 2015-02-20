@@ -106,6 +106,7 @@ urlpatterns = patterns('community.views',
                        url(r'^redeem-promo/', 'redeemed', name='redeemed'),
                        url(r'^print-promo/(?P<id>\d+)/$', 'print_promo', name='print-promo'),
                        url(r'^share-smart/$', 'share_emails_buys', name='share_emails_buys'),
+                       url(r'^business-one/$', 'business_one_json', name='business_one_json'),
 )
 
 

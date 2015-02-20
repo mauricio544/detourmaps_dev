@@ -2980,6 +2980,32 @@ def business_json(request, page, slice):
     return HttpResponse(simplejson.dumps(lista_business))
 
 
+@csrf_exempt
+def business_one_json(request):
+    if request.method == "GET":
+        dict_business = None
+        if "biz_code" in request.GET:
+            business_object = Business.objects.get(pk=decode_url(request.GET["biz_code"]))
+            dict_business = {
+                'id': business_object.id,
+                'name': business_object.name,
+                'url_name': business_object.get_absolute_url(),
+                'slug': business_object.url_name,
+                'code': business_object.getUniqueCode(),
+                'description': force_unicode(business_object.description),
+                'url': force_unicode(business_object.get_absolute_url()),
+                'geo': force_unicode(business_object.geo), # paso del geo a la vista en json
+                'address': business_object.address,
+                'phones': business_object.phones,
+                'site': business_object.site,
+                'email': business_object.email,
+                'facebook': business_object.facebook,
+                'twitter': business_object.twitter
+            }
+        return HttpResponse(simplejson.dumps(dict_business))
+
+
+@csrf_exempt
 def all_business_json(request):
     community_object = Community.objects.filter(active=True).order_by('name')
     lista_communities = []
@@ -3045,6 +3071,8 @@ def all_business_json(request):
             'id': i.id,
             'name': i.name,
             'url_name': i.get_absolute_url(),
+            'slug': i.url_name,
+            'code': i.getUniqueCode(),
             'local_deals': local_deals,
             'ten_off': ten_off,
             'smart_buys': smart_buys,
