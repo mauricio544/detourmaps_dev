@@ -28,7 +28,7 @@
     text-decoration: none;
 }
 .btn-round {
-    border-radius: 50px;
+    border-radius: 5px;
 }
 .btn-o {
     border-width: 1px;
@@ -2119,6 +2119,67 @@ h1.pageTitle {
     overflow: hidden;
     margin-left: -40px;
 }
+.appcat{
+    display: none;
+}
+    .appcat label{
+        cursor: pointer;
+    }
+    .appcat.autos + label {
+        background: url(../images/auto-a-icon.png);
+        width: 91px;
+        height: 91px;
+        cursor: pointer;
+    }
+    .appcat.beauty + label {
+        background: url(../images/beauty-a-icon.png);
+        width: 91px;
+        height: 91px;
+        cursor: pointer;
+    }
+    .appcat.health + label {
+        background: url(../images/health-a-icon.png);
+        width: 91px;
+        height: 91px;
+        cursor: pointer;
+    }
+    .appcat.food + label {
+        background: url(../images/food-a-icon.png);
+        width: 91px;
+        height: 91px;
+        cursor: pointer;
+    }
+    .appcat.services + label {
+        background: url(../images/services-a-icon.png);
+        width: 91px;
+        height: 91px;
+        cursor: pointer;
+    }
+    .appcat.autos:checked + label, .appcat.autos:hover + label{
+        background: url(../images/auto-cat-icon.png);
+        width: 91px;
+        height: 91px;
+    }
+    .appcat.beauty:checked + label, .appcat.beauty:hover + label{
+        background: url(../images/beauty-cat-icon.png);
+        width: 91px;
+        height: 91px;
+    }
+    .appcat.health:checked + label, .appcat.health:hover + label {
+        background: url(../images/health-cat-icon.png);
+        width: 91px;
+        height: 91px;
+    }
+    .appcat.food:checked + label, .appcat.food:hover + label {
+        background: url(../images/food-cat-icon.png);
+        width: 91px;
+        height: 91px;
+    }
+    .appcat.services:checked + label, .appcat.services:hover + label {
+        background: url(../images/services-cat-icon.png);
+        width: 91px;
+        height: 91px;
+    }
 .app-biz {
     width: 95%;
     margin: 20px auto;

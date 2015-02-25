@@ -83,24 +83,29 @@
         <div class="row">
             <ul class="list-inline text-center">
                 <li>
-                    <a href="#autos"><img src="{{ STATIC_URL }}images/auto-a-icon.png" alt="Autos">
-                    </a>
+                    <!--<a href="#autos"><img src="{{ STATIC_URL }}images/auto-a-icon.png" alt="Autos">
+                    </a>-->
+                    <input type="checkbox" class="appcat autos" id="catautos"><label for="catautos"></label>
                 </li>
                 <li>
-                    <a href="#beauty"><img src="{{ STATIC_URL }}images/beauty-a-icon.png" alt="Beauty">
-                    </a>
+                    <!--<a href="#beauty"><img src="{{ STATIC_URL }}images/beauty-a-icon.png" alt="Beauty">
+                    </a>-->
+                    <input type="checkbox" class="appcat beauty" id="catbeauty"><label for="catbeauty"></label>
                 </li>
                 <li>
-                    <a href="#health"><img src="{{ STATIC_URL }}images/health-a-icon.png" alt="Health">
-                    </a>
+                    <!--<a href="#health"><img src="{{ STATIC_URL }}images/health-a-icon.png" alt="Health">
+                    </a>-->
+                    <input type="checkbox" class="appcat health" id="cathealth"><label for="cathealth"></label>
                 </li>
                 <li>
-                    <a href="#food"><img src="{{ STATIC_URL }}images/food-a-icon.png" alt="Food">
-                    </a>
+                    <!--<a href="#food"><img src="{{ STATIC_URL }}images/food-a-icon.png" alt="Food">
+                    </a>-->
+                    <input type="checkbox" class="appcat food" id="catfood"><label for="catfood"></label>
                 </li>
                 <li>
-                    <a href="#services"><img src="{{ STATIC_URL }}images/services-a-icon.png" alt="Services">
-                    </a>
+                    <!--<a href="#services"><img src="{{ STATIC_URL }}images/services-a-icon.png" alt="Services">
+                    </a>-->
+                    <input type="checkbox" class="appcat services" id="catservices"><label for="catservices"></label>
                 </li>
             </ul>
         </div>
@@ -109,9 +114,9 @@
 <div class="clearfix"></div>
 <div id="deals">
     <ul>
-        <li class="col-xs-12 col-sm-12 col-md-6 col-lg-6 result" ng-repeat="biz in business | startFrom:currentPage*pageSize | limitTo:pageSize">
+        <li class="col-xs-12 col-sm-12 col-md-6 col-lg-6 result" ng-repeat="biz in model.business | startFrom:currentPage*pageSize | limitTo:pageSize">
             <section class="app-biz">
-                <a href="[[ biz.url ]]">
+                <a href="#/[[ biz.slug ]]/[[ biz.code ]]">
                     <figure>
                         <img src="/media/[[ biz.image ]]" alt="[[ biz.name ]]" />
                     </figure>
@@ -143,7 +148,7 @@
             Previous
         </button>
         [[currentPage+1]]/[[numberOfPages()]]
-        <button class="btn btn-primary" ng-disabled="currentPage >= business.length/pageSize - 1" ng-click="currentPage=currentPage+1">
+        <button class="btn btn-primary" ng-disabled="currentPage >= model.business.length/pageSize - 1" ng-click="currentPage=currentPage+1">
             Next
         </button>
     </section>

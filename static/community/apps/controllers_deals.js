@@ -11,7 +11,29 @@ catctr.controller('categoryController', function($scope, $http){
 
 var myApp = angular.module('catApp', ['ngRoute']);
 
-myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'businessScope', function ($scope, $route, $routeParams, $http, businessScope) {
+myApp.config(
+    function ($routeProvider, $locationProvider) {
+        $routeProvider
+            .when(
+                "/", {
+                    templateUrl: '/marius/deals/',
+                    controller: 'bizCtrl'
+                }
+            )
+            .when(
+                "/:bizName/:bizCode", {
+                    templateUrl: '/marius/business/',
+                    controller: 'bizonectrl'
+                }
+            )
+            .otherwise({
+                redirectTo: "/",
+                controller: 'bizCtrl'
+            });
+    }
+);
+
+myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'businessScope', 'search' , '$rootScope',function ($scope, $route, $routeParams, $http, businessScope, search, $rootScope) {
     var options = {
             zoom : 14,
             mapTypeId : 'Styled',
@@ -22,6 +44,8 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
         };
     $scope.$route = $route;
     $scope.$routeParams = $routeParams;
+    $rootScope.business;
+    $rootScope.businesstmp;
     var styles = [{
         stylers : [ {
             hue : "#cccccc"
@@ -48,7 +72,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
             visibility: "off"
         }]
     }];
-    $scope.map; // map instance
+    $scope.map = new google.maps.Map(document.getElementById('mapView'), options);
     $scope.newMarker = null;
     $scope.markers = []; // array de marcadores
     $scope.props = []; // array de diccionarios con información para marcadores
@@ -85,7 +109,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
     $scope.refer = false;
     $scope.buys = false;
     $scope.off = false; 
-    $scope.business
+    $scope.model = {
+        business: "",
+        businesstmp: ""
+    };
     $scope.addMarkers;
     $scope.placeholder_nosearch = "Loading Businesses, please wait ...";
     
@@ -165,14 +192,13 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
     // Llenar el mapa con la totalidad de los negocios 
     $scope.getItems = function(){
         businessScope.getAllItems().then(function(data){
-            $scope.business = data.businesses;
+            $scope.model.business = data.businesses;
             $scope.communities = data.communities;
             $scope.categories = data.categories;
-            $scope.businesstmp = data.businesses;
+            $scope.model.businesstmp = data.businesses;
             $scope.bizrandom = data.business
-            $scope.placeholder_nosearch = "Search for pizza, hair salons, mexican food ...";            
-    
-            angular.forEach($scope.businesstmp, function(bizmarker){
+            $scope.placeholder_nosearch = "Search for pizza, hair salons, mexican food ...";
+            angular.forEach($scope.model.businesstmp, function(bizmarker){
                 var marker_icon;
                 if (bizmarker.category === "Lodging and Travel"){
                     marker_icon = "/static/images/Auto_location-01.png";
@@ -287,7 +313,6 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
 
             setTimeout(function() {
                 $('body').removeClass('notransition');
-
                 $scope.map = new google.maps.Map(document.getElementById('mapView'), options);
                 var styledMapType = new google.maps.StyledMapType(styles, {
                     name : 'Styled'
@@ -646,7 +671,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
     
     
     $scope.numberOfPages=function(){
-        return Math.ceil($scope.business.length/$scope.pageSize);
+        return Math.ceil($scope.model.business.length/$scope.pageSize);
     };
     $scope.orderProp = 'name';
     $scope.alldeals = function(){
@@ -659,7 +684,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
         if($scope.selectedCommunity.length > 0){
             if($scope.getcat != 0){
                 angular.forEach($scope.selectedCommunity, function(cid){
-                    angular.forEach($scope.businesstmp, function(bizitem){
+                    angular.forEach($scope.model.businesstmp, function(bizitem){
                         if(angular.equals(bizitem.community, cid)){
                             if(angular.equals(bizitem.category, $scope.getcat)){
                                 tmpBiz.push(bizitem);
@@ -667,30 +692,30 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                         }
                     });
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }else{
                 angular.forEach($scope.selectedCommunity, function(cid){
-                    angular.forEach($scope.businesstmp, function(bizitem){
+                    angular.forEach($scope.model.businesstmp, function(bizitem){
                         if(angular.equals(bizitem.community, cid)){
                             tmpBiz.push(bizitem);
                         }
                     });
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }
         }else{
             if($scope.getcat != 0){
-                angular.forEach($scope.businesstmp, function(bizitem){
+                angular.forEach($scope.model.businesstmp, function(bizitem){
                     if(angular.equals(bizitem.category, $scope.getcat)){
                         tmpBiz.push(bizitem);
                     }
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }else{
-                $scope.business = $scope.businesstmp;
+                $scope.model.business = $scope.model.businesstmp;
             }
         }
-        return $scope.business;
+        return $scope.model.business;
     };
     $scope.get_deal = function(){
         if(this.deal === "1"){
@@ -714,7 +739,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
         $scope.props = [];
         if($scope.selectedCommunity !== null){
             if($scope.getcat != 0){
-                angular.forEach($scope.businesstmp, function(bizitem){
+                angular.forEach($scope.model.businesstmp, function(bizitem){
                     var marker_icon;
                     if (bizitem.category === "Lodging and Travel"){
                         marker_icon = "/static/images/Auto_location-01.png";
@@ -757,9 +782,9 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                         }
                     }
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }else{
-                angular.forEach($scope.businesstmp, function(bizitem){
+                angular.forEach($scope.model.businesstmp, function(bizitem){
                     var marker_icon;
                     if (bizitem.category === "Lodging and Travel"){
                         marker_icon = "/static/images/Auto_location-01.png";
@@ -800,11 +825,11 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                         }
                     }
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }
         }else{
             if($scope.getcat != 0){
-                angular.forEach($scope.businesstmp, function(bizitem){
+                angular.forEach($scope.model.businesstmp, function(bizitem){
                     var marker_icon;
                     if (bizitem.category === "Lodging and Travel"){
                         marker_icon = "/static/images/Auto_location-01.png";
@@ -845,9 +870,9 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                         }
                     }
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }else{
-                angular.forEach($scope.businesstmp, function(bizitem){
+                angular.forEach($scope.model.businesstmp, function(bizitem){
                     var marker_icon;
                     if (bizitem.category === "Lodging and Travel"){
                         marker_icon = "/static/images/Auto_location-01.png";
@@ -886,7 +911,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                         $scope.props.push(dict_marker);
                     }
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }
         }
         $scope.addMarkers($scope.props, $scope.map);
@@ -895,7 +920,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
             limits.extend(marker.position);
         });
         $scope.map.fitBounds(limits);
-        return $scope.business;
+        return $scope.model.business;
     };
     $scope.smart_buys = function(){
         var tmpBiz = [];
@@ -908,7 +933,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
         $scope.props = [];
         if($scope.selectedCommunity !== null){
             if($scope.getcat != 0){
-                angular.forEach($scope.businesstmp, function(bizitem){
+                angular.forEach($scope.model.businesstmp, function(bizitem){
                     var marker_icon;
                     if (bizitem.category === "Lodging and Travel"){
                         marker_icon = "/static/images/Auto_location-01.png";
@@ -951,9 +976,9 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                         }
                     }
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }else{
-                angular.forEach($scope.businesstmp, function(bizitem){
+                angular.forEach($scope.model.businesstmp, function(bizitem){
                     var marker_icon;
                     if (bizitem.category === "Lodging and Travel"){
                         marker_icon = "/static/images/Auto_location-01.png";
@@ -994,11 +1019,11 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                         }
                     }
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }
         }else{
             if($scope.getcat != 0){
-                angular.forEach($scope.businesstmp, function(bizitem){
+                angular.forEach($scope.model.businesstmp, function(bizitem){
                     var marker_icon;
                     if (bizitem.category === "Lodging and Travel"){
                         marker_icon = "/static/images/Auto_location-01.png";
@@ -1039,9 +1064,9 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                         }
                     }
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }else{
-                angular.forEach($scope.businesstmp, function(bizitem){
+                angular.forEach($scope.model.businesstmp, function(bizitem){
                     var marker_icon;
                     if (bizitem.category === "Lodging and Travel"){
                         marker_icon = "/static/images/Auto_location-01.png";
@@ -1080,7 +1105,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                         $scope.props.push(dict_marker);
                     }
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }
         }
         $scope.addMarkers($scope.props, $scope.map);
@@ -1089,7 +1114,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
             limits.extend(marker.position);
         });
         $scope.map.fitBounds(limits);
-        return $scope.business;
+        return $scope.model.business;
     };
     $scope.ten_visits = function(){
         var tmpBiz = [];
@@ -1102,7 +1127,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
         $scope.props = [];
         if($scope.selectedCommunity !== null){
             if($scope.getcat != 0){
-                angular.forEach($scope.businesstmp, function(bizitem){
+                angular.forEach($scope.model.businesstmp, function(bizitem){
                     var marker_icon;
                     if (bizitem.category === "Lodging and Travel"){
                         marker_icon = "/static/images/Auto_location-01.png";
@@ -1145,9 +1170,9 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                         }
                     }
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }else{
-                angular.forEach($scope.businesstmp, function(bizitem){
+                angular.forEach($scope.model.businesstmp, function(bizitem){
                     var marker_icon;
                     if (bizitem.category === "Lodging and Travel"){
                         marker_icon = "/static/images/Auto_location-01.png";
@@ -1188,11 +1213,11 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                         }
                     }
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }
         }else{
             if($scope.getcat != 0){
-                angular.forEach($scope.businesstmp, function(bizitem){
+                angular.forEach($scope.model.businesstmp, function(bizitem){
                     var marker_icon;
                     if (bizitem.category === "Lodging and Travel"){
                         marker_icon = "/static/images/Auto_location-01.png";
@@ -1233,9 +1258,9 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                         }
                     }
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }else{
-                angular.forEach($scope.businesstmp, function(bizitem){
+                angular.forEach($scope.model.businesstmp, function(bizitem){
                     var marker_icon;
                     if (bizitem.category === "Lodging and Travel"){
                         marker_icon = "/static/images/Auto_location-01.png";
@@ -1274,7 +1299,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                         $scope.props.push(dict_marker);
                     }
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }
         }
         $scope.addMarkers($scope.props, $scope.map);
@@ -1283,7 +1308,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
             limits.extend(marker.position);
         });
         $scope.map.fitBounds(limits);
-        return $scope.business;
+        return $scope.model.business;
     };
     $scope.refer_friends = function(){
         var tmpBiz = [];
@@ -1296,7 +1321,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
         $scope.props = [];
         if($scope.selectedCommunity !== null){
             if($scope.getcat != 0){
-                angular.forEach($scope.businesstmp, function(bizitem){
+                angular.forEach($scope.model.businesstmp, function(bizitem){
                     var marker_icon;
                     if (bizitem.category === "Lodging and Travel"){
                         marker_icon = "/static/images/Auto_location-01.png";
@@ -1339,9 +1364,9 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                         }
                     }
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }else{
-                angular.forEach($scope.businesstmp, function(bizitem){
+                angular.forEach($scope.model.businesstmp, function(bizitem){
                     var marker_icon;
                     if (bizitem.category === "Lodging and Travel"){
                         marker_icon = "/static/images/Auto_location-01.png";
@@ -1382,11 +1407,11 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                         }
                     }
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }
         }else{
             if($scope.getcat != 0){
-                angular.forEach($scope.businesstmp, function(bizitem){
+                angular.forEach($scope.model.businesstmp, function(bizitem){
                     var marker_icon;
                     if (bizitem.category === "Lodging and Travel"){
                         marker_icon = "/static/images/Auto_location-01.png";
@@ -1427,9 +1452,9 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                         }
                     }
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }else{
-                angular.forEach($scope.businesstmp, function(bizitem){
+                angular.forEach($scope.model.businesstmp, function(bizitem){
                     var marker_icon;
                     if (bizitem.category === "Lodging and Travel"){
                         marker_icon = "/static/images/Auto_location-01.png";
@@ -1468,7 +1493,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                         $scope.props.push(dict_marker);
                     }
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }
         }
         $scope.addMarkers($scope.props, $scope.map);
@@ -1477,7 +1502,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
             limits.extend(marker.position);
         });
         $scope.map.fitBounds(limits);
-        return $scope.business;
+        return $scope.model.business;
     };
     $scope.getCat = function(id){
         var tmpBiz = [];
@@ -1486,7 +1511,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
         if($scope.selectedCommunity.length > 0){
             if($scope.off){
                 angular.forEach($scope.selectedCommunity, function(cid){
-                    angular.forEach($scope.businesstmp, function(bizitem){
+                    angular.forEach($scope.model.businesstmp, function(bizitem){
                         if(angular.equals(bizitem.community, cid)) {
                             if (angular.equals(bizitem.category, id)) {
                                 if (angular.equals(bizitem.ten_off, true)) {
@@ -1496,10 +1521,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                         }
                     });
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }else if($scope.buys){
                 angular.forEach($scope.selectedCommunity, function(cid){
-                    angular.forEach($scope.businesstmp, function(bizitem){
+                    angular.forEach($scope.model.businesstmp, function(bizitem){
                         if(angular.equals(bizitem.community, cid)) {
                             if (angular.equals(bizitem.category, id)) {
                                 if (angular.equals(bizitem.smart_buys, true)) {
@@ -1509,10 +1534,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                         }
                     });
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }else if($scope.visits){
                 angular.forEach($scope.selectedCommunity, function(cid){
-                    angular.forEach($scope.businesstmp, function(bizitem){
+                    angular.forEach($scope.model.businesstmp, function(bizitem){
                         if(angular.equals(bizitem.community, cid)) {
                             if (angular.equals(bizitem.category, id)) {
                                 if (angular.equals(bizitem.ten_visits, true)) {
@@ -1522,10 +1547,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                         }
                     });
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }else if($scope.refer){
                 angular.forEach($scope.selectedCommunity, function(cid){
-                    angular.forEach($scope.businesstmp, function(bizitem){
+                    angular.forEach($scope.model.businesstmp, function(bizitem){
                         if(angular.equals(bizitem.community, cid)) {
                             if (angular.equals(bizitem.category, id)) {
                                 if (angular.equals(bizitem.refer_friends, true)) {
@@ -1535,10 +1560,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                         }
                     });
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }else{
                 angular.forEach($scope.selectedCommunity, function(cid){
-                    angular.forEach($scope.businesstmp, function(bizitem){
+                    angular.forEach($scope.model.businesstmp, function(bizitem){
                         if(angular.equals(bizitem.community, cid)){
                             if(angular.equals(bizitem.category, id)){
                                 tmpBiz.push(bizitem);
@@ -1546,55 +1571,55 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                         }
                     });
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }
         }else{
             if($scope.off){
-                angular.forEach($scope.businesstmp, function(bizitem){
+                angular.forEach($scope.model.businesstmp, function(bizitem){
                     if(angular.equals(bizitem.category, id)){
                         if(angular.equals(bizitem.ten_off, true)){
                             tmpBiz.push(bizitem);
                         }
                     }
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }else if($scope.buys){
-                angular.forEach($scope.businesstmp, function(bizitem){
+                angular.forEach($scope.model.businesstmp, function(bizitem){
                     if(angular.equals(bizitem.category, id)){
                         if(angular.equals(bizitem.smart_buys, true)){
                             tmpBiz.push(bizitem);
                         }
                     }
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }else if($scope.visits){
-                angular.forEach($scope.businesstmp, function(bizitem){
+                angular.forEach($scope.model.businesstmp, function(bizitem){
                     if(angular.equals(bizitem.category, id)){
                         if(angular.equals(bizitem.ten_visits, true)){
                             tmpBiz.push(bizitem);
                         }
                     }
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }else if($scope.refer){
-                angular.forEach($scope.businesstmp, function(bizitem){
+                angular.forEach($scope.model.businesstmp, function(bizitem){
                     if(angular.equals(bizitem.category, id)){
                         if(angular.equals(bizitem.refer_friends, true)){
                             tmpBiz.push(bizitem);
                         }
                     }
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }else{
-                angular.forEach($scope.businesstmp, function(bizitem){
+                angular.forEach($scope.model.businesstmp, function(bizitem){
                     if(angular.equals(bizitem.category, id)){
                         tmpBiz.push(bizitem);
                     }
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }
         }
-        return $scope.business;
+        return $scope.model.business;
     };
     $scope.getCommunityName = function(idComm){
         var communityName = "";
@@ -1612,7 +1637,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
         var tmpBiz = [];
         $scope.props = [];
         $scope.currentPage = 0;
-        angular.forEach($scope.businesstmp, function(bizitem){
+        angular.forEach($scope.model.businesstmp, function(bizitem){
             var marker_icon;
             if (bizitem.category === "Lodging and Travel"){
                 marker_icon = "/static/images/Auto_location-01.png";
@@ -1657,8 +1682,8 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
             limits.extend(marker.position);
         });
         $scope.map.fitBounds(limits);
-        $scope.business = tmpBiz;
-        return $scope.business;
+        $scope.model.business = tmpBiz;
+        return $scope.model.business;
     };
     $scope.getCommunity = function(){
         var id = this.community.id;
@@ -1669,7 +1694,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
             if($scope.selectedCommunity !== null){
                 if($scope.off){
                     angular.forEach($scope.selectedCommunity, function(id){
-                        angular.forEach($scope.businesstmp, function(bizitem){
+                        angular.forEach($scope.model.businesstmp, function(bizitem){
                             if(angular.equals(bizitem.community, id)) {
                                 if (angular.equals(bizitem.category, $scope.getcat)) {
                                     if (angular.equals(bizitem.ten_off, true)) {
@@ -1679,10 +1704,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                             }
                         });
                     });
-                    $scope.business = tmpBiz;
+                    $scope.model.business = tmpBiz;
                 }else if($scope.buys){
                     angular.forEach($scope.selectedCommunity, function(id){
-                        angular.forEach($scope.businesstmp, function(bizitem){
+                        angular.forEach($scope.model.businesstmp, function(bizitem){
                             if(angular.equals(bizitem.community, id)) {
                                 if (angular.equals(bizitem.category, $scope.getcat)) {
                                     if (angular.equals(bizitem.smart_buys, true)) {
@@ -1692,10 +1717,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                             }
                         });
                     });
-                    $scope.business = tmpBiz;
+                    $scope.model.business = tmpBiz;
                 }else if($scope.visits){
                     angular.forEach($scope.selectedCommunity, function(id){
-                        angular.forEach($scope.businesstmp, function(bizitem){
+                        angular.forEach($scope.model.businesstmp, function(bizitem){
                             if(angular.equals(bizitem.community, id)) {
                                 if (angular.equals(bizitem.category, $scope.getcat)) {
                                     if (angular.equals(bizitem.ten_visits, true)) {
@@ -1705,10 +1730,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                             }
                         });
                     });
-                    $scope.business = tmpBiz;
+                    $scope.model.business = tmpBiz;
                 }else if($scope.refer){
                     angular.forEach($scope.selectedCommunity, function(id){
-                        angular.forEach($scope.businesstmp, function(bizitem){
+                        angular.forEach($scope.model.businesstmp, function(bizitem){
                             if(angular.equals(bizitem.community, id)) {
                                 if (angular.equals(bizitem.category, $scope.getcat)) {
                                     if (angular.equals(bizitem.refer_friends, true)) {
@@ -1718,10 +1743,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                             }
                         });
                     });
-                    $scope.business = tmpBiz;
+                    $scope.model.business = tmpBiz;
                 }else{
                     angular.forEach($scope.selectedCommunity, function(id){
-                        angular.forEach($scope.businesstmp, function(bizitem){
+                        angular.forEach($scope.model.businesstmp, function(bizitem){
                             if(angular.equals(bizitem.community, id)){
                                 if(angular.equals(bizitem.category, $scope.getcat)){
                                     tmpBiz.push(bizitem);
@@ -1729,16 +1754,16 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                             }
                         });
                     });
-                    $scope.business = tmpBiz;
+                    $scope.model.business = tmpBiz;
                 }
             }else{
-                $scope.business = $scope.businesstmp;
+                $scope.model.business = $scope.model.businesstmp;
             }
         }else{
             if($scope.selectedCommunity.length > 0){
                 if($scope.off){
                     angular.forEach($scope.selectedCommunity, function(id){
-                        angular.forEach($scope.businesstmp, function(bizitem){
+                        angular.forEach($scope.model.businesstmp, function(bizitem){
                             if(angular.equals(bizitem.community, id)) {
                                 if (angular.equals(bizitem.ten_off, true)) {
                                     tmpBiz.push(bizitem);
@@ -1746,10 +1771,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                             }
                         });
                     });
-                    $scope.business = tmpBiz;
+                    $scope.model.business = tmpBiz;
                 }else if($scope.buys){
                     angular.forEach($scope.selectedCommunity, function(id){
-                        angular.forEach($scope.businesstmp, function(bizitem){
+                        angular.forEach($scope.model.businesstmp, function(bizitem){
                             if(angular.equals(bizitem.community, id)) {
                                 if (angular.equals(bizitem.smart_buys, true)) {
                                     tmpBiz.push(bizitem);
@@ -1757,10 +1782,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                             }
                         });
                     });
-                    $scope.business = tmpBiz;
+                    $scope.model.business = tmpBiz;
                 }else if($scope.visits){
                     angular.forEach($scope.selectedCommunity, function(id){
-                        angular.forEach($scope.businesstmp, function(bizitem){
+                        angular.forEach($scope.model.businesstmp, function(bizitem){
                             if(angular.equals(bizitem.community, id)) {
                                 if (angular.equals(bizitem.ten_visits, true)) {
                                     tmpBiz.push(bizitem);
@@ -1768,10 +1793,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                             }
                         });
                     });
-                    $scope.business = tmpBiz;
+                    $scope.model.business = tmpBiz;
                 }else if($scope.refer){
                     angular.forEach($scope.selectedCommunity, function(id){
-                        angular.forEach($scope.businesstmp, function(bizitem){
+                        angular.forEach($scope.model.businesstmp, function(bizitem){
                             if(angular.equals(bizitem.community, id)) {
                                 if (angular.equals(bizitem.refer_friends, true)) {
                                     tmpBiz.push(bizitem);
@@ -1779,22 +1804,22 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                             }
                         });
                     });
-                    $scope.business = tmpBiz;
+                    $scope.model.business = tmpBiz;
                 }else{
                     angular.forEach($scope.selectedCommunity, function(id){
-                        angular.forEach($scope.businesstmp, function(bizitem){
+                        angular.forEach($scope.model.businesstmp, function(bizitem){
                             if(angular.equals(bizitem.community, id)){
                                 tmpBiz.push(bizitem);
                             }
                         });
                     });
-                    $scope.business = tmpBiz;
+                    $scope.model.business = tmpBiz;
                 }
             }else{
-                $scope.business = $scope.businesstmp;
+                $scope.model.business = $scope.model.businesstmp;
             }
         }
-        return $scope.business;
+        return $scope.model.business;
     };
     
     // Función para la búequeda de deals por nombre
@@ -1803,7 +1828,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
         $scope.deleteMarkers(null);
         var tmpBiz = [];
         $scope.props = [];
-        angular.forEach($scope.businesstmp, function(bizitem) {
+        angular.forEach($scope.model.businesstmp, function(bizitem) {
             searchText = val.toLowerCase();
             var marker_icon;
             if (bizitem.category === "Lodging and Travel"){
@@ -1841,16 +1866,16 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                     markerIcon : marker_icon
                 };
                 $scope.props.push(dict_marker);
-            }               
-        });        
+            }
+        });
         $scope.addMarkers($scope.props, $scope.map);
         var limits = new google.maps.LatLngBounds();
         $.each($scope.markers, function (index, marker){
             limits.extend(marker.position);            
         });
         $scope.map.fitBounds(limits);        
-        $scope.business = tmpBiz;
-        return $scope.business;
+        $scope.model.business = tmpBiz;
+        return $scope.model.business;
     };
     $scope.matchsearch = function(query){
         if($scope.selectedCommunity.length > 0){
@@ -1858,7 +1883,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                 var tmpBiz = [];
                 var keep =  true;
                 angular.forEach($scope.selectedCommunity, function(id){
-                    angular.forEach($scope.businesstmp, function(bizitem){
+                    angular.forEach($scope.model.businesstmp, function(bizitem){
                         if(angular.equals(bizitem.category, $scope.getcat)){
                             if(angular.equals(bizitem.community, id)){
                                 if(bizitem.name.toString().toLowerCase().search(query.toLowerCase()) >= 0){
@@ -1868,13 +1893,13 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                         }
                     });
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }else{
                 var tmpBiz = [];
                 var keep =  true;
                 angular.forEach($scope.selectedCommunity, function(id){
 
-                    angular.forEach($scope.businesstmp, function(bizitem){
+                    angular.forEach($scope.model.businesstmp, function(bizitem){
                         if(angular.equals(bizitem.community, id)){
                             if(bizitem.name.toString().toLowerCase().search(query.toLowerCase()) >= 0){
                                 tmpBiz.push(bizitem);
@@ -1882,34 +1907,34 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                         }
                     });
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }
         }else{
             if($scope.getcat != 0){
-                angular.forEach($scope.businesstmp, function(bizitem){
+                angular.forEach($scope.model.businesstmp, function(bizitem){
                     if(angular.equals(bizitem.category, $scope.getcat)){
                         if(bizitem.name.toString().toLowerCase().search(query.toLowerCase()) >= 0){
                             tmpBiz.push(bizitem);
                         }
                     }
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }else{
                 var tmpBiz = [];
                 var keep = true;
-                angular.forEach($scope.businesstmp, function(bizitem){
+                angular.forEach($scope.model.businesstmp, function(bizitem){
                     if(bizitem.name.toString().toLowerCase().search(query.toLowerCase()) >= 0){
                         tmpBiz.push(bizitem);
                     }
                 });
-                $scope.business = tmpBiz;
+                $scope.model.business = tmpBiz;
             }
         }
-        return $scope.business;
+        return $scope.model.business;
     }
 }]);
 
-myApp.controller('bizonectrl', ['$scope', '$routeParams',  '$http', 'businessOneScope',function($scope, $routeParams, $http, businessOneScope){
+myApp.controller('bizonectrl', ['$scope', '$routeParams',  '$http', 'businessOneScope', 'search',function($scope, $routeParams, $http, businessOneScope, search){
     $scope.bizName = $routeParams.bizName;
     $scope.bizCode = $routeParams.bizCode;
     $scope.bizInfo;
@@ -1937,6 +1962,24 @@ myApp.filter('matchName', function() {
       return biz.name.indexOf(query) !== -1;
     });
   };
+});
+
+myApp.filter('searchtext', function(){
+    return function (items, letter){
+        var filtered = [];
+        var letterMatch = new RegExp(letter, 'i');
+        for (var i = 0; i < items.length; i++) {
+            var item = items[i];
+            if (letterMatch.test(item.name.substring(0, 1))) {
+                filtered.push(item);
+            }
+        }
+        return filtered;
+    }
+});
+
+myApp.factory('search',function(){
+  return {text:''};
 });
 
 myApp.factory('businessOneScope', function($http, $q){
@@ -2006,37 +2049,3 @@ myApp.factory('Biz', function($http){
     return Biz;
 });
 
-myApp.config(
-    function ($routeProvider) {
-        // Typically, when defining routes, you will map the
-        // route to a Template to be rendered; however, this
-        // only makes sense for simple web sites. When you
-        // are building more complex applications, with
-        // nested navigation, you probably need something more
-        // complex. In this case, we are mapping routes to
-        // render "Actions" rather than a template.
-        $routeProvider
-            .when(
-                "/", {
-                    action: "home.default",
-                    templateUrl: '/marius/deals/',
-                    controller: 'bizCtrl'
-                }
-            )
-            .when(
-                "/:bizName/:bizCode", {
-                    templateUrl: '/marius/business/',
-                    controller: 'bizonectrl'
-                }
-            )
-            .when(
-                "/contact/:username", {
-                    action: "contact.form"
-                }
-            )
-            .otherwise({
-                redirectTo: "/",
-                controller: 'bizCtrl'
-            });
-    }
-);

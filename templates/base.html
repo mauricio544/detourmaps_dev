@@ -70,12 +70,10 @@
             <a href="#" class="navHandler"><span class="fa fa-bars"></span></a>
             <div class="search">
                 <span class="searchIcon icon-magnifier"></span>
-                <input type="text" placeholder="[[ placeholder_nosearch ]]" ng-model="search" ng-change="searchtext(search)">
-                <!--<datalist id="_business"> #TODO: implementar lista de opciones
-                    <select style="display: none;" id="_biz" ng-model="search">
-                        <option ng-repeat="biz in business track by $id" value="[[ biz.name ]]">[[ biz.name ]]</option>
-                    </select>
-                </datalist>-->
+                <input type="text" placeholder="[[ placeholder_nosearch ]]" ng-model="search" ng-change="searchtext(search)" list="_business">
+                <datalist id="_business">
+                    <option ng-repeat="biz in model.business" value="[[ biz.name ]]"></option>
+                </datalist>
             </div>
             <div class="headerUserWraper">
                 <a href="#" class="userHandler dropdown-toggle" data-toggle="dropdown"><span class="icon-user"></span><span class="counter">5</span></a>
@@ -176,7 +174,7 @@
                     <div class="clearfix"></div>
                 </div>
                 <ul>
-                    <li><a href="explore.html"><span class="navIcon"><img src="{{ STATIC_URL }}images/neighborhood-icon.png" alt="Neighborhoods"></span><span class="navLabel">Neighborhoods</span></a></li>
+                    <li><a href="explore.html"><span class="navIcon"><img src="{{ STATIC_URL }}images/neighborhood-icon.png" alt="Neighborhoods"></span><span class="navLabel">Communities</span></a></li>
                     <li><a href="single.html"><span class="navIcon"><img src="{{ STATIC_URL }}images/orange-deals-icon.png" alt="Orange Deals"></span><span class="navLabel">Orange Deals</span></a></li>
                     <li><a href="add.html"><span class="navIcon"><img src="{{ STATIC_URL }}images/how-it-works-icon.png" alt="How It Works"></span><span class="navLabel">How it Works</span></a></li>
                     <li>

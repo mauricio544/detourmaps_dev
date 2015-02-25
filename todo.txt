@@ -1,0 +1,9 @@
++ Comunicación entre controladores
++ Business page
+
+# Search Home
+- Comunicación entre controladores, carga de marcadores en mapa según búsqueda
+
+# Business Page
+- Estilos business page
+
