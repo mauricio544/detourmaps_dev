@@ -3403,7 +3403,7 @@ h1.pageTitle {
     cursor: default;
 }
 .cal .clndr .clndr-table tr .day.today .day-contents {
-    background: #ea3d36;
+    background: #f7941e;
     color: #fff;
 }
 .cal .clndr .clndr-table tr .day.event .day-contents {
@@ -3412,7 +3412,7 @@ h1.pageTitle {
 .cal .clndr .clndr-table tr .day.event .day-contents span {
     display: block;
     position: absolute;
-    color: #0eaaa6;
+    color: #f7941e;
     width: 100%;
     text-align: center;
     line-height: 6px;
