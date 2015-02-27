@@ -2986,22 +2986,267 @@ def business_one_json(request):
         dict_business = None
         if "biz_code" in request.GET:
             business_object = Business.objects.get(pk=decode_url(request.GET["biz_code"]))
-            dict_business = {
-                'id': business_object.id,
-                'name': business_object.name,
-                'url_name': business_object.get_absolute_url(),
-                'slug': business_object.url_name,
-                'code': business_object.getUniqueCode(),
-                'description': force_unicode(business_object.description),
-                'url': force_unicode(business_object.get_absolute_url()),
-                'geo': force_unicode(business_object.geo), # paso del geo a la vista en json
-                'address': business_object.address,
-                'phones': business_object.phones,
-                'site': business_object.site,
-                'email': business_object.email,
-                'facebook': business_object.facebook,
-                'twitter': business_object.twitter
-            }
+            avg = qualify(business_object)
+            ten_visits = False
+            if business_object.tenvisitsbusiness_set.all().count() > 0:
+                ten_visits = get_thumbnail_vists(business_object.tenvisitsbusiness_set.all()[0].image)
+            hasSubscription = getSuscription(business_object)
+            if not business_object.EntryDetails():
+                dict_business = {
+                    'id': business_object.id,
+                    'name': business_object.name,
+                    'url_name': business_object.get_absolute_url(),
+                    'slug': business_object.url_name,
+                    'code': business_object.getUniqueCode(),
+                    'description': force_unicode(business_object.description),
+                    'url': force_unicode(business_object.get_absolute_url()),
+                    'geo': force_unicode(business_object.geo), # paso del geo a la vista en json
+                    'address': business_object.address,
+                    'phones': business_object.phones,
+                    'site': business_object.site,
+                    'email': business_object.email,
+                    'facebook': business_object.facebook,
+                    'twitter': business_object.twitter,
+                    'enable_comments': business_object.enable_comments,
+                    'avg': avg,
+                    #'vote':hasVote,
+                    'logo': force_unicode(business_object.logo),
+                    'video': '',
+                    'video_title': '',
+                    'ten_visit': ten_visits,
+                    'video_description': business_object.video_description,
+                    'subscription': hasSubscription,
+                    'deals': get_deals(business_object),
+                    'community': business_object.community.url_name,
+                    'partner': get_partner(business_object),
+                    'refer_friends': business_object.refer_friends
+                }
+                lista_tag_services = []
+                lista_images_business = []
+                lista_cupon_business = []
+                list_business_event = []
+                for tag in business_object.tag_service.all():
+                    lista_tag_services.append(str(tag.name))
+                image_business_object = ImageBusiness.objects.filter(business=business_object)
+                for img in image_business_object:
+                    thumbnailer = get_thumbnailer(img.img)
+                    thumb = thumbnailer.get_thumbnail({'size': (617, 319), 'crop': True})
+                    thumb = thumbnailer.get_thumbnail_name({'size': (617, 319), 'crop': True})
+                    dictionary_image_business = {
+                        'name': img.name,
+                        'img': thumb
+                    }
+                    lista_images_business.append(dictionary_image_business)
+
+                cupon_business_object = CuponBusiness.objects.filter(business=business_object, active=1)
+                for img in cupon_business_object:
+                    thumbnailer = get_thumbnailer(img.coupon)
+                    thumb = thumbnailer.get_thumbnail({'size': (420, 200), 'crop': True})
+                    thumb = thumbnailer.get_thumbnail_name({'size': (420, 200), 'crop': True})
+                    medium_thumb = thumbnailer.get_thumbnail({'size': (720, 400), 'crop': True})
+                    medium_thumb = thumbnailer.get_thumbnail_name({'size': (720, 400), 'crop': True})
+                    small_thumb = thumbnailer.get_thumbnail({'size': (280, 120), 'crop': True})
+                    small_thumb = thumbnailer.get_thumbnail_name({'size': (280, 120), 'crop': True})
+                    dictionary_cupon_business = {
+                        'id': img.id,
+                        'name': img.name,
+                        'img': thumb,
+                        'medium': medium_thumb,
+                        'small': small_thumb,
+                        'start_date': img.start_date.strftime('%m/%d/%Y'),
+                        'end_date': img.end_date.strftime('%m/%d/%Y')
+                    }
+                    lista_cupon_business.append(dictionary_cupon_business)
+                business_events = BusinessEvent.objects.filter(business__id=business_object.id, active=True).filter(date_end__gte=datetime.datetime.now().date())
+                for evt in business_events:
+                    img_business_event = ImageBusinessEvents.objects.filter(business_event=evt)
+                    list_img_business_event = []
+                    return_date = lambda date_evt: date_evt or ''
+                    for img_evt in img_business_event:
+                        thumbn = get_thumbnailer(img_evt.img)
+                        thumb = thumbn.get_thumbnail({'size': (215, 215), 'crop': True})
+                        thumb = thumbn.get_thumbnail_name({'size': (215, 215), 'crop': True})
+                        dictionary_image_business_event = {
+                            'name': img_evt.name,
+                            'img': settings.MEDIA_URL + thumb
+                        }
+                        list_img_business_event.append(dictionary_image_business_event)
+                    if evt.date_end:
+                        list_business_event.append({
+                            'id': business_object.id,
+                            'name': business_object.name,
+                            'title': evt.title,
+                            'description': evt.description,
+                            'facebook': evt.facebook,
+                            'twitter': evt.twitter,
+                            'google_plus': evt.google_plus,
+                            'images': list_img_business_event,
+                            'date': {
+                                'str': force_unicode(return_date(evt.date_begin.strftime('%b %d'))),
+                                'end': force_unicode(return_date(evt.date_end.strftime('%b %d'))),
+                                'day': force_unicode(return_date(evt.date_begin.strftime('%d'))),
+                                'month': force_unicode(return_date(evt.date_begin.strftime('%m'))),
+                                'year': force_unicode(return_date(evt.date_begin.strftime('%Y'))),
+                            },
+                            'geo': force_unicode(evt.geo),
+                            'address': evt.address,
+                            'url': "event/" + base64.urlsafe_b64encode(str(evt.id)),
+                            'images': list_img_business_event
+                        })
+                    else:
+                        list_business_event.append({
+                            'id': business_object.id,
+                            'name': business_object.name,
+                            'title': evt.title,
+                            'description': evt.description,
+                            'facebook': evt.facebook,
+                            'twitter': evt.twitter,
+                            'google_plus': evt.google_plus,
+                            'images': list_img_business_event,
+                            'date': {
+                                'str': force_unicode(return_date(evt.date_begin.strftime('%b %d'))),
+                                'end': '',
+                                'day': force_unicode(return_date(evt.date_begin.strftime('%d'))),
+                                'month': force_unicode(return_date(evt.date_begin.strftime('%m'))),
+                                'year': force_unicode(return_date(evt.date_begin.strftime('%Y'))),
+                            },
+                            'geo': force_unicode(evt.geo),
+                            'address': evt.address,
+                            'url': "event/" + base64.urlsafe_b64encode(str(evt.id)),
+                            'images': list_img_business_event
+                        })
+                dict_business['img'] = lista_images_business
+                dict_business['cupon'] = lista_cupon_business
+                dict_business['tags'] = lista_tag_services
+                dict_business['events'] = list_business_event
+            else:
+                entryDetails = business_object.EntryDetails()
+                dict_business = {
+                    'id': business_object.id,
+                    'name': business_object.name,
+                    'url_name': business_object.get_absolute_url(),
+                    'slug': business_object.url_name,
+                    'code': business_object.getUniqueCode(),
+                    'description': force_unicode(business_object.description),
+                    'url': force_unicode(business_object.get_absolute_url()),
+                    'geo': force_unicode(business_object.geo), # paso del geo a la vista en json
+                    'address': business_object.address,
+                    'phones': business_object.phones,
+                    'site': business_object.site,
+                    'email': business_object.email,
+                    'facebook': business_object.facebook,
+                    'twitter': business_object.twitter,
+                    'video': business_object.parseId(),
+                    'video_title': entryDetails.title.text,
+                    'ten_visit': ten_visits,
+                    'video_img_0': entryDetails.media.thumbnail[1].url,
+                    'video_img_1': entryDetails.media.thumbnail[2].url,
+                    'video_img_2': entryDetails.media.thumbnail[3].url,
+                    'video_description': business_object.video_description,
+                    'subscription': hasSubscription,
+                    'deals': get_deals(business_object),
+                    'community': business_object.community.url_name,
+                    'partner': get_partner(business_object),
+                    'refer_friends': business_object.refer_friends
+                }
+                lista_tag_services = []
+                lista_images_business = []
+                lista_cupon_business = []
+                list_business_event = []
+                for tag in business_object.tag_service.all():
+                    lista_tag_services.append(str(tag.name))
+                image_business_object = ImageBusiness.objects.filter(business=business_object)
+                for img in image_business_object:
+                    thumbnailer = get_thumbnailer(img.img)
+                    thumb = thumbnailer.get_thumbnail({'size': (617, 319), 'crop': True})
+                    thumb = thumbnailer.get_thumbnail_name({'size': (617, 319), 'crop': True})
+                    dictionary_image_business = {
+                        'name': img.name,
+                        'img': thumb
+                    }
+                    lista_images_business.append(dictionary_image_business)
+
+                cupon_business_object = CuponBusiness.objects.filter(business=business_object, active=1)
+                for img in cupon_business_object:
+                    thumbnailer = get_thumbnailer(img.coupon)
+                    thumb = thumbnailer.get_thumbnail({'size': (420, 200), 'crop': True})
+                    thumb = thumbnailer.get_thumbnail_name({'size': (420, 200), 'crop': True})
+                    medium_thumb = thumbnailer.get_thumbnail({'size': (720, 400), 'crop': True})
+                    medium_thumb = thumbnailer.get_thumbnail_name({'size': (720, 400), 'crop': True})
+                    small_thumb = thumbnailer.get_thumbnail({'size': (280, 120), 'crop': True})
+                    small_thumb = thumbnailer.get_thumbnail_name({'size': (280, 120), 'crop': True})
+                    dictionary_cupon_business = {
+                        'id': img.id,
+                        'name': img.name,
+                        'img': thumb,
+                        'medium': medium_thumb,
+                        'small': small_thumb,
+                        'start_date': img.start_date.strftime('%m/%d/%Y'),
+                        'end_date': img.end_date.strftime('%m/%d/%Y')
+                    }
+                    lista_cupon_business.append(dictionary_cupon_business)
+                business_events = BusinessEvent.objects.filter(business__id=business_object.id, active=True).filter(date_end__gte=datetime.datetime.now().date())
+                for evt in business_events:
+                    img_business_event = ImageBusinessEvents.objects.filter(business_event=evt)
+                    list_img_business_event = []
+                    return_date = lambda date_evt: date_evt or ''
+                    for img_evt in img_business_event:
+                        thumbn = get_thumbnailer(img_evt.img)
+                        thumb = thumbn.get_thumbnail({'size': (215, 215), 'crop': True})
+                        thumb = thumbn.get_thumbnail_name({'size': (215, 215), 'crop': True})
+                        dictionary_image_business_event = {
+                            'name': img_evt.name,
+                            'img': settings.MEDIA_URL + thumb
+                        }
+                        list_img_business_event.append(dictionary_image_business_event)
+                    if evt.date_end:
+                        list_business_event.append({
+                            'id': business_object.id,
+                            'name': business_object.name,
+                            'title': evt.title,
+                            'description': evt.description,
+                            'facebook': evt.facebook,
+                            'twitter': evt.twitter,
+                            'google_plus': evt.google_plus,
+                            'images': list_img_business_event,
+                            'date': {
+                                'str': force_unicode(return_date(evt.date_begin.strftime('%b %d'))),
+                                'end': force_unicode(return_date(evt.date_end.strftime('%b %d'))),
+                                'day': force_unicode(return_date(evt.date_begin.strftime('%d'))),
+                                'month': force_unicode(return_date(evt.date_begin.strftime('%m'))),
+                                'year': force_unicode(return_date(evt.date_begin.strftime('%Y'))),
+                            },
+                            'geo': force_unicode(evt.geo),
+                            'address': evt.address,
+                            'url': "event/" + base64.urlsafe_b64encode(str(evt.id)),
+                            'images': list_img_business_event
+                        })
+                    else:
+                        list_business_event.append({
+                            'id': business_object.id,
+                            'name': business_object.name,
+                            'title': evt.title,
+                            'description': evt.description,
+                            'facebook': evt.facebook,
+                            'twitter': evt.twitter,
+                            'google_plus': evt.google_plus,
+                            'images': list_img_business_event,
+                            'date': {
+                                'str': force_unicode(return_date(evt.date_begin.strftime('%b %d'))),
+                                'end': '',
+                                'day': force_unicode(return_date(evt.date_begin.strftime('%d'))),
+                                'month': force_unicode(return_date(evt.date_begin.strftime('%m'))),
+                                'year': force_unicode(return_date(evt.date_begin.strftime('%Y'))),
+                            },
+                            'geo': force_unicode(evt.geo),
+                            'address': evt.address,
+                            'url': "event/" + base64.urlsafe_b64encode(str(evt.id)),
+                            'images': list_img_business_event
+                        })
+                dict_business['img'] = lista_images_business
+                dict_business['cupon'] = lista_cupon_business
+                dict_business['tags'] = lista_tag_services
+                dict_business['events'] = list_business_event
         return HttpResponse(simplejson.dumps(dict_business))
 
 

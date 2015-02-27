@@ -593,7 +593,7 @@ a.headerNotify {
     width: 60px;
     height: 60px;
     text-align: center;
-    padding-top: 22px;
+    padding-top: 14px;
     text-decoration: none;
 }
 .no-touch a.headerNotify:hover, .headerNotifyWraper.open a.headerNotify {
@@ -1452,7 +1452,7 @@ a.btn.viewInfo {
     overflow-y: auto;
     background-color: #f3f3f3;
     width: 50%;
-
+    height: 100vh;
     border-top: 1px solid #e8e8e8;
     float: right;
     -webkit-overflow-scrolling: touch;
@@ -5246,7 +5246,90 @@ blockquote {
     font-size: 11px;
     font-style: italic;
 }
-
+.navcenter {
+    width: 85%;
+    margin: auto;
+}
+a.arrow.left {
+    width: 5%;
+    display: inline-block;
+    vertical-align: middle;
+}
+div.navbtn {
+    width: 88%;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: middle;
+}
+.rowbtn {
+    width: 500%;
+}
+a.btninfo {
+    width: 105px;
+    display: inline-block;
+    vertical-align: middle;
+    text-align: center;
+    background: #e8e5e8;
+}
+a.btninfo img {
+    width: 50%;
+    margin: auto;
+    display: block;
+}
+a.arrow.right {
+    width: 5%;
+    display: inline-block;
+    vertical-align: middle;
+}
+div.appshare {
+    width: 90%;
+    margin: auto;
+}
+a.sharebiz {
+    border-radius: 15px;
+    width: 80%;
+    display: block;
+    margin: auto;
+    font-family: 'Open sans', sans-serif;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+}
+    a.sharebiz.facebook {
+        background: #1c75bc;
+    }
+    a.sharebiz.twitter {
+        background: #27aae1;
+    }
+    a.sharebiz.google {
+        background: #ed1c24;
+    }
+    a.sharebiz.pinterest {
+        background: #be1e2d;
+    }
+div.contentBusiness {
+    padding: 20px;
+    margin-bottom: 40px;
+}
+div.row.contentbiz{
+    background: #f3f3f3;
+    margin-bottom: 40px;
+}
+div.navdeals {
+    width: 90%;
+    margin: auto;
+}
+a.btndeal {
+    display: inline-block;
+    vertical-align: middle;
+    width: 24%;
+    background: #ffffff;
+}
+    a.btndeal img {
+        width: 50%;
+        display: block;
+        margin: auto;
+    }
 /* Media Queries */
 
 @media screen and (max-width: 1199px) {

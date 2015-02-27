@@ -1,21 +1,19 @@
 <div class="singleTop">
     <div id="carouselFull" class="carousel slide" data-ride="carousel">
         <ol class="carousel-indicators">
-            <li data-target="#carouselFull" data-slide-to="0" class="active"></li>
-            <li data-target="#carouselFull" data-slide-to="1"></li>
-            <li data-target="#carouselFull" data-slide-to="2"></li>
-            <li data-target="#carouselFull" data-slide-to="3"></li>
+            <li ng-repeat="image in bizInfo.img" ng-class="{ active: $first }" data-target="#carouselFull" data-slide-to="[[ $index ]]"></li>
+
         </ol>
         <div class="carousel-inner">
-            <div class="item active">
-                <img src="{{ STATIC_URL }}images/local-deals.png" alt="First slide">
+            <div class="item" ng-repeat="img in bizInfo.img" ng-class="{ active: $first }">
+                <img src="/media/[[ img.img ]]" alt="[[ img.name ]]">
                 <div class="container">
                     <div class="carousel-caption">
 
                     </div>
                 </div>
             </div>
-            <div class="item">
+            <!--<div class="item">
                 <img src="{{ STATIC_URL }}images/prop/4-2.png" alt="Second slide">
                 <div class="container">
                     <div class="carousel-caption">
@@ -38,7 +36,7 @@
 
                     </div>
                 </div>
-            </div>
+            </div>-->
         </div>
         <a class="left carousel-control" href="#carouselFull" role="button" data-slide="prev"><span class="fa fa-chevron-left"></span></a>
         <a class="right carousel-control" href="#carouselFull" role="button" data-slide="next"><span class="fa fa-chevron-right"></span></a>
@@ -49,31 +47,116 @@
                 <div class="summaryItem">
                     <div class="row">
                         <div class="col-xs-12 sm-12 col-md-12 col-lg-12">
-                            <div class="pull-left">
-                                <h2>[[ bizInfo.name ]]</h2>
-                                <h3><img src="{{ STATIC_URL }}images/marker-icon.png" alt="Marker">[[ bizInfo.address ]]</h3>
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
+                                    <div class="pull-left">
+                                        <h2>[[ bizInfo.name ]]</h2>
+                                        <h3><img src="{{ STATIC_URL }}images/marker-icon.png" alt="Marker"> [[ bizInfo.address ]]</h3>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                                    <div class="pull-left" style="margin-top: 30px;">
+                                        <p>[[ bizInfo.phones ]]</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="pullright">
-                                <h3>[[ bizInfo.phones ]]</h3>
-                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="propRating">
+                            <span class="fa fa-star-o"></span>
+                            <span class="fa fa-star-o"></span>
+                            <span class="fa fa-star-o"></span>
+                            <span class="fa fa-star-o"></span>
+                            <span class="fa fa-star-o"></span>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                            <h3>Description</h3>
-                            <p>[[ bizInfo.description ]]</p>
+                            <div class="navcenter">
+                                <a href="" class="arrow left"><img src="{{ STATIC_URL }}images/arrow-left-icon.png" alt="left"></a>
+                                <div class="navbtn">
+                                    <div class="rowbtn">
+                                        <a href="" class="btninfo"><img src="{{ STATIC_URL }}images/info-icon-slide.png" alt="Info">Info</a>
+                                        <a href="" class="btninfo"><img src="{{ STATIC_URL }}images/deals-icon-slide.png" alt="Deals">Deals</a>
+                                        <a href="" class="btninfo"><img src="{{ STATIC_URL }}images/share-icon-slide.png" alt="Share">Share</a>
+                                        <a href="" class="btninfo"><img src="{{ STATIC_URL }}images/services-icon-slide.png" alt="Services">Services</a>
+                                        <a href="" class="btninfo"><img src="{{ STATIC_URL }}images/services-icon-slide.png" alt="Services">Services</a>
+                                        <a href="" class="btninfo"><img src="{{ STATIC_URL }}images/video-icon-slide.png" alt="Video">Video</a>
+                                        <a href="" class="btninfo"><img src="{{ STATIC_URL }}images/events-icon-slide.png" alt="Events">Events</a>
+                                        <a href="" class="btninfo"><img src="{{ STATIC_URL }}images/directions-icon-slide.png" alt="Directions">Directions</a>
+                                    </div>
+                                </div>
+                                <a href="" class="arrow right"><img src="{{ STATIC_URL }}images/arrow-right-icon.png" alt="right"></a>
+                            </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <h3>Orange Deals</h3>
-                    </div>
-                    <div class="clearfix"></div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="summary">
-
-    </div>
 </div>
 <div class="clearfix"></div>
+<div class="contentBusiness">
+    <div class="row contentbiz">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h3>Description</h3>
+            <p>[[ bizInfo.description ]]</p>
+        </div>
+    </div>
+    <div class="row contentbiz">
+       <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h3>Orange Deals</h3>
+            <div class="navdeals">
+                <a href="" class="btndeal"><img src="{{ STATIC_URL }}images/smart-buys-icon.png" alt="Smart Buys"></a>
+                <a href="" class="btndeal"><img src="{{ STATIC_URL }}images/10-off-icon.png" alt="10 Off"></a>
+                <a href="" class="btndeal"><img src="{{ STATIC_URL }}images/10-visits-icon.png" alt="10 Visits"></a>
+                <a href="" class="btndeal"><img src="{{ STATIC_URL }}images/525-icon.png" alt="5 = 25 Refer Friends"></a>
+            </div>
+        </div>
+    </div>
+    <div class="row contentbiz">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h3>Share</h3>
+            <div class="row">
+                <div class="appshare">
+                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3"><a href="" class="sharebiz facebook"><i class="fa fa-facebook"></i> Facebook</a></div>
+                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3"><a href="" class="sharebiz twitter"><i class="fa fa-twitter"></i> Twitter</a></div>
+                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3"><a href="" class="sharebiz google"><i class="fa fa-google-plus"></i> Google +</a></div>
+                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3"><a href="" class="sharebiz pinterest"><i class="fa fa-pinterest"></i> Pinterest</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row contentbiz">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h3>Service Tags</h3>
+            <div class="row">
+                <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4" ng-repeat="tag in bizInfo.tags">[[ tag ]]</div>
+            </div>
+        </div>
+    </div>
+    <div class="row contentbiz">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h3>Menu of Services</h3>
+        </div>
+    </div>
+    <div class="row contentbiz">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h3>Video</h3>
+            <div class="text-center">
+                <iframe id="ytVideo" width="480" height="315" ng-src="[[ video ]]" frameborder="0" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+    <div class="row contentbiz">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h3>Events</h3>
+        </div>
+    </div>
+    <div class="row contentbiz">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h3>Directions</h3>
+        </div>
+    </div>
+</div>

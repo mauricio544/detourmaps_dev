@@ -34,19 +34,19 @@ myApp.config(
 );
 
 myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'businessScope', 'search' , '$rootScope',function ($scope, $route, $routeParams, $http, businessScope, search, $rootScope) {
-    var options = {
-            zoom : 14,
-            mapTypeId : 'Styled',
-            disableDefaultUI: true,
-            mapTypeControlOptions : {
-                mapTypeIds : [ 'Styled' ]
-            }
-        };
+    $scope.options = {
+        zoom : 14,
+        mapTypeId : 'Styled',
+        disableDefaultUI: true,
+        mapTypeControlOptions : {
+            mapTypeIds : [ 'Styled' ]
+        }
+    };
     $scope.$route = $route;
     $scope.$routeParams = $routeParams;
     $rootScope.business;
     $rootScope.businesstmp;
-    var styles = [{
+    $scope.styles = [{
         stylers : [ {
             hue : "#cccccc"
         }, {
@@ -72,7 +72,12 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
             visibility: "off"
         }]
     }];
-    $scope.map = new google.maps.Map(document.getElementById('mapView'), options);
+    var styledMapType = new google.maps.StyledMapType($scope.styles, {
+        name : 'Styled'
+    });
+    $scope.map = new google.maps.Map(document.getElementById('mapView'), $scope.options);
+    $scope.map.mapTypes.set('Styled', styledMapType);
+    $scope.map.setZoom(14);
     $scope.newMarker = null;
     $scope.markers = []; // array de marcadores
     $scope.props = []; // array de diccionarios con información para marcadores
@@ -313,14 +318,6 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
 
             setTimeout(function() {
                 $('body').removeClass('notransition');
-                $scope.map = new google.maps.Map(document.getElementById('mapView'), options);
-                var styledMapType = new google.maps.StyledMapType(styles, {
-                    name : 'Styled'
-                });
-
-                $scope.map.mapTypes.set('Styled', styledMapType);
-                $scope.map.setCenter(new google.maps.LatLng(40.6984237,-73.9890044));
-                $scope.map.setZoom(14);
 
                 if ($('#address').length > 0) {
                     $scope.newMarker = new google.maps.Marker({
@@ -346,12 +343,6 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                     });
                 }
 
-                $scope.addMarkers($scope.props, $scope.map);
-                var limits = new google.maps.LatLngBounds();
-                $.each($scope.markers, function (index, marker){
-                    limits.extend(marker.position);
-                });
-                $scope.map.fitBounds(limits);
             }, 300);
 
             if(!(('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch)) {
@@ -662,6 +653,14 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
             }
 
             $('input, textarea').placeholder();
+
+            $scope.addMarkers($scope.props, $scope.map);
+            var limits = new google.maps.LatLngBounds();
+            $.each($scope.markers, function (index, marker){
+                limits.extend(marker.position);
+            });
+            $scope.map.fitBounds(limits);
+            return $scope.model.business;
         }, function(errorMessage){
             $scope.error = errorMessage;
         });
@@ -1934,13 +1933,14 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
     }
 }]);
 
-myApp.controller('bizonectrl', ['$scope', '$routeParams',  '$http', 'businessOneScope', 'search',function($scope, $routeParams, $http, businessOneScope, search){
+myApp.controller('bizonectrl', ['$scope', '$routeParams',  '$http', 'businessOneScope', 'search' , '$sce',function($scope, $routeParams, $http, businessOneScope, search, $sce){
     $scope.bizName = $routeParams.bizName;
     $scope.bizCode = $routeParams.bizCode;
     $scope.bizInfo;
     $scope.getItem = function(){
         businessOneScope.getAllItem($scope.bizCode).then(function(data){
             $scope.bizInfo = data;
+            $scope.video = $sce.trustAsResourceUrl('http://www.youtube.com/embed/' + data.video + '?wmode=transparent');
         }, function(errorMessage){
             $scope.error = errorMessage;
         });
