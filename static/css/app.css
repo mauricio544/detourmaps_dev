@@ -5330,6 +5330,26 @@ a.btndeal {
         display: block;
         margin: auto;
     }
+.eventsapp {
+    padding: 10px;
+    /* background: #fff; */
+    margin-bottom: 3px;
+}
+.row.eventcontent {
+    background: #fff;
+    margin-bottom: 4px;
+    padding: 10px 0;
+}
+div.eventday {
+    width: 55%;
+    margin: 10px auto;
+    text-align: center;
+    height: 40px;
+    padding: 10px 0 0 0;
+    background: #f7941e;
+    color: #fff;
+    border-radius: 50%;
+}
 /* Media Queries */
 
 @media screen and (max-width: 1199px) {

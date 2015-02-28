@@ -155,6 +155,25 @@
             <div class="calendarWidget">
                 <div class="cal"></div>
             </div>
+            <div class="eventsapp" ng-repeat="event in bizInfo.events">
+                <div class="row eventcontent">
+                    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                        <div class="eventday"><span>[[ event.date.day ]]</span></div>
+                    </div>
+                    <div class="col-xs-10 colsm-10 col-md-10 col-lg-10">
+                        <h3>[[ event.title ]]</h3>
+                        <p>[[ event.date.str ]], [[ event.date.year ]]</p>
+                    </div>
+                </div>
+                <div class="row eventcontent" ng-show="event.description">
+                    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+
+                    </div>
+                    <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
+                        <p>[[ event.description ]]</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <script>
