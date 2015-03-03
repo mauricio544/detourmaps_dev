@@ -3074,6 +3074,7 @@ def business_one_json(request):
                     if evt.date_end:
                         list_business_event.append({
                             'id': business_object.id,
+                            'unique': base64.urlsafe_b64encode(str(evt.id)),
                             'name': business_object.name,
                             'title': evt.title,
                             'description': evt.description,
@@ -3082,8 +3083,9 @@ def business_one_json(request):
                             'google_plus': evt.google_plus,
                             'images': list_img_business_event,
                             'date': {
-                                'str': force_unicode(return_date(evt.date_begin.strftime('%b %d'))),
-                                'end': force_unicode(return_date(evt.date_end.strftime('%b %d'))),
+                                'str': force_unicode(return_date(evt.date_begin.strftime('%B %d'))),
+                                'start': force_unicode(return_date(evt.date_begin.strftime('%Y-%m-%d'))),
+                                'end': force_unicode(return_date(evt.date_end.strftime('%Y-%m-%d'))),
                                 'day': force_unicode(return_date(evt.date_begin.strftime('%d'))),
                                 'month': force_unicode(return_date(evt.date_begin.strftime('%m'))),
                                 'year': force_unicode(return_date(evt.date_begin.strftime('%Y'))),
@@ -3096,6 +3098,7 @@ def business_one_json(request):
                     else:
                         list_business_event.append({
                             'id': business_object.id,
+                            'unique': base64.urlsafe_b64encode(str(evt.id)),
                             'name': business_object.name,
                             'title': evt.title,
                             'description': evt.description,
@@ -3105,6 +3108,7 @@ def business_one_json(request):
                             'images': list_img_business_event,
                             'date': {
                                 'str': force_unicode(return_date(evt.date_begin.strftime('%b %d'))),
+                                'start': force_unicode(return_date(evt.date_begin.strftime('%Y-%m-%d'))),
                                 'end': '',
                                 'day': force_unicode(return_date(evt.date_begin.strftime('%d'))),
                                 'month': force_unicode(return_date(evt.date_begin.strftime('%m'))),

@@ -5350,6 +5350,38 @@ div.eventday {
     color: #fff;
     border-radius: 50%;
 }
+div.eventwrap {
+    background: #f3f3f3;
+}
+div.infoevent {
+    padding: 5px;
+}
+h3.titleevent {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    margin-top: 10px !important;
+    margin-bottom: 8px !important;
+    margin-left: 10px !important;
+    color: #414042 !important;
+}
+h4.dateevent {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 12px !important;
+    margin-bottom: 8px !important;
+    margin-left: 10px !important;
+    color: #414042 !important;
+    font-weight: lighter !important;
+}
+p.descevent {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 10px;
+    color: #414042;
+    font-weight: lighter;
+    width: 80%;
+    margin: auto;
+    margin-left: 15px !important;
+}
 /* Media Queries */
 
 @media screen and (max-width: 1199px) {

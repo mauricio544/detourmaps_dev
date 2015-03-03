@@ -10,7 +10,7 @@ catctr.controller('categoryController', function($scope, $http){
 });*/
 
 var myApp = angular.module('catApp', ['ngRoute']);
-
+var myEvents;
 myApp.config(
     function ($routeProvider, $locationProvider) {
         $routeProvider
@@ -1937,17 +1937,61 @@ myApp.controller('bizonectrl', ['$scope', '$routeParams',  '$http', 'businessOne
     $scope.bizName = $routeParams.bizName;
     $scope.bizCode = $routeParams.bizCode;
     $scope.bizInfo;
+    $scope.events;
     $scope.getItem = function(){
         businessOneScope.getAllItem($scope.bizCode).then(function(data){
             $scope.bizInfo = data;
             $scope.video = $sce.trustAsResourceUrl('http://www.youtube.com/embed/' + data.video + '?wmode=transparent');
+            var calendars = {};
+            var eventArray = [];
+            $scope.events = data.events;
+            angular.forEach($scope.events, function(event){
+                var dict_event = {
+                    start: event.date.start,
+                    end: event.date.end,
+                    title: event.title,
+                    pop: 'pop' + event.unique
+                };
+                eventArray.push(dict_event);
+            })
+            calendars.clndr1 = $('.cal').clndr({
+                events: eventArray,
+                weekOffset: 1,
+                daysOfTheWeek: ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'],
+                clickEvents: {
+                    click: function(target) {
+                        if(target.events.length > 0) {
+                            var el = target.element.children[0];
+                            $(el).popover({
+                              html : true,
+                              placement: 'auto',
+                              delay: { "show": 500, "hide": 100 },
+                              content: function(){
+                                  return $("#" + target.events[0].pop).html();
+                              }
+                            });
+                            //$(el).popover('show');
+                        }
+                    }
+                },
+                multiDayEvents: {
+                    startDate: 'start',
+                    endDate: 'end'
+                },
+                showAdjacentMonths: true,
+                adjacentDaysChangeMonth: false,
+                doneRendering: function() {
+                    $('.clndr-previous-button').html('<span class="fa fa-angle-left"></span>');
+                    $('.clndr-next-button').html('<span class="fa fa-angle-right"></span>');
+                    $('.clndr-table tr .day.event .day-contents').append('<span class="fa fa-circle"></span>');
+                }
+            });
         }, function(errorMessage){
             $scope.error = errorMessage;
         });
     };
     $scope.getItem();
 }]);
-
 myApp.filter('startFrom', function() {
     return function(input, start) {
         start = +start; //parse to int
@@ -2048,4 +2092,3 @@ myApp.factory('Biz', function($http){
     };
     return Biz;
 });
-
