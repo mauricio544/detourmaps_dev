@@ -1942,6 +1942,7 @@ myApp.controller('bizonectrl', ['$scope', '$routeParams',  '$http', 'businessOne
         businessOneScope.getAllItem($scope.bizCode).then(function(data){
             $scope.bizInfo = data;
             $scope.video = $sce.trustAsResourceUrl('http://www.youtube.com/embed/' + data.video + '?wmode=transparent');
+            $scope.menu = $sce.trustAsHtml(data.menu);
             var calendars = {};
             var eventArray = [];
             $scope.events = data.events;
@@ -1986,6 +1987,7 @@ myApp.controller('bizonectrl', ['$scope', '$routeParams',  '$http', 'businessOne
                     $('.clndr-table tr .day.event .day-contents').append('<span class="fa fa-circle"></span>');
                 }
             });
+            angular.element("#menulist").find("h4").append("<i class='fa fa-caret-down'></i>").addClass("menucat col-lg-4").next().hide();
         }, function(errorMessage){
             $scope.error = errorMessage;
         });

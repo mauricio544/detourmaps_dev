@@ -3307,7 +3307,7 @@ h1.pageTitle {
     margin-bottom: 20px;
     text-decoration: none;
     border-radius: 3px;
-    height: 283px;
+    height: 300px;
 }
 .cal {
     font-family: 'open_sansregular', sans-serif, Arial;
@@ -5382,6 +5382,19 @@ p.descevent {
     margin: auto;
     margin-left: 15px !important;
 }
+h4.menucat {
+    background: #999999;
+    color: #fff;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: bold;
+    float: left;
+    padding: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+    h4.menucat i{
+        float: right;
+    }
 /* Media Queries */
 
 @media screen and (max-width: 1199px) {

@@ -2984,12 +2984,15 @@ def business_json(request, page, slice):
 def business_one_json(request):
     if request.method == "GET":
         dict_business = None
+        menu = None
         if "biz_code" in request.GET:
             business_object = Business.objects.get(pk=decode_url(request.GET["biz_code"]))
             avg = qualify(business_object)
             ten_visits = False
             if business_object.tenvisitsbusiness_set.all().count() > 0:
                 ten_visits = get_thumbnail_vists(business_object.tenvisitsbusiness_set.all()[0].image)
+            if business_object.businessmenu_set.all().count() > 0:
+                menu = business_object.businessmenu_set.all()[0].menu
             hasSubscription = getSuscription(business_object)
             if not business_object.EntryDetails():
                 dict_business = {
@@ -3019,7 +3022,8 @@ def business_one_json(request):
                     'deals': get_deals(business_object),
                     'community': business_object.community.url_name,
                     'partner': get_partner(business_object),
-                    'refer_friends': business_object.refer_friends
+                    'refer_friends': business_object.refer_friends,
+                    'menu': force_unicode(menu)
                 }
                 lista_tag_services = []
                 lista_images_business = []
@@ -3107,7 +3111,7 @@ def business_one_json(request):
                             'google_plus': evt.google_plus,
                             'images': list_img_business_event,
                             'date': {
-                                'str': force_unicode(return_date(evt.date_begin.strftime('%b %d'))),
+                                'str': force_unicode(return_date(evt.date_begin.strftime('%B %d'))),
                                 'start': force_unicode(return_date(evt.date_begin.strftime('%Y-%m-%d'))),
                                 'end': '',
                                 'day': force_unicode(return_date(evt.date_begin.strftime('%d'))),
@@ -3151,7 +3155,8 @@ def business_one_json(request):
                     'deals': get_deals(business_object),
                     'community': business_object.community.url_name,
                     'partner': get_partner(business_object),
-                    'refer_friends': business_object.refer_friends
+                    'refer_friends': business_object.refer_friends,
+                    'menu': force_unicode(menu)
                 }
                 lista_tag_services = []
                 lista_images_business = []
@@ -3206,6 +3211,7 @@ def business_one_json(request):
                     if evt.date_end:
                         list_business_event.append({
                             'id': business_object.id,
+                            'unique': base64.urlsafe_b64encode(str(evt.id)),
                             'name': business_object.name,
                             'title': evt.title,
                             'description': evt.description,
@@ -3214,8 +3220,9 @@ def business_one_json(request):
                             'google_plus': evt.google_plus,
                             'images': list_img_business_event,
                             'date': {
-                                'str': force_unicode(return_date(evt.date_begin.strftime('%b %d'))),
-                                'end': force_unicode(return_date(evt.date_end.strftime('%b %d'))),
+                                'str': force_unicode(return_date(evt.date_begin.strftime('%B %d'))),
+                                'start': force_unicode(return_date(evt.date_begin.strftime('%Y-%m-%d'))),
+                                'end': force_unicode(return_date(evt.date_end.strftime('%Y-%m-%d'))),
                                 'day': force_unicode(return_date(evt.date_begin.strftime('%d'))),
                                 'month': force_unicode(return_date(evt.date_begin.strftime('%m'))),
                                 'year': force_unicode(return_date(evt.date_begin.strftime('%Y'))),
@@ -3228,6 +3235,7 @@ def business_one_json(request):
                     else:
                         list_business_event.append({
                             'id': business_object.id,
+                            'unique': base64.urlsafe_b64encode(str(evt.id)),
                             'name': business_object.name,
                             'title': evt.title,
                             'description': evt.description,
@@ -3236,7 +3244,8 @@ def business_one_json(request):
                             'google_plus': evt.google_plus,
                             'images': list_img_business_event,
                             'date': {
-                                'str': force_unicode(return_date(evt.date_begin.strftime('%b %d'))),
+                                'str': force_unicode(return_date(evt.date_begin.strftime('%B %d'))),
+                                'start': force_unicode(return_date(evt.date_begin.strftime('%Y-%m-%d'))),
                                 'end': '',
                                 'day': force_unicode(return_date(evt.date_begin.strftime('%d'))),
                                 'month': force_unicode(return_date(evt.date_begin.strftime('%m'))),
