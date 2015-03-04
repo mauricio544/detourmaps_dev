@@ -33,7 +33,7 @@ myApp.config(
     }
 );
 
-myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'businessScope', 'search' , '$rootScope',function ($scope, $route, $routeParams, $http, businessScope, search, $rootScope) {
+myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'businessScope', 'search' , '$rootScope', 'catmenu',function ($scope, $route, $routeParams, $http, businessScope, search, $rootScope, catmenu) {
     $scope.options = {
         zoom : 14,
         mapTypeId : 'Styled',
@@ -42,10 +42,12 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
             mapTypeIds : [ 'Styled' ]
         }
     };
+    $scope.catmenu = false;
     $scope.$route = $route;
     $scope.$routeParams = $routeParams;
     $rootScope.business;
     $rootScope.businesstmp;
+    $rootScope.cat = false;
     $scope.styles = [{
         stylers : [ {
             hue : "#cccccc"
@@ -1933,11 +1935,13 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
     }
 }]);
 
-myApp.controller('bizonectrl', ['$scope', '$routeParams',  '$http', 'businessOneScope', 'search' , '$sce',function($scope, $routeParams, $http, businessOneScope, search, $sce){
+myApp.controller('bizonectrl', ['$scope', '$rootScope','$routeParams',  '$http', 'businessOneScope', 'search' , '$sce', 'catmenu',function($scope, $rootScope,$routeParams, $http, businessOneScope, search, $sce, catmenu){
     $scope.bizName = $routeParams.bizName;
     $scope.bizCode = $routeParams.bizCode;
     $scope.bizInfo;
     $scope.events;
+    $scope.catmenu = true;
+    $rootScope.cat = true;
     $scope.getItem = function(){
         businessOneScope.getAllItem($scope.bizCode).then(function(data){
             $scope.bizInfo = data;
@@ -1994,6 +1998,7 @@ myApp.controller('bizonectrl', ['$scope', '$routeParams',  '$http', 'businessOne
     };
     $scope.getItem();
 }]);
+
 myApp.filter('startFrom', function() {
     return function(input, start) {
         start = +start; //parse to int
@@ -2022,6 +2027,10 @@ myApp.filter('searchtext', function(){
         }
         return filtered;
     }
+});
+
+myApp.factory('catmenu', function(){
+    return {flag: false};
 });
 
 myApp.factory('search',function(){
