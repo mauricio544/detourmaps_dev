@@ -2018,6 +2018,108 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope','$routeParams',  '$http',
         });
     };
     $scope.getItem();
+    $scope.directions = function(newdirection){
+        $scope.options = {
+            zoom : 14,
+            mapTypeId : 'Styled',
+            disableDefaultUI: true,
+            mapTypeControlOptions : {
+                mapTypeIds : [ 'Styled' ]
+            }
+        };
+        $scope.styles = [{
+            stylers : [ {
+                hue : "#cccccc"
+            }, {
+                saturation : -100
+            }]
+        }, {
+            featureType : "road",
+            elementType : "geometry",
+            stylers : [ {
+                lightness : 100
+            }, {
+                visibility : "simplified"
+            }]
+        }, {
+            featureType : "road",
+            elementType : "labels",
+            stylers : [ {
+                visibility : "on"
+            }]
+        }, {
+            featureType: "poi",
+            stylers: [ {
+                visibility: "off"
+            }]
+        }];
+        var styledMapType = new google.maps.StyledMapType($scope.styles, {
+            name : 'Styled'
+        });
+        $scope.map = new google.maps.Map(document.getElementById('mapView'), $scope.options);
+        $scope.map.mapTypes.set('Styled', styledMapType);
+        $scope.map.setZoom(14);
+        var geo = $scope.bizInfo.geo || undefined;
+        var r = geo.slice(7, geo.length - 1).split(' ') || [];
+        var directionsDisplay;
+        var directionsService = new google.maps.DirectionsService();
+        var latlng = new google.maps.LatLng(parseFloat(r[1]), parseFloat(r[0]));
+        function initialize(map) {
+            directionsDisplay = new google.maps.DirectionsRenderer();
+            directionsDisplay.setMap(map);
+            directionsDisplay.setPanel(document.getElementById('directionsPanel'));
+            var marker = new google.maps.Marker({
+                position: latlng,
+                map: map,
+                title: $scope.bizInfo.name
+            });
+        }
+
+        function calcRoute() {
+            var start = newdirection;
+            var end = $scope.bizInfo.address;
+            var waypoints = [];
+            if (end != "") {
+                // if waypoints (via) are set, add them to the waypoints array
+                waypoints.push({
+                    location: end,
+                    stopover: true
+                });
+            }
+            var request = {
+                origin: start,
+                destination: end,
+                waypoints: waypoints,
+                travelMode: google.maps.DirectionsTravelMode.DRIVING
+            };
+            directionsService.route(request, function (response, status) {
+                if (status == google.maps.DirectionsStatus.OK) {
+                    $('#directionsPanel').empty();
+                    directionsDisplay.setDirections(response);
+                    var newHeightFooterH = $(document).height();
+                } else {
+                    // alert an error message when the route could nog be calculated.
+                    if (status == 'ZERO_RESULTS') {
+                        alert('No route could be found between the origin and destination.');
+                    } else if (status == 'UNKNOWN_ERROR') {
+                        alert('A directions request could not be processed due to a server error. The request may succeed if you try again.');
+                    } else if (status == 'REQUEST_DENIED') {
+                        alert('This webpage is not allowed to use the directions service.');
+                    } else if (status == 'OVER_QUERY_LIMIT') {
+                        alert('The webpage has gone over the requests limit in too short a period of time.');
+                    } else if (status == 'NOT_FOUND') {
+                        alert('At least one of the origin, destination, or waypoints could not be geocoded.');
+                    } else if (status == 'INVALID_REQUEST') {
+                        alert('The DirectionsRequest provided was invalid.');
+                    } else {
+                        alert("There was an unknown error in your request. Requeststatus: nn" + status);
+                    }
+                }
+            });
+        };
+        initialize($scope.map);
+        calcRoute();
+    }
 }]);
 
 myApp.filter('startFrom', function() {

@@ -5448,6 +5448,17 @@ h4.menucat {
             display: block;
             width: 100%;
         }
+.left-inner-addon {
+    position: relative;
+}
+.left-inner-addon input {
+    padding-left: 30px;
+}
+.left-inner-addon i {
+    position: absolute;
+    padding: 10px 12px;
+    pointer-events: none;
+}
 /* Media Queries */
 
 @media screen and (max-width: 1199px) {
