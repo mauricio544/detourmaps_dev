@@ -1947,6 +1947,26 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope','$routeParams',  '$http',
             $scope.bizInfo = data;
             $scope.video = $sce.trustAsResourceUrl('http://www.youtube.com/embed/' + data.video + '?wmode=transparent');
             $scope.menu = $sce.trustAsHtml(data.menu);
+            $scope.rendermenu = function(menu){
+                $("#menulistfake").html(menu);
+                var listmenu = $("#menulistfake").find("h4");
+                var ulmenu = $("#menulistfake").find("h4").next("ul").hide();
+                for(var i=0; i<listmenu.length; i++){
+                    var ddmenu = "<a class='col-lg-4 ddmenu'></a>";
+                    $(listmenu[i]).append("<i class='fa fa-caret-down'></i>").addClass("menucat");
+                    $(ddmenu).append($(listmenu[i])).append($(ulmenu[i])).appendTo("#menulist");
+                };
+                $("a.ddmenu").click(function(e){
+                    e.preventDefault();
+                    var showmenu = $(this).find("ul").css("display");
+                    if(showmenu==="none"){
+                        $(this).find("ul").addClass("ddown");
+                    }else{
+                        $(this).find("ul").removeClass("ddown");
+                    }
+                });
+            };
+            $scope.rendermenu(data.menu);
             var calendars = {};
             var eventArray = [];
             $scope.events = data.events;
@@ -1991,7 +2011,6 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope','$routeParams',  '$http',
                     $('.clndr-table tr .day.event .day-contents').append('<span class="fa fa-circle"></span>');
                 }
             });
-            angular.element("#menulist").find("h4").append("<i class='fa fa-caret-down'></i>").addClass("menucat col-lg-4").next().hide();
         }, function(errorMessage){
             $scope.error = errorMessage;
         });
