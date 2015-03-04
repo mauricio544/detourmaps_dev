@@ -1949,6 +1949,8 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope','$routeParams',  '$http',
             $scope.menu = $sce.trustAsHtml(data.menu);
             $scope.rendermenu = function(menu){
                 $("#menulistfake").html(menu);
+                $(".scrollmenu").html(menu);
+                $(".scrollmenu").find("h4").hide();
                 var listmenu = $("#menulistfake").find("h4");
                 var ulmenu = $("#menulistfake").find("h4").next("ul").hide();
                 for(var i=0; i<listmenu.length; i++){

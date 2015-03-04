@@ -5382,6 +5382,10 @@ p.descevent {
     margin: auto;
     margin-left: 15px !important;
 }
+a.ddmenu{
+    display: block;
+    margin: 10px 0 5px 0;
+}
 h4.menucat {
     background: #999999;
     color: #fff;
@@ -5411,6 +5415,39 @@ h4.menucat {
     .ddown li{
         margin-left: -35px;
     }
+    .ddown li img{
+        display: none;
+    }
+    #rollmenu{
+        overflow: hidden;
+        width: 100%;
+    }
+    .scrollmenu {
+        width: 10000%;
+    }
+    .scrollmenu ul {
+        list-style: none;
+        position: relative;
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: -40px;
+    }
+    .scrollmenu ul li {
+        position: relative;
+        display: inline-block;
+        vertical-align: top;
+        background: #fff;
+        padding: 4px 10px;
+        width: 185px;
+        margin-right: 10px;
+    }
+        .scrollmenu ul li b{
+            display: block;
+        }
+        .scrollmenu ul li img{
+            display: block;
+            width: 100%;
+        }
 /* Media Queries */
 
 @media screen and (max-width: 1199px) {
