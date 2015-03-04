@@ -5459,6 +5459,31 @@ h4.menucat {
     padding: 10px 12px;
     pointer-events: none;
 }
+.panel-smart main figure {
+    width: 90%;
+    margin: auto;
+}
+    .panel-smart main figure img{
+        width: 100%;
+    }
+.navbtntool {
+    margin: 20px 0;
+}
+a.btntoolsmart{
+    padding: 4px 10px;
+    text-align: center;
+    width: 80%;
+    margin: auto;
+    border-radius: 10px;
+    background: #999;
+    color: #fff;
+}
+    a.btntoolsmart img{
+        margin-right: 10px;
+        display: inline-block;
+        vertical-align: middle;
+        width: 20%;
+    }
 /* Media Queries */
 
 @media screen and (max-width: 1199px) {

@@ -113,6 +113,33 @@
                 <a href="" class="btndeal"><img src="{{ STATIC_URL }}images/10-visits-icon.png" alt="10 Visits"></a>
                 <a href="" class="btndeal"><img src="{{ STATIC_URL }}images/525-icon.png" alt="5 = 25 Refer Friends"></a>
             </div>
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="smart-buys" ng-show="bizInfo.coupon">
+                    <div class="rollsmart">
+                        <div class="panel-smart">
+                            <header>
+                                <h4>Smart Buys / Not Your Ordinary Coupons</h4>
+                                <p>Smart Buys are exclusive offers created by local businesses to offer you the best deals  and discounts</p>
+                            </header>
+                            <main>
+                                <figure><img src="/media/[[ bizInfo.coupon.img]]" alt="Coupon [[ bizInfo.name ]]"></figure>
+                            </main>
+                        </div>
+                        <div class="panel-smart"></div>
+                        <div class="panel-smart"></div>
+                        <div class="panel-smart"></div>
+                        <div class="panel-smart"></div>
+                    </div>
+                    <div class="row navbtntool">
+                        <ul class="list-inline text-center">
+                            <li><a href="" class="btntoolsmart"><img src="{{ STATIC_URL }}images/icon-request.png" alt="Request"> Request</a></li>
+                            <li><a href="" class="btntoolsmart"><img src="{{ STATIC_URL }}images/icon-save-to.png" alt="Save To"> Save To</a></li>
+                            <li><a href="" class="btntoolsmart"><img src="{{ STATIC_URL }}images/icon-share.png" alt="Share"> Share</a></li>
+                            <li><a href="" class="btntoolsmart"><img src="{{ STATIC_URL }}images/icon-redeem.png" alt="Redeem"> Redeem</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <div class="row contentbiz">
