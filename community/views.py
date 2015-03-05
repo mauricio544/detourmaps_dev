@@ -2987,11 +2987,14 @@ def business_one_json(request):
         menu = None
         coupon = None
         dict_coupon = {}
+        user = False
         if "biz_code" in request.GET:
             business_object = Business.objects.get(pk=decode_url(request.GET["biz_code"]))
             avg = qualify(business_object)
             ten_visits = False
             smart_buys = False
+            if request.session.get("user"):
+                user = True
             if business_object.tenvisitsbusiness_set.all().count() > 0:
                 ten_visits = get_thumbnail_vists(business_object.tenvisitsbusiness_set.all()[0].image)
             if business_object.businessmenu_set.all().count() > 0:
@@ -3036,7 +3039,8 @@ def business_one_json(request):
                     'menu': force_unicode(menu),
                     'coupon': dict_coupon,
                     'smart_buys': smart_buys,
-                    'refer_friends': business_object.refer_friends
+                    'refer_friends': business_object.refer_friends,
+                    'user': user
                 }
                 lista_tag_services = []
                 lista_images_business = []
@@ -3172,7 +3176,8 @@ def business_one_json(request):
                     'menu': force_unicode(menu),
                     'coupon': dict_coupon,
                     'smart_buys': smart_buys,
-                    'refer_friends': business_object.refer_friends
+                    'refer_friends': business_object.refer_friends,
+                    'user': user
                 }
                 lista_tag_services = []
                 lista_images_business = []

@@ -125,7 +125,50 @@
                                 <figure><img src="/media/[[ bizInfo.coupon.img]]" alt="Coupon [[ bizInfo.name ]]"></figure>
                             </main>
                         </div>
-                        <div class="panel-smart"></div>
+                        <div class="panel-smart">
+                            <div class="popup" id="loginusersmart" ng-show="bizInfo.user==false">
+                                <div class="topBar">
+                                    <img src="{{ STATIC_URL }}community/evolution/images/userWhite.png" width="35" height="38" style="padding-top:7px;">
+
+                                    <p>User Log In</p>
+                                </div>
+                                <div class="inside">
+                                    <form id="loginuser" action="" class="loginfrm pure-form pure-form-stacked" method="post">
+                                        <div class="pure-g">
+                                            <div class="pure-u-1">
+                                                <label for="email">E-mail</label>
+                                                <input type="email" placeholder="" name="user_email" id="email" class="required email">
+                                            </div>
+                                            <div class="pure-u-1">
+                                                <label for="password">Password<a href="#forgotsmart" class="menuinside"><span
+                            style="font-size:11px; color:#2cadb0; padding-left:10px;">Forgot Password?</span></a>
+                                                </label>
+                                                <input type="password" placeholder="" name="user_password" id="password" class="required">
+                                            </div>
+                                        </div>
+                                        <ul class="submit pure-g">
+                                            <li class="pure-u-1-4">
+                                                <button class="pure-button pure-button-primary btnlogin">Sign In
+                                                </button>
+                                            </li>
+                                            <li class="pure-u-3-4">
+                                                <span style="font-size:11px; margin:0; color:#2cadb0; text-align: center;">Not a member yet?</span>
+                                                <button class="pure-button pure-button-primary btncreate">Create Account
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </form>
+
+                                </div>
+                                <div class="inside2">
+                                    <p>Or log in with</p>
+                                    <a href="#"><img src="{{ STATIC_URL }}community/evolution/images/fbLogin.png" width="110" height="27" style="padding-right:20px;">
+                                    </a>
+                                    <a href="#"><img src="{{ STATIC_URL }}community/evolution/images/g+Login.png" width="110" height="27">
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                         <div class="panel-smart"></div>
                         <div class="panel-smart"></div>
                         <div class="panel-smart"></div>
