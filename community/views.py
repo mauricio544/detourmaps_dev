@@ -2985,14 +2985,24 @@ def business_one_json(request):
     if request.method == "GET":
         dict_business = None
         menu = None
+        coupon = None
+        dict_coupon = {}
         if "biz_code" in request.GET:
             business_object = Business.objects.get(pk=decode_url(request.GET["biz_code"]))
             avg = qualify(business_object)
             ten_visits = False
+            smart_buys = False
             if business_object.tenvisitsbusiness_set.all().count() > 0:
                 ten_visits = get_thumbnail_vists(business_object.tenvisitsbusiness_set.all()[0].image)
             if business_object.businessmenu_set.all().count() > 0:
                 menu = business_object.businessmenu_set.all()[0].menu
+            if business_object.cuponbusiness_set.filter(active=1).count() > 0:
+                coupon = business_object.cuponbusiness_set.filter(active=True)[0]
+                return_date_coupon = lambda date_coupon: date_coupon or ''
+                dict_coupon['img'] = force_unicode(coupon.coupon)
+                dict_coupon['start'] = force_unicode(return_date_coupon(coupon.start_date.strftime('%Y-%m-%d')))
+                dict_coupon['end'] = force_unicode(return_date_coupon(coupon.end_date.strftime('%Y-%m-%d')))
+                smart_buys = True
             hasSubscription = getSuscription(business_object)
             if not business_object.EntryDetails():
                 dict_business = {
@@ -3016,14 +3026,17 @@ def business_one_json(request):
                     'logo': force_unicode(business_object.logo),
                     'video': '',
                     'video_title': '',
-                    'ten_visit': ten_visits,
+                    'ten_visit': business_object.ten_visits,
                     'video_description': business_object.video_description,
                     'subscription': hasSubscription,
                     'deals': get_deals(business_object),
                     'community': business_object.community.url_name,
                     'partner': get_partner(business_object),
                     'refer_friends': business_object.refer_friends,
-                    'menu': force_unicode(menu)
+                    'menu': force_unicode(menu),
+                    'coupon': dict_coupon,
+                    'smart_buys': smart_buys,
+                    'refer_friends': business_object.refer_friends
                 }
                 lista_tag_services = []
                 lista_images_business = []
@@ -3146,7 +3159,7 @@ def business_one_json(request):
                     'twitter': business_object.twitter,
                     'video': business_object.parseId(),
                     'video_title': entryDetails.title.text,
-                    'ten_visit': ten_visits,
+                    'ten_visit': business_object.ten_visits,
                     'video_img_0': entryDetails.media.thumbnail[1].url,
                     'video_img_1': entryDetails.media.thumbnail[2].url,
                     'video_img_2': entryDetails.media.thumbnail[3].url,
@@ -3156,7 +3169,10 @@ def business_one_json(request):
                     'community': business_object.community.url_name,
                     'partner': get_partner(business_object),
                     'refer_friends': business_object.refer_friends,
-                    'menu': force_unicode(menu)
+                    'menu': force_unicode(menu),
+                    'coupon': dict_coupon,
+                    'smart_buys': smart_buys,
+                    'refer_friends': business_object.refer_friends
                 }
                 lista_tag_services = []
                 lista_images_business = []
