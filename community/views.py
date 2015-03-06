@@ -3005,6 +3005,9 @@ def business_one_json(request):
                 dict_coupon['img'] = force_unicode(coupon.coupon)
                 dict_coupon['start'] = force_unicode(return_date_coupon(coupon.start_date.strftime('%Y-%m-%d')))
                 dict_coupon['end'] = force_unicode(return_date_coupon(coupon.end_date.strftime('%Y-%m-%d')))
+                dict_coupon['until'] = force_unicode(return_date_coupon(coupon.end_date.strftime('%m-%d-%Y')))
+                dict_coupon['id'] = coupon.id
+                dict_coupon['name'] = coupon.name
                 smart_buys = True
             hasSubscription = getSuscription(business_object)
             if not business_object.EntryDetails():

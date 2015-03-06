@@ -810,7 +810,7 @@ def userLoginAjax(request):
             return HttpResponse(simplejson.dumps(dict_response))
             # Return a 'disabled account' error message
     else:
-        dict_response["msg"] = "The email and/or the password were incorrect"
+        dict_response["msg"] = "The email and/or the password are incorrect"
         dict_response["confirm"] = False
         return HttpResponse(simplejson.dumps(dict_response))
         # Return an 'invalid login' error message.

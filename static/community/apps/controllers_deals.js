@@ -1942,6 +1942,7 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope','$routeParams',  '$http',
     $scope.events;
     $scope.catmenu = true;
     $rootScope.cat = true;
+    $scope.actionconfirm = false;
     $scope.getItem = function(){
         businessOneScope.getAllItem($scope.bizCode).then(function(data){
             $scope.bizInfo = data;
@@ -2037,6 +2038,41 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope','$routeParams',  '$http',
             );
         }
     };
+    $scope.formLogin = {};
+    $scope.promo = {}
+    $scope.login = function(){
+        $http({
+            method  : 'POST',
+            url     : '/user/login/ajax',
+            data    : $.param($scope.formLogin),
+            headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
+        })
+        .success(function(data) {
+            if (data.confirm) {
+                $scope.message = data.msg;
+                $scope.actionconfirm = true;
+                setTimeout(function(){
+                    $scope.actionconfirm = false;
+                    $('#loginusersmart').modal('hide');
+                    $http({
+                        method  : 'POST',
+                        url     : '/communities/get-promo/',
+                        data    : $.param($scope.promo),
+                        headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
+                    })
+                    .success(function(data) {
+                        $scope.promo.image = data.image;
+                        $scope.promo.voucher = data.voucher
+                        $scope.promo.message = data.message
+                    });
+                }, 10000)
+
+            } else {
+            // if successful, bind success message to message
+                $scope.message = data.msg;
+            }
+        });
+    }
     $scope.directions = function(newdirection){
         $scope.options = {
             zoom : 14,

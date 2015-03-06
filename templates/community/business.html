@@ -92,7 +92,7 @@
             <div class="row">
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="smart-buys" ng-show="bizInfo.smart_buys==true">
                     <div class="rollsmart">
-                        <div class="panel-smart">
+                        <div class="panel-smart" ng-hide="promo.voucher">
                             <header>
                                 <h4>Smart Buys / Not Your Ordinary Coupons</h4>
                                 <p>Smart Buys are exclusive offers created by local businesses to offer you the best deals  and discounts</p>
@@ -111,22 +111,25 @@
                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                                         </div>
                                         <div class="inside">
-                                            <form id="loginuser" action="" class="loginfrm" method="post">
+                                            <form id="loginuser" action="" class="loginfrm" method="post" ng-submit="login()">
                                                 <div class="row">
                                                     <div class="col-lg-12">
                                                         <label for="email">E-mail</label>
-                                                        <input type="email" placeholder="" name="user_email" id="email" class="required email form-control">
+                                                        <input type="email" placeholder="" name="user_email" id="email" class="required email form-control" ng-model="formLogin.user_email">
                                                     </div>
                                                     <div class="col-lg-12">
                                                         <label for="password">Password<a href="#forgotsmart" class="menuinside"><span
                                     style="font-size:11px; color:#2cadb0; padding-left:10px;">Forgot Password?</span></a>
                                                         </label>
-                                                        <input type="password" placeholder="" name="user_password" id="password" class="required form-control">
+                                                        <input type="password" placeholder="" name="user_password" id="password" class="required form-control" ng-model="formLogin.user_password">
+                                                        <input type="hidden" name="cpid" value="[[ bizInfo.coupon.id ]]" ng-model="promo.id">
                                                     </div>
                                                 </div>
+                                                <p ng-hide="actionconfirm===true">[[ message ]]</p>
+                                                <p class="actionconfirm" ng-hide="actionconfirm===false">[[ message ]]. Please wait ...<i class="fa fa-spinner fa-spin"></i></p>
                                                 <ul class="submit list-inline">
                                                     <li>
-                                                        <button class="btn btn-primary">Log In
+                                                        <button class="btn btn-primary btnlogin">Log In
                                                         </button>
                                                     </li>
                                                     <li>
@@ -154,10 +157,31 @@
                             </div>
                         </div>
                         <div class="panel-smart"></div>
-                        <div class="panel-smart"></div>
+                        <div class="panel-smart">
+                            <div class="getpromo" ng-show="promo.voucher">
+                                <header>
+                                    <h1 class="text-center">[[ bizInfo.coupon.name ]]</h1>
+                                    <p class="text-center">(Must present phone or print coupon at time of purchase)</p>
+                                    <ul class="list-inline text-center">
+                                        <li>VOUCHER: [[ promo.voucher ]]</li>
+                                        <li>|</li>
+                                        <li>Deal valid until [[ bizInfo.coupon.until ]]</li>
+                                        <figure><img src="[[ promo.image ]]" alt=""></figure>
+                                    </ul>
+                                    <p class="text-center">*By redeeming you agree to the terms and conditions</p>
+                                    <p ng-show="promo.redeemed==true" class="text-center">[[ promo.message ]]</p>
+                                    <div>
+                                        <ul class="list-inline text-center">
+                                            <li><a href="" class="btntoolsmart">Redeem Now</a></li>
+                                            <li><a href="" class="btntoolsmart">Use Later</a></li>
+                                        </ul>
+                                    </div>
+                                </header>
+                            </div>
+                        </div>
                         <div class="panel-smart"></div>
                     </div>
-                    <div class="row navbtntool">
+                    <div class="row navbtntool" ng-show="actionconfirm==false">
                         <ul class="list-inline text-center">
                             <li><a href="" class="btntoolsmart" ng-click="smartactions()"><img src="{{ STATIC_URL }}images/icon-request.png" alt="Request"> Request</a></li>
                             <li><a href="" class="btntoolsmart"><img src="{{ STATIC_URL }}images/icon-save-to.png" alt="Save To"> Save To</a></li>
