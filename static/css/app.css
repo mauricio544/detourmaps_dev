@@ -5353,6 +5353,11 @@ div.eventday {
 div.eventwrap {
     background: #f3f3f3;
 }
+div.eventwrap figure img{
+    margin: auto;
+    display: block;
+    width: 100%;
+}
 div.infoevent {
     padding: 5px;
 }
