@@ -122,7 +122,6 @@
                                     style="font-size:11px; color:#2cadb0; padding-left:10px;">Forgot Password?</span></a>
                                                         </label>
                                                         <input type="password" placeholder="" name="user_password" id="password" class="required form-control" ng-model="formLogin.user_password">
-                                                        <input type="hidden" name="cpid" value="[[ bizInfo.coupon.id ]]" ng-model="promo.id">
                                                     </div>
                                                 </div>
                                                 <p ng-hide="actionconfirm===true">[[ message ]]</p>
@@ -181,7 +180,7 @@
                         </div>
                         <div class="panel-smart"></div>
                     </div>
-                    <div class="row navbtntool" ng-show="actionconfirm==false">
+                    <div class="row navbtntool" ng-hide="promo.voucher">
                         <ul class="list-inline text-center">
                             <li><a href="" class="btntoolsmart" ng-click="smartactions()"><img src="{{ STATIC_URL }}images/icon-request.png" alt="Request"> Request</a></li>
                             <li><a href="" class="btntoolsmart"><img src="{{ STATIC_URL }}images/icon-save-to.png" alt="Save To"> Save To</a></li>

@@ -4414,7 +4414,7 @@ def how_it_works(request):
 def get_promotion(request):
     dict_response = {}
     user = User.objects.get(username=request.session.get("user"))
-    coupon_business = CuponBusiness.objects.get(pk=request.POST["id"])
+    coupon_business = CuponBusiness.objects.get(pk=request.POST["cpid"])
     new_owner, created = CouponOwner.objects.get_or_create(
         user=user,
         coupon_business=coupon_business

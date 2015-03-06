@@ -2039,7 +2039,7 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope','$routeParams',  '$http',
         }
     };
     $scope.formLogin = {};
-    $scope.promo = {}
+    $scope.promo = {};
     $scope.login = function(){
         $http({
             method  : 'POST',
@@ -2054,19 +2054,18 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope','$routeParams',  '$http',
                 setTimeout(function(){
                     $scope.actionconfirm = false;
                     $('#loginusersmart').modal('hide');
-                    $http({
-                        method  : 'POST',
-                        url     : '/communities/get-promo/',
-                        data    : $.param($scope.promo),
-                        headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
-                    })
-                    .success(function(data) {
-                        $scope.promo.image = data.image;
-                        $scope.promo.voucher = data.voucher
-                        $scope.promo.message = data.message
-                    });
-                }, 10000)
-
+                }, 10000);
+                $http({
+                    method  : 'POST',
+                    url     : '/communities/get-promo/',
+                    data    : $.param({ cpid: $scope.bizInfo.coupon.id}),
+                    headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
+                })
+                .success(function(data) {
+                    $scope.promo.image = data.image;
+                    $scope.promo.voucher = data.voucher
+                    $scope.promo.message = data.message
+                });
             } else {
             // if successful, bind success message to message
                 $scope.message = data.msg;
