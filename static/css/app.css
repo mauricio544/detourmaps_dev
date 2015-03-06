@@ -5484,6 +5484,162 @@ a.btntoolsmart{
         vertical-align: middle;
         width: 20%;
     }
+#accountsmart.popup, #savesmart.popup, #sharesmart.popup, #signsmart.popup, #requestsmart.popup, #howsmart.popup, #loginusersmart.popup, #loginbusinesssmart.popup, #loginorgsmart, #passwordsmart.popup, #forgotsmart.popup, #printsmart.popup {
+    position: absolute;
+    background: #fff;
+}
+.popup > p {
+	text-align:center;
+}
+.otheraccess {
+    padding: 10px;
+}
+.insideaccount {
+	width:200px;
+	margin:0 auto;
+	margin-bottom:15px;
+    padding: 1em 0;
+}
+.insideaccount div{
+    position: relative;
+    width: 80%;
+    display: block;
+    margin: auto;
+    overflow: hidden;
+    padding: 0.5em 0;
+}
+.insideaccount div > a{
+    display: block;
+    position: relative;
+    overflow: hidden;
+    font-weight: bold;
+}
+.insideaccount div > a:hover{
+    text-decoration: underline;
+}
+.insideaccount div a > img{
+    vertical-align: middle;
+    /* margin-right: 2em; */
+    display: inline-block;
+    left: 0;
+    text-align: left;
+    width: 50px;
+}
+.insideaccount div a > span{
+    vertical-align: middle;
+    display: inline-block;
+    position: relative;
+    width: 110px;
+    text-align: center;
+}
+.popup a {
+	text-decoration:none;
+	color:#676767;
+}
+
+.topBar {
+	background:#ec5b24;
+	height:55px;
+}
+
+.topBar p {
+	margin:0;
+	padding-top:18px;
+	padding-bottom:10px;
+	color:#fff !important;
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    font-weight: bold;
+}
+.topBar p.noicon{
+    width: 100%;
+    text-align: center;
+}
+.topBar > img {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+}
+#share {
+	width:240px;
+}
+
+#share input {
+	width:100%;
+}
+.insidesave {
+	width:240px;
+	margin:0 auto;
+	margin-bottom:15px;
+	font-size:12px;
+}
+.insideshare {
+	width:240px;
+	margin:0 auto;
+	margin-bottom:15px;
+	border-bottom:thin solid #5f6161;
+}
+.insidetoshare {
+	width:240px;
+	margin:0 auto;
+	margin-bottom:15px;
+	font-size:12px;
+}
+#signUp {
+	padding: 0 1em;
+}
+
+#signUp input {
+	width:100%;
+}
+.insiderequest{
+    width: 240px;
+    /* height: 10em; */
+    margin: 0 auto;
+    margin-bottom: 15px;
+}
+.inside > a {
+    display: inline-block;
+    position: relative;
+    vertical-align: top;
+}
+ .loginfrm {
+	padding: 0 1em;
+}
+
+.loginfrm input {
+	width:100%;
+}
+ul.submit{
+    list-style: none;
+    overflow: hidden;
+    margin-top: 10px;
+}
+ul.submit > li{
+    vertical-align: middle;
+}
+#passChange, #forgotpass {
+	padding 0 1em;
+}
+#passChange input {
+	width:100%;
+}
+p.submit{
+    overflow: hidden;
+    width: 100%;
+}
+.subFooterContent.yesdeal{
+    display: none;
+}
+li.toolevent a{
+    display: block;
+    text-align: center;
+}
+    li.toolevent a img{
+        display: block;
+        margin: auto;
+    }
 /* Media Queries */
 
 @media screen and (max-width: 1199px) {

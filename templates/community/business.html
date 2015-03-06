@@ -13,30 +13,6 @@
                     </div>
                 </div>
             </div>
-            <!--<div class="item">
-                <img src="{{ STATIC_URL }}images/prop/4-2.png" alt="Second slide">
-                <div class="container">
-                    <div class="carousel-caption">
-
-                    </div>
-                </div>
-            </div>
-            <div class="item">
-                <img src="{{ STATIC_URL }}images/prop/4-3.png" alt="Third slide">
-                <div class="container">
-                    <div class="carousel-caption">
-
-                    </div>
-                </div>
-            </div>
-            <div class="item">
-                <img src="{{ STATIC_URL }}images/prop/4-4.png" alt="Fourth slide">
-                <div class="container">
-                    <div class="carousel-caption">
-
-                    </div>
-                </div>
-            </div>-->
         </div>
         <a class="left carousel-control" href="#carouselFull" role="button" data-slide="prev"><span class="fa fa-chevron-left"></span></a>
         <a class="right carousel-control" href="#carouselFull" role="button" data-slide="next"><span class="fa fa-chevron-right"></span></a>
@@ -126,46 +102,54 @@
                             </main>
                         </div>
                         <div class="panel-smart">
-                            <div class="popup" id="loginusersmart" ng-show="bizInfo.user==false">
-                                <div class="topBar">
-                                    <img src="{{ STATIC_URL }}community/evolution/images/userWhite.png" width="35" height="38" style="padding-top:7px;">
-
-                                    <p>User Log In</p>
-                                </div>
-                                <div class="inside">
-                                    <form id="loginuser" action="" class="loginfrm pure-form pure-form-stacked" method="post">
-                                        <div class="pure-g">
-                                            <div class="pure-u-1">
-                                                <label for="email">E-mail</label>
-                                                <input type="email" placeholder="" name="user_email" id="email" class="required email">
-                                            </div>
-                                            <div class="pure-u-1">
-                                                <label for="password">Password<a href="#forgotsmart" class="menuinside"><span
-                            style="font-size:11px; color:#2cadb0; padding-left:10px;">Forgot Password?</span></a>
-                                                </label>
-                                                <input type="password" placeholder="" name="user_password" id="password" class="required">
+                            <div class="modal fade" id="loginusersmart" style="display: none;" role="dialog" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="topBar">
+                                            <img src="{{ STATIC_URL }}community/evolution/images/userWhite.png" width="35" height="38" style="padding-top:7px;">
+                                            <p>Login</p>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        </div>
+                                        <div class="inside">
+                                            <form id="loginuser" action="" class="loginfrm" method="post">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <label for="email">E-mail</label>
+                                                        <input type="email" placeholder="" name="user_email" id="email" class="required email form-control">
+                                                    </div>
+                                                    <div class="col-lg-12">
+                                                        <label for="password">Password<a href="#forgotsmart" class="menuinside"><span
+                                    style="font-size:11px; color:#2cadb0; padding-left:10px;">Forgot Password?</span></a>
+                                                        </label>
+                                                        <input type="password" placeholder="" name="user_password" id="password" class="required form-control">
+                                                    </div>
+                                                </div>
+                                                <ul class="submit list-inline">
+                                                    <li>
+                                                        <button class="btn btn-primary">Log In
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <a href="" class="btncreate">Create an Account
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </form>
+                                            <div class="otheraccess">
+                                                <p>Or log in with</p>
+                                                <ul class="list-inline">
+                                                    <li>
+                                                        <a href="#"><img src="{{ STATIC_URL }}community/evolution/images/fbLogin.png" width="110" height="27" style="padding-right:20px;">
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#"><img src="{{ STATIC_URL }}community/evolution/images/g+Login.png" width="110" height="27">
+                                                        </a>
+                                                    </li>
+                                                </ul>
                                             </div>
                                         </div>
-                                        <ul class="submit pure-g">
-                                            <li class="pure-u-1-4">
-                                                <button class="pure-button pure-button-primary btnlogin">Sign In
-                                                </button>
-                                            </li>
-                                            <li class="pure-u-3-4">
-                                                <span style="font-size:11px; margin:0; color:#2cadb0; text-align: center;">Not a member yet?</span>
-                                                <button class="pure-button pure-button-primary btncreate">Create Account
-                                                </button>
-                                            </li>
-                                        </ul>
-                                    </form>
-
-                                </div>
-                                <div class="inside2">
-                                    <p>Or log in with</p>
-                                    <a href="#"><img src="{{ STATIC_URL }}community/evolution/images/fbLogin.png" width="110" height="27" style="padding-right:20px;">
-                                    </a>
-                                    <a href="#"><img src="{{ STATIC_URL }}community/evolution/images/g+Login.png" width="110" height="27">
-                                    </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -175,7 +159,7 @@
                     </div>
                     <div class="row navbtntool">
                         <ul class="list-inline text-center">
-                            <li><a href="" class="btntoolsmart"><img src="{{ STATIC_URL }}images/icon-request.png" alt="Request"> Request</a></li>
+                            <li><a href="" class="btntoolsmart" ng-click="smartactions()"><img src="{{ STATIC_URL }}images/icon-request.png" alt="Request"> Request</a></li>
                             <li><a href="" class="btntoolsmart"><img src="{{ STATIC_URL }}images/icon-save-to.png" alt="Save To"> Save To</a></li>
                             <li><a href="" class="btntoolsmart"><img src="{{ STATIC_URL }}images/icon-share.png" alt="Share"> Share</a></li>
                             <li><a href="" class="btntoolsmart"><img src="{{ STATIC_URL }}images/icon-redeem.png" alt="Redeem"> Redeem</a></li>
@@ -289,7 +273,18 @@
                 <h3 class="titleevent">[[ event.title ]]</h3>
                 <h4 class="dateevent">[[ event.date.str ]], [[ event.date.year ]]</h4>
                 <p class="descevent">[[ event.description ]]</p>
+                <div class="row">
+                    <ul class="list-inline text-right">
+                        <li class="toolevent"><a href="#call"><img src="{{ STATIC_URL }}images/call-event-icon.png" alt="Call">Call</a></li>
+                        <li class="toolevent"><a href="#map"><img src="{{ STATIC_URL }}images/map-event-icon.png" alt="View event in Map">View Map</a></li>
+                        <li class="toolevent"><a href="#direction"><img src="{{ STATIC_URL }}images/direction-event-icon.png" alt="Directions">Directions</a></li>
+                        <li class="toolevent"><a href="#share"><img src="{{ STATIC_URL }}images/share-event-icon.png" alt="Share Event">Share</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
+</div>
+<div id="alert">
+
 </div>

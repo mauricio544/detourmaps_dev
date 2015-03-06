@@ -2018,6 +2018,25 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope','$routeParams',  '$http',
         });
     };
     $scope.getItem();
+    $scope.smartactions = function(){
+        console.log("smart");
+        if ($scope.bizInfo.user === true){
+            $(this).popover({
+              html : true,
+              placement: 'auto',
+              delay: { "show": 500, "hide": 100 },
+              content: function(){
+                  return $("#alert").html("<p>Save to your dashboard or redeem this coupon</p>");
+              }
+            });
+        }else{
+            $('#loginusersmart').modal(
+                {
+                    keyboard: true
+                }
+            );
+        }
+    };
     $scope.directions = function(newdirection){
         $scope.options = {
             zoom : 14,
