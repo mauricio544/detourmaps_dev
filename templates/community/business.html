@@ -157,7 +157,7 @@
                         </div>
                         <div class="panel-smart"></div>
                         <div class="panel-smart">
-                            <div class="getpromo" ng-show="promo.voucher">
+                            <div class="getpromo" ng-show="promo.show==true">
                                 <header>
                                     <h1 class="text-center">[[ bizInfo.coupon.name ]]</h1>
                                     <p class="text-center">(Must present phone or print coupon at time of purchase)</p>
@@ -171,14 +171,26 @@
                                     <p ng-show="promo.redeemed==true" class="text-center">[[ promo.message ]]</p>
                                     <div>
                                         <ul class="list-inline text-center">
-                                            <li><a href="" class="btntoolsmart">Redeem Now</a></li>
-                                            <li><a href="" class="btntoolsmart">Use Later</a></li>
+                                            <li><a href="" class="btntoolsmart" ng-click="redeem()">Redeem Now</a></li>
+                                            <li><a href="" class="btntoolsmart" ng-click="save()">Use Later</a></li>
                                         </ul>
                                     </div>
                                 </header>
                             </div>
                         </div>
-                        <div class="panel-smart"></div>
+                        <div class="panel-smart">
+                            <div class="redeempromo" ng-show="promo.redeem==true">
+                                <header>
+                                    <h1 class="text-center">Thank you for choosing this orange deal!</h1>
+                                    <p class="text-center">You can see this promo again after 7 days</p>
+                                </header>
+                                <figure class="text-center">
+                                    <label for="">USED [[ promo.today ]]</label>
+                                    <img src="[[ promo.redeemed ]]" alt="">
+                                    <p class="text-center">*Track and save deals on your  mobil device. Download the DetourMaps App</p>
+                                </figure>
+                            </div>
+                        </div>
                     </div>
                     <div class="row navbtntool" ng-hide="promo.voucher">
                         <ul class="list-inline text-center">

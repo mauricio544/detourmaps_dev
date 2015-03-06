@@ -4579,8 +4579,8 @@ def redeemed(request):
             coupon_redeem.save()
             card = '%scoupon/%s.jpg' % (settings.MEDIA_ROOT,
                 request.POST["voucher"])
-            mask = '%scommunity/mobile-evolution/redeemed-image.png' % \
-                settings.STATIC_ROOT
+            mask = '%sredeemed-image.png' % \
+                settings.MEDIA_ROOT
             image = MergeImage()
             dict_response['redeemed'] = True
             dict_response['message'] = 'Your coupon was redeemed successfully'

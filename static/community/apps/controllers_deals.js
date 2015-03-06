@@ -2063,15 +2063,31 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope','$routeParams',  '$http',
                 })
                 .success(function(data) {
                     $scope.promo.image = data.image;
-                    $scope.promo.voucher = data.voucher
-                    $scope.promo.message = data.message
+                    $scope.promo.voucher = data.voucher;
+                    $scope.promo.message = data.message;
+                    $scope.promo.show = true
                 });
             } else {
             // if successful, bind success message to message
-                $scope.message = data.msg;
+                $scope.promo.message = data.message;
             }
         });
-    }
+    };
+    $scope.redeem = function(){
+        $http({
+            method  : 'POST',
+            url     : '/communities/redeem-promo/',
+            data    : $.param({ voucher: $scope.promo.voucher }),
+            headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
+        })
+        .success(function(data) {
+            $scope.promo.redeemed = data.image;
+            $scope.promo.message = data.message;
+            $scope.promo.redeem = true;
+            $scope.promo.show = false;
+            $scope.promo.today = moment().format('LL');
+        });
+    };
     $scope.directions = function(newdirection){
         $scope.options = {
             zoom : 14,
