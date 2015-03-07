@@ -2040,6 +2040,8 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope','$routeParams',  '$http',
     };
     $scope.formLogin = {};
     $scope.formsign = {};
+    $scope.formforgot = {};
+    $scope.formreset = {};
     $scope.promo = {};
     $scope.login = function(){
         $http({
@@ -2107,6 +2109,50 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope','$routeParams',  '$http',
             keyboard: true
         });
     };
+    $scope.newpass = function(){
+        $http({
+            method  : 'POST',
+            url     : '/communities/reset-password/',
+            data    : $.param($scope.formforgot),
+            headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
+        })
+        .success(function(data) {
+            if (data.state) {
+                $scope.message = data.message;
+                $scope.actionconfirm = true;
+                setTimeout(function(){
+                    $scope.actionconfirm = false;
+                    $('#forgotsmart').modal('hide');
+                    $('#passwordsmart').modal('show');
+                    $scope.actionconfirm = true;
+                }, 10000);
+            } else {
+                $scope.message = data.message;
+            }
+        });
+    };
+    $scope.reset = function(){
+        $http({
+            method  : 'POST',
+            url     : '/communities/register/confirm/ajax/04718802/',
+            data    : $.param($scope.formforgot),
+            headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
+        })
+        .success(function(data) {
+            if (data.state) {
+                $scope.message = data.message;
+                $scope.actionconfirm = true;
+                setTimeout(function(){
+                    $scope.actionconfirm = false;
+                    $('#forgotsmart').modal('hide');
+                    $('#passwordsmart').modal('show');
+                    $scope.actionconfirm = true;
+                }, 10000);
+            } else {
+                $scope.message = data.message;
+            }
+        });
+    }
     $scope.redeem = function(){
         $http({
             method  : 'POST',

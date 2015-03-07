@@ -3,8 +3,8 @@
 #EMAIL_HOST_USER = 'cs.detourmaps@gmail.com'
 #EMAIL_HOST_PASSWORD = 'detour6463'
 #EMAIL_PORT = 587
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_HOST_USER = 'detourmaps'
-EMAIL_HOST_PASSWORD = '04718802'
+EMAIL_HOST = 'smtp.mailgun.org'
+EMAIL_HOST_USER = 'postmaster@detourmaps.mailgun.org'
+EMAIL_HOST_PASSWORD = '0eyla2jd6yi1'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True

@@ -4151,13 +4151,14 @@ def register_confirm_password_ajax(request, user_id):
     if user_id:
         id_user = decode_url(user_id)
         if request.POST:
-            user_object = User.objects.get(id=id_user)
+            user_object = User.objects.get(username=request.session.get("user"))
             user = authenticate(username=user_object.username, password=request.POST['old_password'])
             if user.is_active:
                 user.set_password(request.POST['new_password'])
                 user.save()
                 request.session['user'] = user.username
                 dict_response['message'] = 'Your new password was saved!!!'
+                dict_response['state'] = True
         return HttpResponse(simplejson.dumps(dict_response))
 
 
@@ -4724,6 +4725,7 @@ def forgot_password(request):
         )
         user.set_password(password_left)
         user.save()
+        request.session["user"] = user.username
         dict_response['state'] = True
         dict_response['session'] = True,
         dict_response['message'] = 'Your user and password were sent \
