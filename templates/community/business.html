@@ -220,7 +220,7 @@
                                         <div class="inside">
                                             <p style="font-size:12px;">Please insert your e-mail and receive an email with new temporary password</p>
 
-                                            <form id="forgotpass" action="" method="post" class="loginfrm pure-form pure-form-stacked">
+                                            <form id="forgotpass" action="" method="post" class="loginfrm" ng-submit="newpass()">
                                                 <div class="row">
                                                     <div class="col-lg-12">
                                                         <label for="email">E-mail</label>
@@ -228,8 +228,54 @@
                                                                class="required email form-control" ng-model="formforgot.user_email">
                                                     </div>
                                                 </div>
+                                                <p class="actionconfirm" ng-hide="actionconfirm===false">[[ message ]]. Please wait ...<i class="fa fa-spinner fa-spin"></i></p>
                                                 <p class="submit">
                                                     <button class="btn btn-primary btnforgot">Send Password
+                                                    </button>
+                                                </p>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-smart">
+                            <div class="modal fade" id="passwordsmart" style="display: none;" role="dialog" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="topBar">
+                                            <img src="{{ STATIC_URL }}community/evolution/images/userWhite.png" width="35" height="38" style="padding-top:7px;">
+                                            <p>Change Password</p>
+                                        </div>
+                                        <div class="inside">
+                                            <p style="font-size:12px;">Please retrieve your temporary password from your
+                                                e-mail and change it</p>
+
+                                            <form id="passChange" action="" method="post" class="loginfrm" ng-submit="reset()">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <label for="oldPass">Temporary Password</label>
+                                                        <input type="password" placeholder="" name="old_password" id="oldPass"
+                                                               class="required form-control" ng-model="formreset.old_password">
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <label for="newPass">New Password</label>
+                                                        <input type="password" placeholder="" name="new_password" id="newPass"
+                                                               class="required form-control" ng-model="formreset.new_password">
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <label for="reNewPass">Re-type New Password</label>
+                                                        <input type="password" placeholder="" name="reNewPass" id="reNewPass"
+                                                               class="required form-control" ng-model="formreset.reNewPass">
+                                                    </div>
+                                                </div>
+                                                <input type="hidden" name="user_id" value="" id="user_id"/>
+                                                <p class="submit">
+                                                    <button class="btn btn-primary btnpassword">Save Password
                                                     </button>
                                                 </p>
                                             </form>
