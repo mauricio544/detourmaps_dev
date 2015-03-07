@@ -118,7 +118,7 @@
                                                         <input type="email" placeholder="" name="user_email" id="email" class="required email form-control" ng-model="formLogin.user_email">
                                                     </div>
                                                     <div class="col-lg-12">
-                                                        <label for="password">Password<a href="#forgotsmart" class="menuinside"><span
+                                                        <label for="password">Password<a href="" class="menuinside" ng-click="forgot()"><span
                                     style="font-size:11px; color:#2cadb0; padding-left:10px;">Forgot Password?</span></a>
                                                         </label>
                                                         <input type="password" placeholder="" name="user_password" id="password" class="required form-control" ng-model="formLogin.user_password">
@@ -204,6 +204,39 @@
                                   </div>
                               </div>
                            </div>
+                        </div>
+                        <div class="panel-smart">
+                            <div class="modal fade" id="forgotsmart" style="display: none;" role="dialog" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="popup" id="forgotsmart">
+
+                                        </div>
+                                        <div class="topBar">
+                                            <img src="{{ STATIC_URL }}community/evolution/images/userWhite.png" width="35" height="38" style="padding-top:7px;">
+
+                                            <p>Forgot Password</p>
+                                        </div>
+                                        <div class="inside">
+                                            <p style="font-size:12px;">Please insert your e-mail and receive an email with new temporary password</p>
+
+                                            <form id="forgotpass" action="" method="post" class="loginfrm pure-form pure-form-stacked">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <label for="email">E-mail</label>
+                                                        <input type="email" placeholder="" name="user_email" id="forgot_email"
+                                                               class="required email form-control" ng-model="formforgot.user_email">
+                                                    </div>
+                                                </div>
+                                                <p class="submit">
+                                                    <button class="btn btn-primary btnforgot">Send Password
+                                                    </button>
+                                                </p>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="panel-smart">
                             <div class="getpromo" ng-show="promo.show==true">

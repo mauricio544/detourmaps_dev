@@ -2101,6 +2101,12 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope','$routeParams',  '$http',
             }
         });
     };
+    $scope.forgot = function(){
+        $("#loginusersmart").modal("hide");
+        $("#forgotsmart").modal({
+            keyboard: true
+        });
+    };
     $scope.redeem = function(){
         $http({
             method  : 'POST',
