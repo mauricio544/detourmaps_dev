@@ -2039,6 +2039,7 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope','$routeParams',  '$http',
         }
     };
     $scope.formLogin = {};
+    $scope.formsign = {};
     $scope.promo = {};
     $scope.login = function(){
         $http({
@@ -2049,7 +2050,7 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope','$routeParams',  '$http',
         })
         .success(function(data) {
             if (data.confirm) {
-                $scope.message = data.msg;
+                $scope.message = data.messageg;
                 $scope.actionconfirm = true;
                 setTimeout(function(){
                     $scope.actionconfirm = false;
@@ -2068,8 +2069,35 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope','$routeParams',  '$http',
                     $scope.promo.show = true
                 });
             } else {
-            // if successful, bind success message to message
                 $scope.promo.message = data.message;
+            }
+        });
+    };
+    $scope.createaccount = function(){
+        $("#loginusersmart").modal("hide");
+        $("#signsmart").modal({
+            keyboard: true
+        });
+    };
+    $scope.signup = function(){
+        $http({
+            method  : 'POST',
+            url     : '/communities/fake-login/',
+            data    : $.param($scope.formsign),
+            headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
+        })
+        .success(function(data) {
+            if (data.confirm) {
+                $scope.message = data.message;
+                $scope.actionconfirm = true;
+                setTimeout(function(){
+                    $scope.actionconfirm = false;
+                    $('#signsmart').modal('hide');
+                    $('#loginusersmart').modal('show');
+                    $scope.actionconfirm = true;
+                }, 10000);
+            } else {
+                $scope.message = data.message;
             }
         });
     };

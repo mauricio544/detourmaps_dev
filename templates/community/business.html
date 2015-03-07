@@ -132,7 +132,7 @@
                                                         </button>
                                                     </li>
                                                     <li>
-                                                        <a href="" class="btncreate">Create an Account
+                                                        <a href="" class="btncreate" ng-click="createaccount()">Create an Account
                                                         </a>
                                                     </li>
                                                 </ul>
@@ -155,7 +155,56 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="panel-smart"></div>
+                        <div class="panel-smart">
+                           <div class="modal fade" id="signsmart" style="display: none;" role="dialog" tabindex="-1">
+                              <div class="modal-dialog">
+                                  <div class="modal-content">
+                                       <div class="topBar">
+                                            <img src="{{ STATIC_URL }}community/evolution/images/userWhite.png" width="35" height="38" style="padding-top:7px;">
+                                            <p>Create an Account</p>
+                                        </div>
+                                        <div class="inside">
+                                            <form id="signUp" action="" method="post" ng-submit="signup()">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <label for="firstname">First Name</label>
+                                                        <input type="text" name="firstname" id="firstname" required class="form-control" ng-model="formsign.firstname">
+                                                    </div>
+                                                    <div class="col-lg-12">
+                                                        <label for="lastname">Last Name</label>
+                                                        <input type="text" name="lastname" id="lastname" required class="form-control" ng-model="formsign.lastname">
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <label for="email">E-mail</label>
+                                                        <input type="email" placeholder="" name="emailuserdeal" id="email"
+                                                               class="required email form-control" ng-model="formsign.emailuserdeal">
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <p class="col-lg-12">By signing up, I agree to the <a
+                                                            href="{% url 'terms' %}"
+                                                            target="_blank" style="text-decoration:underline;">terms of
+                                                        service</a>
+                                                    </p>
+
+                                                    <p class="submit col-lg-12">
+                                                        <button class="btn btn-primary btnsignup">Sign Up
+                                                        </button>
+                                                    </p>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <p class="actionconfirm" ng-hide="actionconfirm===false">[[ message ]]. Please wait ...<i class="fa fa-spinner fa-spin"></i></p>
+                                        <div class="inside2">
+                                            <p style="font-size:10px;margin: 0;">Check your e-mail to get
+                                                your temporary password</p>
+                                        </div>
+                                  </div>
+                              </div>
+                           </div>
+                        </div>
                         <div class="panel-smart">
                             <div class="getpromo" ng-show="promo.show==true">
                                 <header>
