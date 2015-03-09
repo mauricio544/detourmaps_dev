@@ -98,8 +98,8 @@
                                 <p>Smart Buys are exclusive offers created by local businesses to offer you the best deals  and discounts</p>
                             </header>
                             <main>
-                                <figure ng-hide="bizInfo.smart_buys==true"><img src="/media/[[ bizInfo.coupon.img]]" alt="Coupon [[ bizInfo.name ]]"></figure>
-                                <figure ng-hide="bizInfo.smart_buys==false"><img src="/static/community/evolution/coupon-placement.png" alt="No Deal"></figure>
+                                <figure ng-show="bizInfo.smart_buys==true"><img src="/media/[[ bizInfo.coupon.img]]" alt="Coupon [[ bizInfo.name ]]"></figure>
+                                <figure ng-hide="bizInfo.smart_buys==true"><img src="/static/community/evolution/coupon-placement.png" alt="No Deal"></figure>
                             </main>
                         </div>
                         <div class="panel-smart">
