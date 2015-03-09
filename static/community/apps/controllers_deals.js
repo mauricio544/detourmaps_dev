@@ -1932,7 +1932,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
     }
 }]);
 
-myApp.controller('bizonectrl', ['$scope', '$rootScope','$routeParams',  '$http', 'businessOneScope', 'search' , '$sce', 'catmenu',function($scope, $rootScope,$routeParams, $http, businessOneScope, search, $sce, catmenu){
+myApp.controller('bizonectrl', ['$scope', '$rootScope','$routeParams',  '$location','$http', 'businessOneScope', 'search' , '$sce', 'catmenu' , '$anchorScroll',function($scope, $rootScope,$routeParams, $location, $http, businessOneScope, search, $sce, catmenu, $anchorScroll){
     $scope.bizName = $routeParams.bizName;
     $scope.bizCode = $routeParams.bizCode;
     $scope.bizInfo;
@@ -1941,6 +1941,16 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope','$routeParams',  '$http',
     $rootScope.cat = true;
     $scope.actionconfirm = false;
     $scope.there_is_user = false;
+    $scope.navigation = {
+        info: 'info',
+        deals: 'deals',
+        share: 'share',
+        services: 'services',
+        video: 'video',
+        allevents: 'events',
+        directions: 'directions',
+        allqraccess: 'all-qr-access'
+    }
     $scope.getItem = function(){
         businessOneScope.getAllItem($scope.bizCode).then(function(data){
             $scope.bizInfo = data;
@@ -2140,6 +2150,22 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope','$routeParams',  '$http',
         $("#signsmart").modal({
             keyboard: true
         });
+    };
+    $scope.toLeft = function(){
+        $('.navbtn').stop().animate({
+             'scrollLeft': '400%'
+        }, 900, 'swing');
+    };
+    $scope.toRight = function(){
+        $('.navbtn').stop().animate({
+             'scrollLeft': '0'
+        }, 900, 'swing');
+    };
+    $scope.goToPanel = function(idElement){
+        $('#content').stop().animate({
+	        'scrollTop': $(idElement).offset().top
+	    }, 900, 'swing');
+        console.log($(idElement).offset().top);
     };
     $scope.signup = function(){
         $http({

@@ -50,20 +50,20 @@
                     <div class="row">
                         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                             <div class="navcenter">
-                                <a href="" class="arrow left"><img src="{{ STATIC_URL }}images/arrow-left-icon.png" alt="left"></a>
+                                <a href="" class="arrow left" ng-click="toLeft()"><img src="{{ STATIC_URL }}images/arrow-left-icon.png" alt="left"></a>
                                 <div class="navbtn">
                                     <div class="rowbtn">
-                                        <a href="" class="btninfo"><img src="{{ STATIC_URL }}images/info-icon-slide.png" alt="Info">Info</a>
-                                        <a href="" class="btninfo"><img src="{{ STATIC_URL }}images/deals-icon-slide.png" alt="Deals">Deals</a>
-                                        <a href="" class="btninfo"><img src="{{ STATIC_URL }}images/share-icon-slide.png" alt="Share">Share</a>
-                                        <a href="" class="btninfo"><img src="{{ STATIC_URL }}images/services-icon-slide.png" alt="Services">Services</a>
-                                        <a href="" class="btninfo"><img src="{{ STATIC_URL }}images/services-icon-slide.png" alt="Services">Services</a>
-                                        <a href="" class="btninfo"><img src="{{ STATIC_URL }}images/video-icon-slide.png" alt="Video">Video</a>
-                                        <a href="" class="btninfo"><img src="{{ STATIC_URL }}images/events-icon-slide.png" alt="Events">Events</a>
-                                        <a href="" class="btninfo"><img src="{{ STATIC_URL }}images/directions-icon-slide.png" alt="Directions">Directions</a>
+                                        <a href="" class="btninfo" ng-click="goToPanel('#info')"><img src="{{ STATIC_URL }}images/info-icon-slide.png" alt="Info">Info</a>
+                                        <a href="" class="btninfo" ng-click="goToPanel('#deals')"><img src="{{ STATIC_URL }}images/deals-icon-slide.png" alt="Deals">Deals</a>
+                                        <a href="" class="btninfo" ng-click="goToPanel('#sharepanel')"><img src="{{ STATIC_URL }}images/share-icon-slide.png" alt="Share">Share</a>
+                                        <a href="" class="btninfo" ng-click="goToPanel('#services')"><img src="{{ STATIC_URL }}images/services-icon-slide.png" alt="Services">Services</a>
+                                        <a href="" class="btninfo" ng-click="goToPanel('#video')"><img src="{{ STATIC_URL }}images/video-icon-slide.png" alt="Video">Video</a>
+                                        <a href="" class="btninfo" ng-click="goToPanel('#events')"><img src="{{ STATIC_URL }}images/events-icon-slide.png" alt="Events">Events</a>
+                                        <a href="" class="btninfo" ng-click="goToPanel('#directions')"><img src="{{ STATIC_URL }}images/directions-icon-slide.png" alt="Directions">Directions</a>
+                                        <a href="" class="btninfo" ng-click="goToPanel('#all-access-qr')"><img src="{{ STATIC_URL }}images/qr-icon-slide.png" alt="All Access QR+">All Access QR+</a>
                                     </div>
                                 </div>
-                                <a href="" class="arrow right"><img src="{{ STATIC_URL }}images/arrow-right-icon.png" alt="right"></a>
+                                <a href="" class="arrow right" ng-click="toRight()"><img src="{{ STATIC_URL }}images/arrow-right-icon.png" alt="right"></a>
                             </div>
                         </div>
                     </div>
@@ -74,13 +74,13 @@
 </div>
 <div class="clearfix"></div>
 <div class="contentBusiness">
-    <div class="row contentbiz">
+    <div class="row contentbiz" id="info">
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <h3>Description</h3>
             <p>[[ bizInfo.description ]]</p>
         </div>
     </div>
-    <div class="row contentbiz">
+    <div class="row contentbiz" id="deals">
        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <h3>Orange Deals</h3>
             <div class="navdeals">
@@ -334,7 +334,7 @@
             </div>
         </div>
     </div>
-    <div class="row contentbiz">
+    <div class="row contentbiz" id="sharepanel">
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <h3>Share</h3>
             <div class="row">
@@ -347,7 +347,7 @@
             </div>
         </div>
     </div>
-    <div class="row contentbiz">
+    <div class="row contentbiz" id="services">
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <h3>Service Tags</h3>
             <div class="row">
@@ -369,7 +369,7 @@
             </div>
         </div>
     </div>
-    <div class="row contentbiz">
+    <div class="row contentbiz" id="video">
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <h3>Video</h3>
             <div class="text-center">
@@ -377,7 +377,7 @@
             </div>
         </div>
     </div>
-    <div class="row contentbiz">
+    <div class="row contentbiz" id="events">
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <h3>Events</h3>
             <div class="calendarWidget">
@@ -404,7 +404,7 @@
             </div>
         </div>
     </div>
-    <div class="row contentbiz">
+    <div class="row contentbiz" id="directions">
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <h3>Directions</h3
             <div class="row">
@@ -424,6 +424,12 @@
 
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="row contentbiz" id="all-access-qr">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <h3>All Access QR+</h3>
+
             </div>
         </div>
     </div>
