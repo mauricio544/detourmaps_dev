@@ -2025,7 +2025,7 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope','$routeParams',  '$http',
         ten_visits: 'V',
         refer_friends: 'R'
     }
-    $scope.requestaction = function(){
+    $scope.requestactions = function(){
         if ($scope.bizInfo.user === true){
             if ($scope.bizInfo.smart_buys === true){
                 $scope.alert.message = "This Business is already participating in this promo, Thanks!! :)."
@@ -2036,7 +2036,7 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope','$routeParams',  '$http',
                 $http({
                     method  : 'POST',
                     url     : '/communities/save-feedback/angular/',
-                    data    : $.param({ biz: $scope.bizInfo.code, deal: $scope.type_deal.smart_buys}),
+                    data    : $.param({ biz: $scope.bizInfo.code, deal: $scope.type_deals.smart_buys}),
                     headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
                 })
                 .success(function(data) {

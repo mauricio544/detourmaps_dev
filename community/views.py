@@ -4023,14 +4023,14 @@ def saveFeedBackAngular(request):
             biz_object = Business.objects.get(pk=decode_url(request.POST["biz"]));
             user = Usuario.objects.get(user__username=request.session["user"])
             try:
-                feedaback = FeedbackBusiness.objects.get(business=biz_object, user=user, deal=deal)
+                feedaback = FeedbackBusiness.objects.get(business=biz_object, user=user, deal=request.POST["deal"])
                 msg["response"] = True
                 msg["message"] = "Thanks, Your feedback message was already sent to the business time ago."
             except:
                 feedback = FeedbackBusiness(
                     business=biz_object,
                     user=user,
-                    deal=deal
+                    deal=request.POST["deal"]
                 )
                 feedback.save()
                 msg["response"] = True
