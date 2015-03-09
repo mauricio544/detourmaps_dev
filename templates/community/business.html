@@ -92,13 +92,14 @@
             <div class="row">
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="smart-buys" ng-show="bizInfo.smart_buys==true">
                     <div class="rollsmart">
-                        <div class="panel-smart" ng-hide="promo.voucher">
+                        <div class="panel-smart">
                             <header>
                                 <h4>Smart Buys / Not Your Ordinary Coupons</h4>
                                 <p>Smart Buys are exclusive offers created by local businesses to offer you the best deals  and discounts</p>
                             </header>
                             <main>
-                                <figure><img src="/media/[[ bizInfo.coupon.img]]" alt="Coupon [[ bizInfo.name ]]"></figure>
+                                <figure ng-hide="bizInfo.smart_buys==true"><img src="/media/[[ bizInfo.coupon.img]]" alt="Coupon [[ bizInfo.name ]]"></figure>
+                                <figure ng-hide="bizInfo.smart_buys==false"><img src="/static/community/evolution/coupon-placement.png" alt="No Deal"></figure>
                             </main>
                         </div>
                         <div class="panel-smart">
@@ -274,6 +275,7 @@
                                                     </div>
                                                 </div>
                                                 <input type="hidden" name="user_id" value="" id="user_id"/>
+                                                <p class="actionconfirm" ng-hide="actionconfirm===false">[[ message ]]. Please wait ...<i class="fa fa-spinner fa-spin"></i></p>
                                                 <p class="submit">
                                                     <button class="btn btn-primary btnpassword">Save Password
                                                     </button>
@@ -322,10 +324,10 @@
                     </div>
                     <div class="row navbtntool" ng-hide="promo.voucher">
                         <ul class="list-inline text-center">
-                            <li><a href="" class="btntoolsmart" ng-click="smartactions()"><img src="{{ STATIC_URL }}images/icon-request.png" alt="Request"> Request</a></li>
-                            <li><a href="" class="btntoolsmart"><img src="{{ STATIC_URL }}images/icon-save-to.png" alt="Save To"> Save To</a></li>
-                            <li><a href="" class="btntoolsmart"><img src="{{ STATIC_URL }}images/icon-share.png" alt="Share"> Share</a></li>
-                            <li><a href="" class="btntoolsmart"><img src="{{ STATIC_URL }}images/icon-redeem.png" alt="Redeem"> Redeem</a></li>
+                            <li><a href="" class="btntoolsmart" ng-click="requestaction()"><img src="{{ STATIC_URL }}images/icon-request.png" alt="Request"> Request</a></li>
+                            <li><a href="" class="btntoolsmart" ng-click="saveactions()"><img src="{{ STATIC_URL }}images/icon-save-to.png" alt="Save To"> Save To</a></li>
+                            <li><a href="" class="btntoolsmart" ng-click="shareactions()"><img src="{{ STATIC_URL }}images/icon-share.png" alt="Share"> Share</a></li>
+                            <li><a href="" class="btntoolsmart" ng-click="redeemactions()"><img src="{{ STATIC_URL }}images/icon-redeem.png" alt="Redeem"> Redeem</a></li>
                         </ul>
                     </div>
                 </div>
@@ -448,6 +450,16 @@
         </div>
     </div>
 </div>
-<div id="alert">
-
+<div id="alert" class="modal fade" style="display: none;" role="dialog" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="topBar">
+                <img src="{{ STATIC_URL }}community/evolution/images/userWhite.png" width="35" height="38" style="padding-top:7px;">
+                <p>DetourMaps Message</p>
+            </div>
+            <div class="inside">
+                <p>[[ alert.message ]]</p>
+            </div>
+        </div>
+    </div>
 </div>

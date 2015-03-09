@@ -477,7 +477,7 @@ def emailCoupon(request):
         coupon_object = CuponBusiness.objects.get(pk=request.GET["coupon"])
         html_user = loader.get_template("/home/detourmaps/community/templates/ten_visits.html")
         context_user = Context({'link': '/communities/print/coupon?source=%s&coupon=%s' % (request.GET["source"], request.GET["coupon"]), 'message': 'Your Download coupon link!!', 'program': 'Smart Buys'})
-        subject_user, from_user, to_user = 'Download your Coupon - %s' % business_object.name, 'Detour Maps <info@detourmaps.com>', request.session.get("user")
+        subject_user, from_user, to_user = 'Download your Coupon - %s' % business_object.name, 'Detour Maps <hello@detourmaps.com>', request.session.get("user")
         user_context_html = html_user.render(context_user)
         message_user = EmailMessage(subject_user, user_context_html, from_user, [to_user])
         message_user.content_subtype = "html"
@@ -537,7 +537,7 @@ def sendCardEmail(request):
                 'tag': request.GET["tag"]
             }
         )
-        subject_user, from_user, to_user = 'Detour Maps - Get your deal card', 'Detour Maps <info@detourmaps.com>', user_object.email
+        subject_user, from_user, to_user = 'Detour Maps - Get your deal card', 'Detour Maps <hello@detourmaps.com>', user_object.email
         user_context_html = html_user.render(context_user)
         message_user = EmailMessage(subject_user, user_context_html, from_user, [to_user])
         message_user.content_subtype = "html"
@@ -2647,7 +2647,7 @@ def RegisterUser(request):
             usertipo.save()
             html_user = loader.get_template("/home/detourmaps/community/templates/registration.html")
             context_user = Context({'link': 'www.facebook.com'})
-            subject_user, from_user, to_user = 'Registration DetourMaps', 'Detour Maps <info@detourmaps.com>', user.email
+            subject_user, from_user, to_user = 'Registration DetourMaps', 'Detour Maps <hello@detourmaps.com>', user.email
             user_context_html = html_user.render(context_user)
             message_user = EmailMessage(subject_user, user_context_html, from_user, [to_user])
             message_user.content_subtype = "html"
@@ -4016,6 +4016,32 @@ def saveFeedBack(request):
 
 
 @csrf_exempt
+def saveFeedBackAngular(request):
+    if request.method == "POST":
+        msg = {}
+        if "biz" in request.POST and "deal" in request.POST and request.session.get("user"):
+            biz_object = Business.objects.get(pk=decode_url(request.POST["biz"]));
+            user = Usuario.objects.get(user__username=request.session["user"])
+            try:
+                feedaback = FeedbackBusiness.objects.get(business=biz_object, user=user, deal=deal)
+                msg["response"] = True
+                msg["message"] = "Thanks, Your feedback message was already sent to the business time ago."
+            except:
+                feedback = FeedbackBusiness(
+                    business=biz_object,
+                    user=user,
+                    deal=deal
+                )
+                feedback.save()
+                msg["response"] = True
+                msg["message"] = "Thanks, Your feedback message was already sent to the business."
+        else:
+            msg["response"] = False
+            msg["message"] = "Thanks, Something wrong, in this moment we can't send this feedback message."
+        return HttpResponse(simplejson.dumps(msg))
+
+
+@csrf_exempt
 def fakelogin(request):
     if request.method == "POST":
         try:
@@ -4069,7 +4095,7 @@ def fakelogin(request):
                 dict_response['message'] = 'Your user and password were sent to your email account, please check it.'
                 html_user = loader.get_template("format-mail/registration-password.html")
                 context_user = Context({'link': '%s/communities/register/confirm/%s' % (Site.objects.all()[0], encode_url(user.id, 6)), 'password': password_left})
-                subject_user, from_user, to_user = 'Registration DetourMaps', 'Detour Maps <info@detourmaps.com>', request.POST["emailuserdeal"]
+                subject_user, from_user, to_user = 'Registration DetourMaps', 'Detour Maps <hello@detourmaps.com>', request.POST["emailuserdeal"]
                 user_context_html = html_user.render(context_user)
                 message_user = EmailMessage(subject_user, user_context_html, from_user, [to_user])
                 message_user.content_subtype = "html"
@@ -4117,7 +4143,7 @@ def fakelogin(request):
                         ),
                     'password': password_left}
                 )
-                subject_user, from_user, to_user = 'Registration DetourMaps', 'Detour Maps <info@detourmaps.com>', request.POST["emailuserdeal"]
+                subject_user, from_user, to_user = 'Registration DetourMaps', 'Detour Maps <hello@detourmaps.com>', request.POST["emailuserdeal"]
                 user_context_html = html_user.render(context_user)
                 message_user = EmailMessage(subject_user, user_context_html, from_user, [to_user])
                 message_user.content_subtype = "html"
@@ -4251,7 +4277,7 @@ def save_ten_visits(request):
                         ten_object.save()
                         html_user = loader.get_template("/home/detourmaps/community/templates/ten_visits.html")
                         context_user = Context({'link': '', 'message': 'Your Ten Visits is complete!!', 'program': 'Ten Visits'})
-                        subject_user, from_user, to_user = 'Ten Visits Complete %s' % biz_object.name, 'Detour Maps <info@detourmaps.com>', user_object.email
+                        subject_user, from_user, to_user = 'Ten Visits Complete %s' % biz_object.name, 'Detour Maps <hello@detourmaps.com>', user_object.email
                         user_context_html = html_user.render(context_user)
                         message_user = EmailMessage(subject_user, user_context_html, from_user, [to_user])
                         message_user.content_subtype = "html"
@@ -4309,7 +4335,7 @@ def save_ten_visits(request):
                         ten_object.save()
                         html_user = loader.get_template("/home/detourmaps/community/templates/ten_visits.html")
                         context_user = Context({'link': '', 'message': 'Your Ten Visits is complete!!', 'program': 'Ten Visits'})
-                        subject_user, from_user, to_user = 'Ten Visits Complete %s' % biz_object.name, 'Detour Maps <info@detourmaps.com>', user_object.email
+                        subject_user, from_user, to_user = 'Ten Visits Complete %s' % biz_object.name, 'Detour Maps <hello@detourmaps.com>', user_object.email
                         user_context_html = html_user.render(context_user)
                         message_user = EmailMessage(subject_user, user_context_html, from_user, [to_user])
                         message_user.content_subtype = "html"
@@ -4377,7 +4403,7 @@ def save_refer_friends(request):
                     refer_object.save()
                     html_user = loader.get_template("ten_visits.html")
                     context_user = Context({'link': '', 'message': 'Your Refer Friends is complete!!', 'program': 'Refer Friends'})
-                    subject_user, from_user, to_user = 'Refer Friends Complete %s' % biz_object.name, 'Detour Maps <info@detourmaps.com>', user_object.email
+                    subject_user, from_user, to_user = 'Refer Friends Complete %s' % biz_object.name, 'Detour Maps <hello@detourmaps.com>', user_object.email
                     user_context_html = html_user.render(context_user)
                     message_user = EmailMessage(subject_user, user_context_html, from_user, [to_user])
                     message_user.content_subtype = "html"
@@ -4699,7 +4725,7 @@ def save_promo(request):
                         'image': 'http://%s%s' % (Site.objects.all()[0], new_coupon_qr)
                     }
                 )
-                subject_user, from_user, to_user = 'Smart Buys DetourMaps', 'Detour Maps <info@detourmaps.com>', user.email
+                subject_user, from_user, to_user = 'Smart Buys DetourMaps', 'Detour Maps <hello@detourmaps.com>', user.email
                 user_context_html = html_user.render(context_user)
                 message_user = EmailMessage(subject_user, user_context_html, from_user, [to_user])
                 message_user.content_subtype = "html"
@@ -4740,7 +4766,7 @@ def forgot_password(request):
                 ),
             'password': password_left}
         )
-        subject_user, from_user, to_user = 'Registration DetourMaps', 'Detour Maps <info@detourmaps.com>', request.POST["user_email"]
+        subject_user, from_user, to_user = 'Registration DetourMaps', 'Detour Maps <hello@detourmaps.com>', request.POST["user_email"]
         user_context_html = html_user.render(context_user)
         message_user = EmailMessage(subject_user, user_context_html, from_user, [to_user])
         message_user.content_subtype = "html"
@@ -4766,7 +4792,7 @@ def share_emails_buys(request):
                         'name': business_object.name
                     }
                 )
-                subject_user, from_user, to_user = 'Share Smart Buys DetourMaps', 'Detour Maps <info@detourmaps.com>', e
+                subject_user, from_user, to_user = 'Share Smart Buys DetourMaps', 'Detour Maps <hello@detourmaps.com>', e
                 user_context_html = html_user.render(context_user)
                 message_user = EmailMessage(subject_user, user_context_html, from_user, [to_user])
                 message_user.content_subtype = "html"

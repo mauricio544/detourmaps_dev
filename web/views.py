@@ -188,7 +188,7 @@ def renderPages(request, url_name=None):
                     email_message_admin = EmailMessage(
                         subject_message_admin,
                         body_subject_admin,
-                        "Email Us <info@detourmaps.com>",
+                        "Email Us <hello@detourmaps.com>",
                         ['detourcommunitymaps@gmail.com']
                     )
                     email_message_admin.content_subtype = "html"
@@ -200,7 +200,7 @@ def renderPages(request, url_name=None):
                                         "<p>Thanks for your comunication %s</p>" \
                                         "</div>" % name_is
                     email_message_user = EmailMessage(subject_message_user, body_message_user,
-                                                      "Email Us<info@detourmaps.com>", [email_is])
+                                                      "Email Us<hello@detourmaps.com>", [email_is])
                     email_message_user.content_subtype = "html"
                     email_message_user.send()
                     msg = "Your Information was sent"
@@ -255,8 +255,8 @@ def renderPages(request, url_name=None):
                     email = EmailMessage(
                         subject,
                         body,
-                        'DetourMaps<info@detourmaps.com>',
-                        ['info@detourmaps.com', 'detourcommunitymaps@gmail.com', 'mauri544@gmail.com'],
+                        'DetourMaps<hello@detourmaps.com>',
+                        ['hello@detourmaps.com', 'detourcommunitymaps@gmail.com', 'mauri544@gmail.com'],
                     )
                     email.attach_file(settings.MEDIA_ROOT + 'careers/' + str(time.time()) + f.name)
                     email.content_subtype = 'html'
@@ -264,7 +264,7 @@ def renderPages(request, url_name=None):
                     return HttpResponse('Thanks')
                 else:
                     return HttpResponseBadRequest(
-                        'There is something wrong! Sorry please email us to info@detourmaps.com')
+                        'There is something wrong! Sorry please email us to hello@detourmaps.com')
             else:
                 try:
                     complex_objects = ComplexText.objects.filter(page=page_object).order_by('id')
@@ -439,7 +439,7 @@ def contactUs(request):
             email_message_admin = EmailMessage(
                 subject_message_admin,
                 body_subject_admin,
-                "Email Us <info@detourmaps.com>",
+                "Email Us <hello@detourmaps.com>",
                 ['detourcommunitymaps@gmail.com']
             )
             email_message_admin.content_subtype = "html"
@@ -450,7 +450,7 @@ def contactUs(request):
                                 "<h1>DetourMaps</h1>" \
                                 "<p>Thanks for your comunication %s</p>" \
                                 "</div>" % name_is
-            email_message_user = EmailMessage(subject_message_user, body_message_user, "Email Us<info@detourmaps.com>",
+            email_message_user = EmailMessage(subject_message_user, body_message_user, "Email Us<hello@detourmaps.com>",
                                               [email_is])
             email_message_user.content_subtype = "html"
             email_message_user.send()
@@ -522,7 +522,7 @@ def couponsForm(request):
             message = render_to_string('couponsResponse.html', context, r)
         else:
             message = 'Sorry, there is an error in the generation of cards or we have no promotions available in %s. We have registered this incident, so soon you will have news. Sincerely Detourmaps.'
-        email_message = EmailMessage('DetourMaps Coupon', message, "DetourMaps <info@detourmaps.com>", [email])
+        email_message = EmailMessage('DetourMaps Coupon', message, "DetourMaps <hello@detourmaps.com>", [email])
         email_message.content_subtype = "html"
         email_message.send()
 
@@ -692,7 +692,7 @@ def userRegister(request):
         message = render_to_string("format-mail/registration.html", {
             'link': '%s/user/register/confirm/%s' % (Site.objects.all()[0], user_new.id)
         }, RequestContext(request))
-        email_message = EmailMessage('DetourMaps Registration', message, "DetourMaps <info@detourmaps.com>",
+        email_message = EmailMessage('DetourMaps Registration', message, "DetourMaps <hello@detourmaps.com>",
                                      [user_new.email])
         email_message.content_subtype = "html"
         try:
@@ -710,7 +710,7 @@ def reSendActivationMail(request):
     message = render_to_string("registerConfirm.html", {
         'user': usr
     }, RequestContext(request))
-    email_message = EmailMessage('DetourMaps Registration', message, "DetourMaps <info@detourmaps.com>", [usr.email])
+    email_message = EmailMessage('DetourMaps Registration', message, "DetourMaps <hello@detourmaps.com>", [usr.email])
     email_message.content_subtype = "html"
     result = {
         'value': True
@@ -729,7 +729,7 @@ def shareQRUrl(request):
         result = False
         message = '<h1><a href="http://detourmaps.com"><img src="http://detourmaps.com/static/community/img/detourOrange.png"/></a></h1>' \
                  '<a href="%s">%s</a>' % (request.GET['urlToShare'], request.GET['hiddenBiz'])
-        email_message = EmailMessage('DetourMaps Registration', message, "DetourMaps <info@detourmaps.com>", [request.GET['emailShare']])
+        email_message = EmailMessage('DetourMaps Registration', message, "DetourMaps <hello@detourmaps.com>", [request.GET['emailShare']])
         email_message.content_subtype = "html"
         try:
             email_message.send()
@@ -865,7 +865,7 @@ def reset_email_password(request):
             'hash': reset_password,
             'link': Site.objects.all()[0]
         }, RequestContext(request))
-        email_message = EmailMessage('DetourMaps Registration', message, "DetourMaps <info@detourmaps.com>",
+        email_message = EmailMessage('DetourMaps Registration', message, "DetourMaps <hello@detourmaps.com>",
                                      [user_object.email, ])
         email_message.content_subtype = "html"
         email_message.send()
@@ -1097,7 +1097,7 @@ def contact_us(request):
         email_message_admin = EmailMessage(
             subject_message_admin,
             body_subject_admin,
-            "Email Us <info@detourmaps.com>",
+            "Email Us <hello@detourmaps.com>",
             ['detourcommunitymaps@gmail.com']
         )
         email_message_admin.content_subtype = "html"
@@ -1109,7 +1109,7 @@ def contact_us(request):
                             "<p>Thanks for your comunication %s</p>" \
                             "</div>" % name_is
         email_message_user = EmailMessage(subject_message_user, body_message_user,
-                                          "Email Us<info@detourmaps.com>", [email_is])
+                                          "Email Us<hello@detourmaps.com>", [email_is])
         email_message_user.content_subtype = "html"
         email_message_user.send()
         msg = "Your Information was sent"

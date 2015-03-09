@@ -667,10 +667,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
             $scope.error = errorMessage;
         });
     };
-    
     $scope.getItems();
-    
-    
     $scope.numberOfPages=function(){
         return Math.ceil($scope.model.business.length/$scope.pageSize);
     };
@@ -1943,11 +1940,13 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope','$routeParams',  '$http',
     $scope.catmenu = true;
     $rootScope.cat = true;
     $scope.actionconfirm = false;
+    $scope.there_is_user = false;
     $scope.getItem = function(){
         businessOneScope.getAllItem($scope.bizCode).then(function(data){
             $scope.bizInfo = data;
             $scope.video = $sce.trustAsResourceUrl('http://www.youtube.com/embed/' + data.video + '?wmode=transparent');
             $scope.menu = $sce.trustAsHtml(data.menu);
+            $scope.there_is_user = data.user;
             $scope.rendermenu = function(menu){
                 $("#menulistfake").html(menu);
                 $(".scrollmenu").html(menu);
@@ -2019,16 +2018,77 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope','$routeParams',  '$http',
         });
     };
     $scope.getItem();
-    $scope.smartactions = function(){
-        console.log("smart");
+    $scope.alert = {};
+    $scope.type_deals = {
+        smart_buys: 'S',
+        ten_off: 'T',
+        ten_visits: 'V',
+        refer_friends: 'R'
+    }
+    $scope.requestaction = function(){
         if ($scope.bizInfo.user === true){
-            $(this).popover({
-              html : true,
-              placement: 'auto',
-              delay: { "show": 500, "hide": 100 },
-              content: function(){
-                  return $("#alert").html("<p>Save to your dashboard or redeem this coupon</p>");
-              }
+            if ($scope.bizInfo.smart_buys === true){
+                $scope.alert.message = "This Business is already participating in this promo, Thanks!! :)."
+                $("#alert").modal({
+                    keyboard: true
+                });
+            }else{
+                $http({
+                    method  : 'POST',
+                    url     : '/communities/save-feedback/angular/',
+                    data    : $.param({ biz: $scope.bizInfo.code, deal: $scope.type_deal.smart_buys}),
+                    headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
+                })
+                .success(function(data) {
+                    $scope.alert.message = data.message;
+                    $("#alert").modal({
+                        keyboard: true
+                    });
+                });
+            }
+        }else{
+            $('#loginusersmart').modal(
+                {
+                    keyboard: true
+                }
+            );
+        }
+    };
+    $scope.saveactions = function(){
+        if ($scope.bizInfo.user === true){
+            $http({
+                method  : 'POST',
+                url     : '/communities/save-promo/',
+                data    : $.param({ id: $scope.bizInfo.coupon.id}),
+                headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
+            })
+            .success(function(data) {
+                $scope.promo.image = data.image;
+                $scope.promo.voucher = data.voucher;
+                $scope.promo.message = data.message;
+                $scope.promo.show = true
+            });
+        }else{
+            $('#loginusersmart').modal(
+                {
+                    keyboard: true
+                }
+            );
+        }
+    };
+    $scope.redeemactions = function(){
+        if ($scope.bizInfo.user === true){
+            $http({
+                method  : 'POST',
+                url     : '/communities/get-promo/',
+                data    : $.param({ cpid: $scope.bizInfo.coupon.id}),
+                headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
+            })
+            .success(function(data) {
+                $scope.promo.image = data.image;
+                $scope.promo.voucher = data.voucher;
+                $scope.promo.message = data.message;
+                $scope.promo.show = true
             });
         }else{
             $('#loginusersmart').modal(
@@ -2134,7 +2194,7 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope','$routeParams',  '$http',
     $scope.reset = function(){
         $http({
             method  : 'POST',
-            url     : '/communities/register/confirm/ajax/04718802/',
+            url     : '/communities/register/confirm/ajax/04718802',
             data    : $.param($scope.formforgot),
             headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
         })
@@ -2144,10 +2204,21 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope','$routeParams',  '$http',
                 $scope.actionconfirm = true;
                 setTimeout(function(){
                     $scope.actionconfirm = false;
-                    $('#forgotsmart').modal('hide');
-                    $('#passwordsmart').modal('show');
+                    $('#passwordsmart').modal('hide');
                     $scope.actionconfirm = true;
                 }, 10000);
+                $http({
+                    method  : 'POST',
+                    url     : '/communities/get-promo/',
+                    data    : $.param({ cpid: $scope.bizInfo.coupon.id}),
+                    headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
+                })
+                .success(function(data) {
+                    $scope.promo.image = data.image;
+                    $scope.promo.voucher = data.voucher;
+                    $scope.promo.message = data.message;
+                    $scope.promo.show = true
+                });
             } else {
                 $scope.message = data.message;
             }

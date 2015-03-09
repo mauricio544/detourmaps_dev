@@ -5,6 +5,6 @@
 #EMAIL_PORT = 587
 EMAIL_HOST = 'smtp.mailgun.org'
 EMAIL_HOST_USER = 'postmaster@detourmaps.mailgun.org'
-EMAIL_HOST_PASSWORD = '0eyla2jd6yi1'
+EMAIL_HOST_PASSWORD = 'G_04718802_@_JLLJ'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
