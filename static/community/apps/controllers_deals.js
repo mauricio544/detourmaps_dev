@@ -121,6 +121,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
         businesstmp: ""
     };
     $scope.addMarkers;
+    $scope.GeoMarker;
     $scope.placeholder_nosearch = "Loading Businesses, please wait ...";
     
     $scope.setWindowTitle = function( title ) {
@@ -135,7 +136,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
     }
     
     // Añadir marcadores al mapa
-    $scope.addMarkers = function(props, map) {
+    $scope.addMarkers = function(props, map, GeoMarker) {
         $.each(props, function(i,prop) {
             var latlng = new google.maps.LatLng(prop.position.lat,prop.position.lng);
             var marker = new google.maps.Marker({
@@ -188,6 +189,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                     infobox.open(map, marker);
                 }
             })(marker, i));
+
 
             $(document).on('click', '.closeInfo', function() {
                 infobox.open(null,null);
@@ -656,12 +658,24 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
 
             $('input, textarea').placeholder();
 
-            $scope.addMarkers($scope.props, $scope.map);
-            var limits = new google.maps.LatLngBounds();
+            $scope.addMarkers($scope.props, $scope.map, $scope.GeoMarker);
+            /*var limits = new google.maps.LatLngBounds();
             $.each($scope.markers, function (index, marker){
                 limits.extend(marker.position);
             });
-            $scope.map.fitBounds(limits);
+            $scope.map.fitBounds(limits);*/
+            if (navigator.geolocation) {
+                 navigator.geolocation.getCurrentPosition(function (position) {
+                     initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                     $scope.map.setCenter(initialLocation);
+                 }, function(){
+                    $scope.map.setCenter(new google.maps.LatLng(41.8337329,-87.7321555));
+                    $scope.map.setZoom(12);
+                 });
+             }else{
+                $scope.map.setCenter(new google.maps.LatLng(41.8337329,-87.7321555));
+                $scope.map.setZoom(12);
+             }
             return $scope.model.business;
         }, function(errorMessage){
             $scope.error = errorMessage;
@@ -1106,7 +1120,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                 $scope.model.business = tmpBiz;
             }
         }
-        $scope.addMarkers($scope.props, $scope.map);
+        $scope.addMarkers($scope.props, $scope.map, $scope.GeoMarker);
         var limits = new google.maps.LatLngBounds();
         $.each($scope.markers, function (index, marker){
             limits.extend(marker.position);
@@ -1300,7 +1314,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                 $scope.model.business = tmpBiz;
             }
         }
-        $scope.addMarkers($scope.props, $scope.map);
+        $scope.addMarkers($scope.props, $scope.map, $scope.GeoMarker);
         var limits = new google.maps.LatLngBounds();
         $.each($scope.markers, function (index, marker){
             limits.extend(marker.position);
@@ -1494,7 +1508,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                 $scope.model.business = tmpBiz;
             }
         }
-        $scope.addMarkers($scope.props, $scope.map);
+        $scope.addMarkers($scope.props, $scope.map, $scope.GeoMarker);
         var limits = new google.maps.LatLngBounds();
         $.each($scope.markers, function (index, marker){
             limits.extend(marker.position);
@@ -1674,7 +1688,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                 $scope.props.push(dict_marker);
             }
         });
-        $scope.addMarkers($scope.props, $scope.map);
+        $scope.addMarkers($scope.props, $scope.map, $scope.GeoMarker);
         var limits = new google.maps.LatLngBounds();
         $.each($scope.markers, function (index, marker){
             limits.extend(marker.position);
@@ -1866,7 +1880,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                 $scope.props.push(dict_marker);
             }
         });
-        $scope.addMarkers($scope.props, $scope.map);
+        $scope.addMarkers($scope.props, $scope.map, $scope.GeoMarker);
         var limits = new google.maps.LatLngBounds();
         $.each($scope.markers, function (index, marker){
             limits.extend(marker.position);            
