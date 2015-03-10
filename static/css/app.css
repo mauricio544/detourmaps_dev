@@ -5645,6 +5645,26 @@ li.toolevent a{
         display: block;
         margin: auto;
     }
+.panelcommunity {
+    position: absolute;
+    top: 62px;
+    right: 48%;
+    background: rgba(144, 144, 144, 0.75);
+    border-radius: 3px;
+    border: 1px solid #999;
+    color: #333;
+    padding: 5px;
+}
+    .panelcommunity table td{
+        padding: 5px;
+        vertical-align: middle;
+    }
+        .panelcommunity table td ul {
+            margin-bottom: 0 !important;
+        }
+        .panelcommunity table td a {
+            color: #333;
+        }
 /* Media Queries */
 
 @media screen and (max-width: 1199px) {

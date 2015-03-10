@@ -1974,6 +1974,7 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope','$routeParams',  '$locati
             $scope.there_is_user = data.user;
             $scope.rendermenu = function(menu){
                 $("#menulistfake").html(menu);
+                $(".panelcommunity").show();
                 $(".scrollmenu").html(menu);
                 $(".scrollmenu").find("h4").hide();
                 var listmenu = $("#menulistfake").find("h4");

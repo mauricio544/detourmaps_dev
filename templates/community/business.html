@@ -469,3 +469,16 @@
         </div>
     </div>
 </div>
+<div class="panelcommunity" style="display: none;">
+    <table>
+        <tr>
+            <td>[[ bizInfo.community_name ]]</td>
+            <td><a href="[[ bizInfo.discover ]]" target="_blank">Discover</a></td>
+            <td>
+                <ul class="list-unstyled">
+                    <li ng-repeat="partner in bizInfo.partners"><a href="[[ partner.url ]]">[[ partner.name ]]</a></li>
+                </ul>
+            </td>
+        </tr>
+    </table>
+</div>

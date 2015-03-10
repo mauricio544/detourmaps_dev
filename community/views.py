@@ -2988,6 +2988,8 @@ def business_one_json(request):
         coupon = None
         dict_coupon = {}
         user = False
+        partners = []
+        monthly_promo = False
         if "biz_code" in request.GET:
             business_object = Business.objects.get(pk=decode_url(request.GET["biz_code"]))
             avg = qualify(business_object)
@@ -3009,6 +3011,13 @@ def business_one_json(request):
                 dict_coupon['id'] = coupon.id
                 dict_coupon['name'] = coupon.name
                 smart_buys = True
+            if business_object.community.partner_set.all().count() > 0:
+                for partner in business_object.community.partner_set.all():
+                    dict_partner = {
+                        'name': partner.name,
+                        'url': '/communities/%s/partners/?name=%s' % (business_object.community.url_name, partner.url_name)
+                    }
+                    partners.append(dict_partner)
             hasSubscription = getSuscription(business_object)
             if not business_object.EntryDetails():
                 dict_business = {
@@ -3037,6 +3046,11 @@ def business_one_json(request):
                     'subscription': hasSubscription,
                     'deals': get_deals(business_object),
                     'community': business_object.community.url_name,
+                    'community_name': business_object.community.name,
+                    'zip': business_object.community.zipcode,
+                    'discover': '/communities/%s/discover/' % business_object.community.url_name,
+                    'partners': partners,
+                    'monthly_promo': monthly_promo,
                     'partner': get_partner(business_object),
                     'refer_friends': business_object.refer_friends,
                     'menu': force_unicode(menu),
@@ -3174,6 +3188,11 @@ def business_one_json(request):
                     'subscription': hasSubscription,
                     'deals': get_deals(business_object),
                     'community': business_object.community.url_name,
+                    'community_name': business_object.community.name,
+                    'zip': business_object.community.zipcode,
+                    'discover': '/communities/%s/discover/' % business_object.community.url_name,
+                    'partners': partners,
+                    'monthly_promo': monthly_promo,
                     'partner': get_partner(business_object),
                     'refer_friends': business_object.refer_friends,
                     'menu': force_unicode(menu),
