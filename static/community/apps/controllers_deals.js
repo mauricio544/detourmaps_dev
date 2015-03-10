@@ -659,6 +659,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
             $('input, textarea').placeholder();
 
             $scope.addMarkers($scope.props, $scope.map, $scope.GeoMarker);
+            var markerCluster = new MarkerClusterer($scope.map, $scope.markers);
             /*var limits = new google.maps.LatLngBounds();
             $.each($scope.markers, function (index, marker){
                 limits.extend(marker.position);
