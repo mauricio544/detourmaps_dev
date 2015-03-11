@@ -3330,15 +3330,19 @@ def all_business_json(request):
     return_category = lambda biz_category: biz_category or ''
     comm_id = ""
     cat = ""
+    cat_id = ""
     comm_name = ""
     image = ""
     for i in business_objects:
         ten_off = False
         smart_buys = False
+        monthly_promo = False
         if i.community:
             comm_id = i.community.id
             comm_name = i.community.name
-        if i.category: cat = i.category.name
+        if i.category:
+            cat = i.category.name
+            cat_id = i.category.id
         if i.imagebusiness_set.all().count() > 0:
             thumbnailer = get_thumbnailer(i.imagebusiness_set.all()[0].img)
             image = thumbnailer.get_thumbnail({'size': (300, 150), 'crop': True})
@@ -3378,10 +3382,12 @@ def all_business_json(request):
             'ten_off': ten_off,
             'smart_buys': smart_buys,
             'ten_visits': i.ten_visits,
+            'monthly_promo': monthly_promo,
             'refer_friends': i.refer_friends,
             'community': comm_id,
             'community_name': comm_name,
             'category': cat,
+            'cat_id': cat_id,
             'description': force_unicode(i.description),
             'image': force_unicode(image),
             'url': force_unicode(i.get_absolute_url()),
@@ -3392,6 +3398,7 @@ def all_business_json(request):
     biz = Business.objects.filter(Q(local_deals='T') | Q(local_deals="Q") | Q(local_deals='F') | Q(ten_visits=1)| Q(refer_friends=1)).order_by("?")[0]
     comm_biz_id = ""
     comm_biz_name = ""
+    cat_biz_name = ""
     cat_biz_id = ""
     image_biz = ""
     smart_biz = False
@@ -3400,7 +3407,9 @@ def all_business_json(request):
     if biz.community:
         comm_biz_id = biz.community.id
         comm_biz_name = biz.community.name
-        if biz.category: cat_biz_id = biz.category.id
+        if biz.category:
+            cat_biz_id = biz.category.id
+            cat_biz_name = biz.category.name
         if biz.imagebusiness_set.all().count() > 0:
             thumbnailer = get_thumbnailer(biz.imagebusiness_set.all()[0].img)
             image_biz = thumbnailer.get_thumbnail({'size': (800, 180), 'crop': True})
@@ -3429,11 +3438,13 @@ def all_business_json(request):
             'local_deals': local_deals_biz,
             'ten_off': True,
             'smart_buys': smart_biz,
+            'monthly_promo': monthly_promo,
             'ten_visits': biz.ten_visits,
             'refer_friends': biz.refer_friends,
             'community': comm_biz_id,
             'community_name': comm_biz_name,
-            'category': cat_biz_id,
+            'category': cat_biz_name,
+            'cat_id': cat_biz_id,
             'description': force_unicode(biz.description),
             'image': force_unicode(image_biz),
             'url': force_unicode(biz.get_absolute_url())

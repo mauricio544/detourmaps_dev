@@ -59,7 +59,7 @@
                     <div class="row">
                         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
                             <label for="" class="app-label-block">Search by Community</label>
-                            <select name="app-community" id="app-community" class="app-select" ng-model="community" ng-options="community as community.name for community in communities" ng-change="getCommunityUnique()">
+                            <select name="app-community" id="app-community" class="app-select" ng-model="community" ng-options="community as community.name for community in communities" ng-change="getCommunity()">
                                 <option value="">-- Community --</option>
                             </select>
                         </div>
@@ -86,27 +86,27 @@
                 <li>
                     <!--<a href="#autos"><img src="{{ STATIC_URL }}images/auto-a-icon.png" alt="Autos">
                     </a>-->
-                    <input type="checkbox" class="appcat autos" id="catautos"><label for="catautos"></label>
+                    <input type="radio" class="appcat autos" id="catautos" name="catRadio" ng-click="getCat(17)"><label for="catautos"></label>
                 </li>
                 <li>
                     <!--<a href="#beauty"><img src="{{ STATIC_URL }}images/beauty-a-icon.png" alt="Beauty">
                     </a>-->
-                    <input type="checkbox" class="appcat beauty" id="catbeauty"><label for="catbeauty"></label>
+                    <input type="radio" class="appcat beauty" id="catbeauty" name="catRadio" ng-click="getCat(19)"><label for="catbeauty"></label>
                 </li>
                 <li>
                     <!--<a href="#health"><img src="{{ STATIC_URL }}images/health-a-icon.png" alt="Health">
                     </a>-->
-                    <input type="checkbox" class="appcat health" id="cathealth"><label for="cathealth"></label>
+                    <input type="radio" class="appcat health" id="cathealth" name="catRadio" ng-click="getCat(20)"><label for="cathealth"></label>
                 </li>
                 <li>
                     <!--<a href="#food"><img src="{{ STATIC_URL }}images/food-a-icon.png" alt="Food">
                     </a>-->
-                    <input type="checkbox" class="appcat food" id="catfood"><label for="catfood"></label>
+                    <input type="radio" class="appcat food" id="catfood" name="catRadio" ng-click="getCat(15)"><label for="catfood"></label>
                 </li>
                 <li>
                     <!--<a href="#services"><img src="{{ STATIC_URL }}images/services-a-icon.png" alt="Services">
                     </a>-->
-                    <input type="checkbox" class="appcat services" id="catservices"><label for="catservices"></label>
+                    <input type="radio" class="appcat services" id="catservices" name="catRadio" ng-click="getCat(21)"><label for="catservices"></label>
                 </li>
             </ul>
         </div>
