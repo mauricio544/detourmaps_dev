@@ -33,7 +33,7 @@ myApp.config(
     }
 );
 
-myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'businessScope', 'search' , '$rootScope', 'catmenu',function ($scope, $route, $routeParams, $http, businessScope, search, $rootScope, catmenu) {
+myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'businessScope', 'search' , '$rootScope', 'catmenu' ,function ($scope, $route, $routeParams, $http, businessScope, search, $rootScope, catmenu) {
     $scope.options = {
         zoom : 14,
         mapTypeId : 'Styled',
@@ -105,7 +105,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
     var contentHeight;
     var contentWidth;
     var isDevice = true;
-    $scope.selectedCommunity = null;
+    $scope.selectedCommunity = [];
     $scope.currentPage = 0;
     $scope.pageSize = 6;
     $scope.query = {}
@@ -243,8 +243,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                 };
                 $scope.props.push(dict_marker);
             });                           
-                        
-            
+
             // calculations for elements that changes size on window resize
             var windowResizeHandler = function() {
                 windowHeight = window.innerHeight;
@@ -686,6 +685,22 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
         });
     };
     $scope.getItems();
+    $scope.setSelectedItem = function(){
+        var id = this.community.id;
+        if (_.contains($scope.selectedCommunity, id)) {
+            $scope.selectedCommunity = _.without($scope.selectedCommunity, id);
+        } else {
+            $scope.selectedCommunity.push(id);
+        }
+        console.log($scope.selectedCommunity);
+        return false;
+    };
+    $scope.isChecked = function (id) {
+        if (_.contains($scope.selectedCommunity, id)) {
+            return 'fa fa-check pull-right';
+        }
+        return false;
+    };
     $scope.numberOfPages=function(){
         return Math.ceil($scope.model.business.length/$scope.pageSize);
     };
@@ -3367,4 +3382,21 @@ myApp.factory('Biz', function($http){
         }.bind(this));
     };
     return Biz;
+});
+
+myApp.directive('selectpicker', function()
+{
+  return {
+      restrict: 'E',
+      scope: {
+          array: '=',
+          model: '=',
+          class: '='
+      },
+      template: '<select class="selectpicker" id="app-community" name="app-community" ng-model="model" ng-options="o as o.label for o in array" ng-change="getCommunity()"></select>',
+      replace: true,
+      link: function(scope, element, attrs) {
+          $(element).selectpicker();
+      }
+  }
 });

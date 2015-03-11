@@ -59,9 +59,19 @@
                     <div class="row">
                         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
                             <label for="" class="app-label-block">Search by Community</label>
-                            <select name="app-community" id="app-community" class="app-select" ng-model="community" ng-options="community as community.name for community in communities" ng-change="getCommunity()">
+                            <!--<select name="app-community" id="app-community" class="app-select" ng-model="community" ng-options="community as community.label for community in communities" ng-change="getCommunity()">
                                 <option value="">-- Community --</option>
-                            </select>
+                            </select>-->
+                            <div class="btn-group" ng-class="{open: open}">
+                                <button class="btn">Filter by Community</button>
+                                <button class="btn dropdown-toggle" data-ng-click="open=!open"><span class="caret"></span>
+
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu">
+                                    <li ng-repeat="community in communities"> <a ng-click="setSelectedItem()">[[ community.label ]]<span ng-class="isChecked(community.id)"></span></a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
                             <label for="" class="app-label-block">Search by Deal</label>
