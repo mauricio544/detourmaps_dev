@@ -2213,7 +2213,11 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
     $scope.getCommunityUnique = function(){
         $scope.deleteMarkers(null);
         var id = this.community.id;
-        $scope.selectedCommunity = id;
+        if (_.contains($scope.selectedCommunity, id)) {
+            $scope.selectedCommunity = _.without($scope.selectedCommunity, id);
+        } else {
+            $scope.selectedCommunity.push(id);
+        }
         var tmpBiz = [];
         $scope.props = [];
         $scope.currentPage = 0;
@@ -2268,27 +2272,270 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
     $scope.getCommunity = function(){
         $scope.deleteMarkers(null);
         var id = this.community.id;
+        if (_.contains($scope.selectedCommunity, id)) {
+            $scope.selectedCommunity = _.without($scope.selectedCommunity, id);
+        } else {
+            $scope.selectedCommunity.push(id);
+        }
         $scope.currentPage = 0;
-        $scope.selectedCommunity = id;
         var tmpBiz = [];
         if($scope.getcat != 0){
-            if($scope.selectedCommunity !== null){
+            if($scope.selectedCommunity.length > 0){
                 if($scope.off){
-                    angular.forEach($scope.model.businesstmp, function(bizitem){
-                        var marker_icon;
-                        if (bizitem.category === "Lodging and Travel"){
-                            marker_icon = "/static/images/Auto_location-01.png";
-                        }else if(bizitem.category === "Health and Medical"){
-                            marker_icon = "/static/images/Health_location-01.png";
-                        }else if(bizitem.category === "Beauty and Spas"){
-                            marker_icon = "/static/images/Beauty_location-01.png";
-                        }else if(bizitem.category === "Restaurants"){
-                            marker_icon = "/static/images/Food_location-01.png";
-                        }else{
-                            marker_icon = "/static/images/Services_location-01.png";
-                        }
-                        if(angular.equals(bizitem.community, $scope.selectedCommunity)) {
-                            if (angular.equals(bizitem.cat_id, $scope.getcat)) {
+                    angular.forEach($scope.selectedCommunity, function(id){
+                        angular.forEach($scope.model.businesstmp, function(bizitem){
+                            var marker_icon;
+                            if (bizitem.category === "Lodging and Travel"){
+                                marker_icon = "/static/images/Auto_location-01.png";
+                            }else if(bizitem.category === "Health and Medical"){
+                                marker_icon = "/static/images/Health_location-01.png";
+                            }else if(bizitem.category === "Beauty and Spas"){
+                                marker_icon = "/static/images/Beauty_location-01.png";
+                            }else if(bizitem.category === "Restaurants"){
+                                marker_icon = "/static/images/Food_location-01.png";
+                            }else{
+                                marker_icon = "/static/images/Services_location-01.png";
+                            }
+                            if(angular.equals(bizitem.community, id)) {
+                                if (angular.equals(bizitem.cat_id, $scope.getcat)) {
+                                    if (angular.equals(bizitem.ten_off, true)) {
+                                        tmpBiz.push(bizitem);
+                                        var geo = bizitem.geo || undefined;
+                                        var r = geo.slice(7, geo.length - 1).split(' ') || [];
+                                        var dict_marker = {
+                                            id: bizitem.id,
+                                            title : bizitem.name,
+                                            url: bizitem.slug + '/' + bizitem.code,
+                                            code: bizitem.code,
+                                            image : '/media/' + bizitem.image,
+                                            type : bizitem.category,
+                                            price : '$1,550,000',
+                                            address : bizitem.address,
+                                            view: bizitem.url,
+                                            bedrooms : '3',
+                                            bathrooms : '2',
+                                            area : '3430 Sq Ft',
+                                            position : {
+                                                lat : parseFloat(r[1]),
+                                                lng : parseFloat(r[0])
+                                            },
+                                            markerIcon : marker_icon
+                                        };
+                                        $scope.props.push(dict_marker);
+                                    }
+                                }
+                            }
+                        });
+                    });
+                    $scope.model.business = tmpBiz;
+                }else if($scope.buys){
+                    angular.forEach($scope.selectedCommunity, function(id){
+                        angular.forEach($scope.model.businesstmp, function(bizitem){
+                            var marker_icon;
+                            if (bizitem.category === "Lodging and Travel"){
+                                marker_icon = "/static/images/Auto_location-01.png";
+                            }else if(bizitem.category === "Health and Medical"){
+                                marker_icon = "/static/images/Health_location-01.png";
+                            }else if(bizitem.category === "Beauty and Spas"){
+                                marker_icon = "/static/images/Beauty_location-01.png";
+                            }else if(bizitem.category === "Restaurants"){
+                                marker_icon = "/static/images/Food_location-01.png";
+                            }else{
+                                marker_icon = "/static/images/Services_location-01.png";
+                            }
+                            if(angular.equals(bizitem.community, id)) {
+                                if (angular.equals(bizitem.cat_id, $scope.getcat)) {
+                                    if (angular.equals(bizitem.smart_buys, true)) {
+                                        tmpBiz.push(bizitem);
+                                        var geo = bizitem.geo || undefined;
+                                        var r = geo.slice(7, geo.length - 1).split(' ') || [];
+                                        var dict_marker = {
+                                            id: bizitem.id,
+                                            title : bizitem.name,
+                                            url: bizitem.slug + '/' + bizitem.code,
+                                            code: bizitem.code,
+                                            image : '/media/' + bizitem.image,
+                                            type : bizitem.category,
+                                            price : '$1,550,000',
+                                            address : bizitem.address,
+                                            view: bizitem.url,
+                                            bedrooms : '3',
+                                            bathrooms : '2',
+                                            area : '3430 Sq Ft',
+                                            position : {
+                                                lat : parseFloat(r[1]),
+                                                lng : parseFloat(r[0])
+                                            },
+                                            markerIcon : marker_icon
+                                        };
+                                        $scope.props.push(dict_marker);
+                                    }
+                                }
+                            }
+                        });
+                    });
+                    $scope.model.business = tmpBiz;
+                }else if($scope.visits){
+                    angular.forEach($scope.selectedCommunity, function(id){
+                        angular.forEach($scope.model.businesstmp, function(bizitem){
+                            var marker_icon;
+                            if (bizitem.category === "Lodging and Travel"){
+                                marker_icon = "/static/images/Auto_location-01.png";
+                            }else if(bizitem.category === "Health and Medical"){
+                                marker_icon = "/static/images/Health_location-01.png";
+                            }else if(bizitem.category === "Beauty and Spas"){
+                                marker_icon = "/static/images/Beauty_location-01.png";
+                            }else if(bizitem.category === "Restaurants"){
+                                marker_icon = "/static/images/Food_location-01.png";
+                            }else{
+                                marker_icon = "/static/images/Services_location-01.png";
+                            }
+                            if(angular.equals(bizitem.community, id)) {
+                                if (angular.equals(bizitem.cat_id, $scope.getcat)) {
+                                    if (angular.equals(bizitem.ten_visits, true)) {
+                                        tmpBiz.push(bizitem);
+                                        var geo = bizitem.geo || undefined;
+                                        var r = geo.slice(7, geo.length - 1).split(' ') || [];
+                                        var dict_marker = {
+                                            id: bizitem.id,
+                                            title : bizitem.name,
+                                            url: bizitem.slug + '/' + bizitem.code,
+                                            code: bizitem.code,
+                                            image : '/media/' + bizitem.image,
+                                            type : bizitem.category,
+                                            price : '$1,550,000',
+                                            address : bizitem.address,
+                                            view: bizitem.url,
+                                            bedrooms : '3',
+                                            bathrooms : '2',
+                                            area : '3430 Sq Ft',
+                                            position : {
+                                                lat : parseFloat(r[1]),
+                                                lng : parseFloat(r[0])
+                                            },
+                                            markerIcon : marker_icon
+                                        };
+                                        $scope.props.push(dict_marker);
+                                    }
+                                }
+                            }
+                        });
+                    });
+                    $scope.model.business = tmpBiz;
+                }else if($scope.refer){
+                    angular.forEach($scope.selectedCommunity, function(id){
+                        angular.forEach($scope.model.businesstmp, function(bizitem){
+                            var marker_icon;
+                            if (bizitem.category === "Lodging and Travel"){
+                                marker_icon = "/static/images/Auto_location-01.png";
+                            }else if(bizitem.category === "Health and Medical"){
+                                marker_icon = "/static/images/Health_location-01.png";
+                            }else if(bizitem.category === "Beauty and Spas"){
+                                marker_icon = "/static/images/Beauty_location-01.png";
+                            }else if(bizitem.category === "Restaurants"){
+                                marker_icon = "/static/images/Food_location-01.png";
+                            }else{
+                                marker_icon = "/static/images/Services_location-01.png";
+                            }
+                            if(angular.equals(bizitem.community, id)) {
+                                if (angular.equals(bizitem.cat_id, $scope.getcat)) {
+                                    if (angular.equals(bizitem.refer_friends, true)) {
+                                        tmpBiz.push(bizitem);
+                                        var geo = bizitem.geo || undefined;
+                                        var r = geo.slice(7, geo.length - 1).split(' ') || [];
+                                        var dict_marker = {
+                                            id: bizitem.id,
+                                            title : bizitem.name,
+                                            url: bizitem.slug + '/' + bizitem.code,
+                                            code: bizitem.code,
+                                            image : '/media/' + bizitem.image,
+                                            type : bizitem.category,
+                                            price : '$1,550,000',
+                                            address : bizitem.address,
+                                            view: bizitem.url,
+                                            bedrooms : '3',
+                                            bathrooms : '2',
+                                            area : '3430 Sq Ft',
+                                            position : {
+                                                lat : parseFloat(r[1]),
+                                                lng : parseFloat(r[0])
+                                            },
+                                            markerIcon : marker_icon
+                                        };
+                                        $scope.props.push(dict_marker);
+                                    }
+                                }
+                            }
+                        });
+                    });
+                    $scope.model.business = tmpBiz;
+                }else{
+                    angular.forEach($scope.selectedCommunity, function(id){
+                        angular.forEach($scope.model.businesstmp, function(bizitem){
+                            var marker_icon;
+                            if (bizitem.category === "Lodging and Travel"){
+                                marker_icon = "/static/images/Auto_location-01.png";
+                            }else if(bizitem.category === "Health and Medical"){
+                                marker_icon = "/static/images/Health_location-01.png";
+                            }else if(bizitem.category === "Beauty and Spas"){
+                                marker_icon = "/static/images/Beauty_location-01.png";
+                            }else if(bizitem.category === "Restaurants"){
+                                marker_icon = "/static/images/Food_location-01.png";
+                            }else{
+                                marker_icon = "/static/images/Services_location-01.png";
+                            }
+                            if(angular.equals(bizitem.community, id)){
+                                if(angular.equals(bizitem.cat_id, $scope.getcat)){
+                                    tmpBiz.push(bizitem);
+                                    var geo = bizitem.geo || undefined;
+                                        var r = geo.slice(7, geo.length - 1).split(' ') || [];
+                                        var dict_marker = {
+                                            id: bizitem.id,
+                                            title : bizitem.name,
+                                            url: bizitem.slug + '/' + bizitem.code,
+                                            code: bizitem.code,
+                                            image : '/media/' + bizitem.image,
+                                            type : bizitem.category,
+                                            price : '$1,550,000',
+                                            address : bizitem.address,
+                                            view: bizitem.url,
+                                            bedrooms : '3',
+                                            bathrooms : '2',
+                                            area : '3430 Sq Ft',
+                                            position : {
+                                                lat : parseFloat(r[1]),
+                                                lng : parseFloat(r[0])
+                                            },
+                                            markerIcon : marker_icon
+                                        };
+                                        $scope.props.push(dict_marker);
+                                }
+                            }
+                        });
+                    });
+                    $scope.model.business = tmpBiz;
+                }
+            }else{
+                $scope.model.business = $scope.model.businesstmp;
+            }
+        }else{
+            if($scope.selectedCommunity.length > 0){
+                if($scope.off){
+                    angular.forEach($scope.selectedCommunity, function(id){
+                        angular.forEach($scope.model.businesstmp, function(bizitem){
+                            var marker_icon;
+                            if (bizitem.category === "Lodging and Travel"){
+                                marker_icon = "/static/images/Auto_location-01.png";
+                            }else if(bizitem.category === "Health and Medical"){
+                                marker_icon = "/static/images/Health_location-01.png";
+                            }else if(bizitem.category === "Beauty and Spas"){
+                                marker_icon = "/static/images/Beauty_location-01.png";
+                            }else if(bizitem.category === "Restaurants"){
+                                marker_icon = "/static/images/Food_location-01.png";
+                            }else{
+                                marker_icon = "/static/images/Services_location-01.png";
+                            }
+                            if(angular.equals(bizitem.community, id)) {
                                 if (angular.equals(bizitem.ten_off, true)) {
                                     tmpBiz.push(bizitem);
                                     var geo = bizitem.geo || undefined;
@@ -2315,25 +2562,25 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                                     $scope.props.push(dict_marker);
                                 }
                             }
-                        }
+                        });
                     });
                     $scope.model.business = tmpBiz;
                 }else if($scope.buys){
-                    angular.forEach($scope.model.businesstmp, function(bizitem){
-                        var marker_icon;
-                        if (bizitem.category === "Lodging and Travel"){
-                            marker_icon = "/static/images/Auto_location-01.png";
-                        }else if(bizitem.category === "Health and Medical"){
-                            marker_icon = "/static/images/Health_location-01.png";
-                        }else if(bizitem.category === "Beauty and Spas"){
-                            marker_icon = "/static/images/Beauty_location-01.png";
-                        }else if(bizitem.category === "Restaurants"){
-                            marker_icon = "/static/images/Food_location-01.png";
-                        }else{
-                            marker_icon = "/static/images/Services_location-01.png";
-                        }
-                        if(angular.equals(bizitem.community, $scope.selectedCommunity)) {
-                            if (angular.equals(bizitem.cat_id, $scope.getcat)) {
+                    angular.forEach($scope.selectedCommunity, function(id){
+                        angular.forEach($scope.model.businesstmp, function(bizitem){
+                            var marker_icon;
+                            if (bizitem.category === "Lodging and Travel"){
+                                marker_icon = "/static/images/Auto_location-01.png";
+                            }else if(bizitem.category === "Health and Medical"){
+                                marker_icon = "/static/images/Health_location-01.png";
+                            }else if(bizitem.category === "Beauty and Spas"){
+                                marker_icon = "/static/images/Beauty_location-01.png";
+                            }else if(bizitem.category === "Restaurants"){
+                                marker_icon = "/static/images/Food_location-01.png";
+                            }else{
+                                marker_icon = "/static/images/Services_location-01.png";
+                            }
+                            if(angular.equals(bizitem.community, id)) {
                                 if (angular.equals(bizitem.smart_buys, true)) {
                                     tmpBiz.push(bizitem);
                                     var geo = bizitem.geo || undefined;
@@ -2360,25 +2607,25 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                                     $scope.props.push(dict_marker);
                                 }
                             }
-                        }
+                        });
                     });
                     $scope.model.business = tmpBiz;
                 }else if($scope.visits){
-                    angular.forEach($scope.model.businesstmp, function(bizitem){
-                        var marker_icon;
-                        if (bizitem.category === "Lodging and Travel"){
-                            marker_icon = "/static/images/Auto_location-01.png";
-                        }else if(bizitem.category === "Health and Medical"){
-                            marker_icon = "/static/images/Health_location-01.png";
-                        }else if(bizitem.category === "Beauty and Spas"){
-                            marker_icon = "/static/images/Beauty_location-01.png";
-                        }else if(bizitem.category === "Restaurants"){
-                            marker_icon = "/static/images/Food_location-01.png";
-                        }else{
-                            marker_icon = "/static/images/Services_location-01.png";
-                        }
-                        if(angular.equals(bizitem.community, $scope.selectedCommunity)) {
-                            if (angular.equals(bizitem.cat_id, $scope.getcat)) {
+                    angular.forEach($scope.selectedCommunity, function(id){
+                        angular.forEach($scope.model.businesstmp, function(bizitem){
+                            var marker_icon;
+                            if (bizitem.category === "Lodging and Travel"){
+                                marker_icon = "/static/images/Auto_location-01.png";
+                            }else if(bizitem.category === "Health and Medical"){
+                                marker_icon = "/static/images/Health_location-01.png";
+                            }else if(bizitem.category === "Beauty and Spas"){
+                                marker_icon = "/static/images/Beauty_location-01.png";
+                            }else if(bizitem.category === "Restaurants"){
+                                marker_icon = "/static/images/Food_location-01.png";
+                            }else{
+                                marker_icon = "/static/images/Services_location-01.png";
+                            }
+                            if(angular.equals(bizitem.community, $scope.selectedCommunity)) {
                                 if (angular.equals(bizitem.ten_visits, true)) {
                                     tmpBiz.push(bizitem);
                                     var geo = bizitem.geo || undefined;
@@ -2405,25 +2652,25 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                                     $scope.props.push(dict_marker);
                                 }
                             }
-                        }
+                        });
                     });
                     $scope.model.business = tmpBiz;
                 }else if($scope.refer){
-                    angular.forEach($scope.model.businesstmp, function(bizitem){
-                        var marker_icon;
-                        if (bizitem.category === "Lodging and Travel"){
-                            marker_icon = "/static/images/Auto_location-01.png";
-                        }else if(bizitem.category === "Health and Medical"){
-                            marker_icon = "/static/images/Health_location-01.png";
-                        }else if(bizitem.category === "Beauty and Spas"){
-                            marker_icon = "/static/images/Beauty_location-01.png";
-                        }else if(bizitem.category === "Restaurants"){
-                            marker_icon = "/static/images/Food_location-01.png";
-                        }else{
-                            marker_icon = "/static/images/Services_location-01.png";
-                        }
-                        if(angular.equals(bizitem.community, $scope.selectedCommunity)) {
-                            if (angular.equals(bizitem.cat_id, $scope.getcat)) {
+                    angular.forEach($scope.selectedCommunity, function(id){
+                        angular.forEach($scope.model.businesstmp, function(bizitem){
+                            var marker_icon;
+                            if (bizitem.category === "Lodging and Travel"){
+                                marker_icon = "/static/images/Auto_location-01.png";
+                            }else if(bizitem.category === "Health and Medical"){
+                                marker_icon = "/static/images/Health_location-01.png";
+                            }else if(bizitem.category === "Beauty and Spas"){
+                                marker_icon = "/static/images/Beauty_location-01.png";
+                            }else if(bizitem.category === "Restaurants"){
+                                marker_icon = "/static/images/Food_location-01.png";
+                            }else{
+                                marker_icon = "/static/images/Services_location-01.png";
+                            }
+                            if(angular.equals(bizitem.community, id)) {
                                 if (angular.equals(bizitem.refer_friends, true)) {
                                     tmpBiz.push(bizitem);
                                     var geo = bizitem.geo || undefined;
@@ -2450,74 +2697,25 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                                     $scope.props.push(dict_marker);
                                 }
                             }
-                        }
+                        });
                     });
                     $scope.model.business = tmpBiz;
                 }else{
-                    angular.forEach($scope.model.businesstmp, function(bizitem){
-                        var marker_icon;
-                        if (bizitem.category === "Lodging and Travel"){
-                            marker_icon = "/static/images/Auto_location-01.png";
-                        }else if(bizitem.category === "Health and Medical"){
-                            marker_icon = "/static/images/Health_location-01.png";
-                        }else if(bizitem.category === "Beauty and Spas"){
-                            marker_icon = "/static/images/Beauty_location-01.png";
-                        }else if(bizitem.category === "Restaurants"){
-                            marker_icon = "/static/images/Food_location-01.png";
-                        }else{
-                            marker_icon = "/static/images/Services_location-01.png";
-                        }
-                        if(angular.equals(bizitem.community, $scope.selectedCommunity)){
-                            if(angular.equals(bizitem.cat_id, $scope.getcat)){
-                                tmpBiz.push(bizitem);
-                                var geo = bizitem.geo || undefined;
-                                    var r = geo.slice(7, geo.length - 1).split(' ') || [];
-                                    var dict_marker = {
-                                        id: bizitem.id,
-                                        title : bizitem.name,
-                                        url: bizitem.slug + '/' + bizitem.code,
-                                        code: bizitem.code,
-                                        image : '/media/' + bizitem.image,
-                                        type : bizitem.category,
-                                        price : '$1,550,000',
-                                        address : bizitem.address,
-                                        view: bizitem.url,
-                                        bedrooms : '3',
-                                        bathrooms : '2',
-                                        area : '3430 Sq Ft',
-                                        position : {
-                                            lat : parseFloat(r[1]),
-                                            lng : parseFloat(r[0])
-                                        },
-                                        markerIcon : marker_icon
-                                    };
-                                    $scope.props.push(dict_marker);
+                    angular.forEach($scope.selectedCommunity, function(id){
+                        angular.forEach($scope.model.businesstmp, function(bizitem){
+                            var marker_icon;
+                            if (bizitem.category === "Lodging and Travel"){
+                                marker_icon = "/static/images/Auto_location-01.png";
+                            }else if(bizitem.category === "Health and Medical"){
+                                marker_icon = "/static/images/Health_location-01.png";
+                            }else if(bizitem.category === "Beauty and Spas"){
+                                marker_icon = "/static/images/Beauty_location-01.png";
+                            }else if(bizitem.category === "Restaurants"){
+                                marker_icon = "/static/images/Food_location-01.png";
+                            }else{
+                                marker_icon = "/static/images/Services_location-01.png";
                             }
-                        }
-                    });
-                    $scope.model.business = tmpBiz;
-                }
-            }else{
-                $scope.model.business = $scope.model.businesstmp;
-            }
-        }else{
-            if($scope.selectedCommunity !== null){
-                if($scope.off){
-                    angular.forEach($scope.model.businesstmp, function(bizitem){
-                        var marker_icon;
-                        if (bizitem.category === "Lodging and Travel"){
-                            marker_icon = "/static/images/Auto_location-01.png";
-                        }else if(bizitem.category === "Health and Medical"){
-                            marker_icon = "/static/images/Health_location-01.png";
-                        }else if(bizitem.category === "Beauty and Spas"){
-                            marker_icon = "/static/images/Beauty_location-01.png";
-                        }else if(bizitem.category === "Restaurants"){
-                            marker_icon = "/static/images/Food_location-01.png";
-                        }else{
-                            marker_icon = "/static/images/Services_location-01.png";
-                        }
-                        if(angular.equals(bizitem.community, $scope.selectedCommunity)) {
-                            if (angular.equals(bizitem.ten_off, true)) {
+                            if(angular.equals(bizitem.community, id)){
                                 tmpBiz.push(bizitem);
                                 var geo = bizitem.geo || undefined;
                                 var r = geo.slice(7, geo.length - 1).split(' ') || [];
@@ -2542,177 +2740,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http', 'busin
                                 };
                                 $scope.props.push(dict_marker);
                             }
-                        }
-                    });
-                    $scope.model.business = tmpBiz;
-                }else if($scope.buys){
-                    angular.forEach($scope.model.businesstmp, function(bizitem){
-                        var marker_icon;
-                        if (bizitem.category === "Lodging and Travel"){
-                            marker_icon = "/static/images/Auto_location-01.png";
-                        }else if(bizitem.category === "Health and Medical"){
-                            marker_icon = "/static/images/Health_location-01.png";
-                        }else if(bizitem.category === "Beauty and Spas"){
-                            marker_icon = "/static/images/Beauty_location-01.png";
-                        }else if(bizitem.category === "Restaurants"){
-                            marker_icon = "/static/images/Food_location-01.png";
-                        }else{
-                            marker_icon = "/static/images/Services_location-01.png";
-                        }
-                        if(angular.equals(bizitem.community, $scope.selectedCommunity)) {
-                            if (angular.equals(bizitem.smart_buys, true)) {
-                                tmpBiz.push(bizitem);
-                                var geo = bizitem.geo || undefined;
-                                var r = geo.slice(7, geo.length - 1).split(' ') || [];
-                                var dict_marker = {
-                                    id: bizitem.id,
-                                    title : bizitem.name,
-                                    url: bizitem.slug + '/' + bizitem.code,
-                                    code: bizitem.code,
-                                    image : '/media/' + bizitem.image,
-                                    type : bizitem.category,
-                                    price : '$1,550,000',
-                                    address : bizitem.address,
-                                    view: bizitem.url,
-                                    bedrooms : '3',
-                                    bathrooms : '2',
-                                    area : '3430 Sq Ft',
-                                    position : {
-                                        lat : parseFloat(r[1]),
-                                        lng : parseFloat(r[0])
-                                    },
-                                    markerIcon : marker_icon
-                                };
-                                $scope.props.push(dict_marker);
-                            }
-                        }
-                    });
-                    $scope.model.business = tmpBiz;
-                }else if($scope.visits){
-                    angular.forEach($scope.model.businesstmp, function(bizitem){
-                        var marker_icon;
-                        if (bizitem.category === "Lodging and Travel"){
-                            marker_icon = "/static/images/Auto_location-01.png";
-                        }else if(bizitem.category === "Health and Medical"){
-                            marker_icon = "/static/images/Health_location-01.png";
-                        }else if(bizitem.category === "Beauty and Spas"){
-                            marker_icon = "/static/images/Beauty_location-01.png";
-                        }else if(bizitem.category === "Restaurants"){
-                            marker_icon = "/static/images/Food_location-01.png";
-                        }else{
-                            marker_icon = "/static/images/Services_location-01.png";
-                        }
-                        if(angular.equals(bizitem.community, $scope.selectedCommunity)) {
-                            if (angular.equals(bizitem.ten_visits, true)) {
-                                tmpBiz.push(bizitem);
-                                var geo = bizitem.geo || undefined;
-                                var r = geo.slice(7, geo.length - 1).split(' ') || [];
-                                var dict_marker = {
-                                    id: bizitem.id,
-                                    title : bizitem.name,
-                                    url: bizitem.slug + '/' + bizitem.code,
-                                    code: bizitem.code,
-                                    image : '/media/' + bizitem.image,
-                                    type : bizitem.category,
-                                    price : '$1,550,000',
-                                    address : bizitem.address,
-                                    view: bizitem.url,
-                                    bedrooms : '3',
-                                    bathrooms : '2',
-                                    area : '3430 Sq Ft',
-                                    position : {
-                                        lat : parseFloat(r[1]),
-                                        lng : parseFloat(r[0])
-                                    },
-                                    markerIcon : marker_icon
-                                };
-                                $scope.props.push(dict_marker);
-                            }
-                        }
-                    });
-                    $scope.model.business = tmpBiz;
-                }else if($scope.refer){
-                    angular.forEach($scope.model.businesstmp, function(bizitem){
-                        var marker_icon;
-                        if (bizitem.category === "Lodging and Travel"){
-                            marker_icon = "/static/images/Auto_location-01.png";
-                        }else if(bizitem.category === "Health and Medical"){
-                            marker_icon = "/static/images/Health_location-01.png";
-                        }else if(bizitem.category === "Beauty and Spas"){
-                            marker_icon = "/static/images/Beauty_location-01.png";
-                        }else if(bizitem.category === "Restaurants"){
-                            marker_icon = "/static/images/Food_location-01.png";
-                        }else{
-                            marker_icon = "/static/images/Services_location-01.png";
-                        }
-                        if(angular.equals(bizitem.community, $scope.selectedCommunity)) {
-                            if (angular.equals(bizitem.refer_friends, true)) {
-                                tmpBiz.push(bizitem);
-                                var geo = bizitem.geo || undefined;
-                                var r = geo.slice(7, geo.length - 1).split(' ') || [];
-                                var dict_marker = {
-                                    id: bizitem.id,
-                                    title : bizitem.name,
-                                    url: bizitem.slug + '/' + bizitem.code,
-                                    code: bizitem.code,
-                                    image : '/media/' + bizitem.image,
-                                    type : bizitem.category,
-                                    price : '$1,550,000',
-                                    address : bizitem.address,
-                                    view: bizitem.url,
-                                    bedrooms : '3',
-                                    bathrooms : '2',
-                                    area : '3430 Sq Ft',
-                                    position : {
-                                        lat : parseFloat(r[1]),
-                                        lng : parseFloat(r[0])
-                                    },
-                                    markerIcon : marker_icon
-                                };
-                                $scope.props.push(dict_marker);
-                            }
-                        }
-                    });
-                    $scope.model.business = tmpBiz;
-                }else{
-                    angular.forEach($scope.model.businesstmp, function(bizitem){
-                        var marker_icon;
-                        if (bizitem.category === "Lodging and Travel"){
-                            marker_icon = "/static/images/Auto_location-01.png";
-                        }else if(bizitem.category === "Health and Medical"){
-                            marker_icon = "/static/images/Health_location-01.png";
-                        }else if(bizitem.category === "Beauty and Spas"){
-                            marker_icon = "/static/images/Beauty_location-01.png";
-                        }else if(bizitem.category === "Restaurants"){
-                            marker_icon = "/static/images/Food_location-01.png";
-                        }else{
-                            marker_icon = "/static/images/Services_location-01.png";
-                        }
-                        if(angular.equals(bizitem.community, $scope.selectedCommunity)){
-                            tmpBiz.push(bizitem);
-                            var geo = bizitem.geo || undefined;
-                            var r = geo.slice(7, geo.length - 1).split(' ') || [];
-                            var dict_marker = {
-                                id: bizitem.id,
-                                title : bizitem.name,
-                                url: bizitem.slug + '/' + bizitem.code,
-                                code: bizitem.code,
-                                image : '/media/' + bizitem.image,
-                                type : bizitem.category,
-                                price : '$1,550,000',
-                                address : bizitem.address,
-                                view: bizitem.url,
-                                bedrooms : '3',
-                                bathrooms : '2',
-                                area : '3430 Sq Ft',
-                                position : {
-                                    lat : parseFloat(r[1]),
-                                    lng : parseFloat(r[0])
-                                },
-                                markerIcon : marker_icon
-                            };
-                            $scope.props.push(dict_marker);
-                        }
+                        });
                     });
                     $scope.model.business = tmpBiz;
                 }
