@@ -7,7 +7,8 @@ django.template.add_to_builtins('django.templatetags.future')
 basedir = dirname(__file__)
 
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
+#TEMPLATE_DEBUG = DEBUG
+TEMPLATE_DEBUG = True
 ALLOWED_HOSTS = ['*']
 ADMINS = (
 # ('Your Name', 'your_email@example.com'),
