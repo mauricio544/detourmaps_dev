@@ -4,13 +4,20 @@
             <li ng-repeat="image in bizInfo.img" ng-class="{ active: $first }" data-target="#carouselFull" data-slide-to="[[ $index ]]"></li>
 
         </ol>
-        <div class="carousel-inner">
+        <div class="carousel-inner" ng-show="bizInfo.img">
             <div class="item" ng-repeat="img in bizInfo.img" ng-class="{ active: $first }">
                 <img src="/media/[[ img.img ]]" alt="[[ img.name ]]">
                 <div class="container">
                     <div class="carousel-caption">
 
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="carousel-inner" ng-hide="bizInfo.img">
+            <div class="item active">
+                <img src="{{ STATIC_URL }}images/local-deals.png" alt="First slide">
+                <div class="container">
                 </div>
             </div>
         </div>

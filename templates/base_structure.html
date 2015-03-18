@@ -1,0 +1,96 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+
+		<!--=============== basic  ===============-->
+
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>
+			DetourMaps - {% block title %}{% endblock %}
+		</title>
+		
+		{% block description %}
+	        <meta name="description=" content="DetourMaps brings you closer to your neighborhood with the latest business promotions, events, and savings. Support your community while staying connected">
+	    {% endblock %}
+
+		{% block keywords %}
+	        <meta name="keywords" content="Home Map,detour, detourmaps, shop local, maps, map, explore your community, neighborhood, select your community, Berwyn, Cicero, archer heights, west lawn"/>
+	    {% endblock %}
+
+	    {% block dynamics %}
+	        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	        <meta name="author" content="www.detourmaps.com">
+	        <meta name="owner" content="Entire Marketing Group LLC">
+	        <meta name="robots" content="index, follow">
+	    {% endblock %}
+
+		<!--=============== favicons ===============-->
+		
+		<link rel="shortcut icon" href="{{ STATIC_URL }}images/favicon.ico">
+
+		<!--=============== css  ===============-->
+
+		<link href="{% static 'css/font-awesome.css' %}" rel="stylesheet">
+        <link href="{% static 'css/simple-line-icons.css' %}" rel="stylesheet">
+        <link href="{% static 'css/jquery-ui.css' %}" rel="stylesheet">
+        <link href="{% static 'css/datepicker.css' %}" rel="stylesheet">
+        <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet">
+        <link href="{% static 'css/app.css' %}" rel="stylesheet">
+        <link href="{% static 'css/sweet-alert.css' %}" rel="stylesheet">
+        <link href="{% static 'css/bootstrap-select.min.css' %}" rel="stylesheet">
+
+			<!--=============== ie styles  ===============-->
+				<!--[if lt IE 9]>
+	          		<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+	          		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	        	<![endif]-->
+<!--=============== fonts  ===============-->
+
+	    <link href='http://fonts.googleapis.com/css?family=Oswald:400,700|Open+Sans:400,300' rel='stylesheet' type='text/css'>
+		
+		{% block font %}
+		{% endblock %}
+	
+	</head>
+	<body class="notransition" ng-app="catApp" ng-controller="bizCtrl" id="bodyApp">
+	{% block content %}
+		
+	{% endblock %}
+	<!--=============== javascript ===============-->
+        <script src="{{ STATIC_URL }}js/json2.js"></script>
+		<script src="{{ STATIC_URL }}js/jquery-2.1.1.min.js"></script>
+        <script src="{{ STATIC_URL }}js/moment-2.5.1.js"></script>
+        <script src="{{ STATIC_URL }}js/jquery-ui.min.js"></script>
+        <script src="{{ STATIC_URL }}js/jquery-ui-touch-punch.js"></script>
+        <script src="{{ STATIC_URL }}js/jquery.placeholder.js"></script>
+        <script src="{{ STATIC_URL }}js/bootstrap.js"></script>
+        <script src="{{ STATIC_URL }}js/jquery.touchSwipe.min.js"></script>
+        <script src="{{ STATIC_URL }}js/jquery.slimscroll.min.js"></script>
+        <script src="{{ STATIC_URL }}js/jquery.visible.js"></script>
+        <script src="http://maps.googleapis.com/maps/api/js?sensor=true&amp;libraries=geometry&amp;libraries=places" type="text/javascript"></script>
+        <script src="{{ STATIC_URL }}js/markercluster.js"></script>
+        <script src="{{ STATIC_URL }}js/infobox.js"></script>
+        <script src="{{ STATIC_URL }}js/clndr.js"></script>
+        <script src="{{ STATIC_URL }}js/jquery.tagsinput.min.js"></script>
+        <script src="{{ STATIC_URL }}js/bootstrap-datepicker.js"></script>
+        <script src="{{ STATIC_URL }}community/angular-1.2.14/angular.js" type="text/javascript"></script>
+        <script src="{{ STATIC_URL }}community/angular-1.2.14/angular-route.js" type="text/javascript"></script>    
+        <script src="{{ STATIC_URL }}community/js/underscore.js" type="text/javascript"></script>
+        <script src="{{ STATIC_URL }}js/sweet-alert.min.js"></script>
+        <script src="{{ STATIC_URL }}js/bootstrap-select.min.js"></script>
+        <script src="{{ STATIC_URL }}community/apps/controllers_deals.js" type="text/javascript"></script>
+        <script src="{{ STATIC_URL }}js/dragdrop.js" type="text/javascript"></script>
+        <script type="text/javascript">
+            myApp.config(function($interpolateProvider) {
+              $interpolateProvider.startSymbol('[[');
+              $interpolateProvider.endSymbol(']]');
+            });            
+        </script>                
+        <!--<script src="{{ STATIC_URL }}js/app.js" type="text/javascript"></script>-->
+		
+		{% block script %}
+		{% endblock %}
+	</body>
+</html>
