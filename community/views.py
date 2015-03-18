@@ -41,6 +41,7 @@ from community.models import Community, Category, Business, ImageBusiness, Servi
 from web.models import PrintMaps, ImagesPrintMaps, LandingPage, PhoneNumber, LandingSocial, HeaderPage, LandingText, \
     Video as WVideo, Newsletter
 from community.twitter import Twitter
+from community.widgets import json_response
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from web.forms import FormCouponsRequest
@@ -1162,10 +1163,11 @@ def discover_by_community(request, name=None):
 
 
 @csrf_exempt
+@json_response
 def api_communities(request):
     if request.method == "GET":
-        if 'community' in request.GET:
-            lista_business = []
+        lista_business = []
+        if 'community' in request.GET:        
             communities_var = request.GET['community']
             communities_split = communities_var.split("|")
             if communities_var.find("|") != -1:
@@ -1189,7 +1191,7 @@ def api_communities(request):
                         'auth_code': j.getUniqueCode()
                     }
                     lista_business.append(dict_biz)
-            return HttpResponse(simplejson.dumps(lista_business))
+        return lista_business
 
 
 def landing_partner(request, name=None):

@@ -310,6 +310,7 @@ class Business(CommunityParent):
     rate_interval = models.IntegerField(max_length=3, blank=False, null=False, default=15,
                                         verbose_name='Interval for business ratting.')
     auth_code = models.CharField(max_length=60, blank=True, null=True)
+    #promotion_message = models.CharField(max_length=90, null=True)
     #choices local deals
     CHOICES_DEALS = (
         ('N', 'None'),

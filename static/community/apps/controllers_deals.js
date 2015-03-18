@@ -51,6 +51,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
     $rootScope.business;
     $rootScope.businesstmp;
     $rootScope.cat = false;
+    $rootScope.panel = false;
     $scope.styles = [{
       stylers: [{
         hue: "#cccccc"
@@ -87,6 +88,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
     $scope.newMarker = null;
     $scope.markers = []; // array de marcadores
     $scope.props = []; // array de diccionarios con información para marcadores
+    $scope.markerCluster = null; // array para el marker cluster
     var infobox = new InfoBox({
       disableAutoPan: false,
       maxWidth: 202,
@@ -134,13 +136,16 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
     // Eliminar los marcadores del mapa y limpiar array de marcadores
     $scope.deleteMarkers = function(map) {
       for (var i = 0; i < $scope.markers.length; i++) {
-        $scope.markers[i].setMap(map);
+        $scope.markers[i].setMap(map);        
       }
       $scope.markers = [];
+      if($scope.markerCluster){
+        $scope.markerCluster.clearMarkers();      
+      }
     }
 
     // Añadir marcadores al mapa
-    $scope.addMarkers = function(props, map, GeoMarker) {
+    $scope.addMarkers = function(props, map, global) {
       $.each(props, function(i, prop) {
         var latlng = new google.maps.LatLng(prop.position.lat, prop.position
           .lng);
@@ -206,6 +211,9 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
         });
 
         $scope.markers.push(marker);
+        if(global){
+          $scope.markerCluster = new MarkerClusterer($scope.map, $scope.markers);        
+        }        
       });
     };
     // Llenar el mapa con la totalidad de los negocios
@@ -744,16 +752,15 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
 
         $('input, textarea').placeholder();
 
-        $scope.addMarkers($scope.props, $scope.map, $scope.GeoMarker);
-        if (markerCluster) {
-          markerCluster.clearMarkers();
-        }
-        var markerCluster = new MarkerClusterer($scope.map, $scope.markers);
+        $scope.addMarkers($scope.props, $scope.map, true);
+        $scope.map.setCenter(new google.maps.LatLng(41.8337329, -
+          87.7321555));
+        $scope.map.setZoom(12);
         /*var limits = new google.maps.LatLngBounds();
         $.each($scope.markers, function (index, marker){
             limits.extend(marker.position);
         });
-        $scope.map.fitBounds(limits);*/
+        $scope.map.fitBounds(limits);
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(function(position) {
             initialLocation = new google.maps.LatLng(position.coords
@@ -768,7 +775,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
           $scope.map.setCenter(new google.maps.LatLng(41.8337329, -
             87.7321555));
           $scope.map.setZoom(12);
-        }
+        }*/
         return $scope.model.business;
       }, function(errorMessage) {
         $scope.error = errorMessage;
@@ -925,7 +932,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
                 } else {
                   marker_icon = "/static/images/Services_location-01.png";
                 }
-                if (angular.equals(bizitem.community, cid) {
+                if (angular.equals(bizitem.community, cid)) {
                   if (angular.equals(bizitem.ten_off, true)) {
                     tmpBiz.push(bizitem);
                     var geo = bizitem.geo || undefined;
@@ -1043,7 +1050,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
           $scope.model.business = tmpBiz;
         }
       }
-      $scope.addMarkers($scope.props, $scope.map);
+      $scope.addMarkers($scope.props, $scope.map, false);
       var limits = new google.maps.LatLngBounds();
       $.each($scope.markers, function(index, marker) {
         limits.extend(marker.position);
@@ -1250,7 +1257,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
           $scope.model.business = tmpBiz;
         }
       }
-      $scope.addMarkers($scope.props, $scope.map, $scope.GeoMarker);
+      $scope.addMarkers($scope.props, $scope.map, false);
       var limits = new google.maps.LatLngBounds();
       $.each($scope.markers, function(index, marker) {
         limits.extend(marker.position);
@@ -1457,7 +1464,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
           $scope.model.business = tmpBiz;
         }
       }
-      $scope.addMarkers($scope.props, $scope.map, $scope.GeoMarker);
+      $scope.addMarkers($scope.props, $scope.map, false);
       var limits = new google.maps.LatLngBounds();
       $.each($scope.markers, function(index, marker) {
         limits.extend(marker.position);
@@ -1664,7 +1671,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
           $scope.model.business = tmpBiz;
         }
       }
-      $scope.addMarkers($scope.props, $scope.map, $scope.GeoMarker);
+      $scope.addMarkers($scope.props, $scope.map, false);
       var limits = new google.maps.LatLngBounds();
       $.each($scope.markers, function(index, marker) {
         limits.extend(marker.position);
@@ -1867,7 +1874,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
           $scope.model.business = tmpBiz;
         }
       }
-      $scope.addMarkers($scope.props, $scope.map, $scope.GeoMarker);
+      $scope.addMarkers($scope.props, $scope.map, false);
       var limits = new google.maps.LatLngBounds();
       $.each($scope.markers, function(index, marker) {
         limits.extend(marker.position);
@@ -1888,8 +1895,9 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
       $scope.deleteMarkers(null);
       var tmpBiz = [];
       $scope.currentPage = 0;
+      $scope.props = [];
       $scope.getcat = parseInt(id);
-      if ($scope.selectedCommunity !== null) {
+      if ($scope.selectedCommunity.length > 0) {
         if ($scope.off) {
           angular.forEach($scope.selectedCommunity, function(cid){
               angular.forEach($scope.model.businesstmp, function(bizitem) {
@@ -1999,7 +2007,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
                 } else {
                   marker_icon = "/static/images/Services_location-01.png";
                 }
-                if (angular.equals(bizitem.community, cid {
+                if (angular.equals(bizitem.community, cid)) {
                   if (angular.equals(bizitem.cat_id, id)) {
                     if (angular.equals(bizitem.ten_visits, true)) {
                       tmpBiz.push(bizitem);
@@ -2340,7 +2348,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
           $scope.model.business = tmpBiz;
         }
       }
-      $scope.addMarkers($scope.props, $scope.map, $scope.GeoMarker);
+      $scope.addMarkers($scope.props, $scope.map, false);
       var limits = new google.maps.LatLngBounds();
       $.each($scope.markers, function(index, marker) {
         limits.extend(marker.position);
@@ -2407,7 +2415,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
           $scope.props.push(dict_marker);
         }
       });
-      $scope.addMarkers($scope.props, $scope.map, $scope.GeoMarker);
+      $scope.addMarkers($scope.props, $scope.map, false);
       var limits = new google.maps.LatLngBounds();
       $.each($scope.markers, function(index, marker) {
         limits.extend(marker.position);
@@ -2424,8 +2432,9 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
       } else {
         $scope.selectedCommunity.push(id);
       }
-      $scope.currentPage = 0;
       var tmpBiz = [];
+      $scope.props = [];
+      $scope.currentPage = 0;
       if ($scope.getcat != 0) {
         if ($scope.selectedCommunity.length > 0) {
           if ($scope.off) {
@@ -3031,7 +3040,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
           $scope.props.push(dict_marker);
         }
       });
-      $scope.addMarkers($scope.props, $scope.map, $scope.GeoMarker);
+      $scope.addMarkers($scope.props, $scope.map, false);
       var limits = new google.maps.LatLngBounds();
       $.each($scope.markers, function(index, marker) {
         limits.extend(marker.position);
@@ -3115,6 +3124,11 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope', '$routeParams',
     $scope.events;
     $scope.catmenu = true;
     $rootScope.cat = true;
+    $rootScope.panel = true;
+    $rootScope.community_name;
+    $rootScope.zip;
+    $rootScope.partners;
+    $rootScope.discover;
     $scope.actionconfirm = false;
     $scope.there_is_user = false;
     $scope.navigation = {
@@ -3130,6 +3144,10 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope', '$routeParams',
     $scope.getItem = function() {
       businessOneScope.getAllItem($scope.bizCode).then(function(data) {
         $scope.bizInfo = data;
+        $rootScope.community_name = data.community_name;
+        $rootScope.zip = data.zip;
+        $rootScope.partners = data.partners;
+        $rootScope.discover = data.discover;
         $scope.video = $sce.trustAsResourceUrl(
           'http://www.youtube.com/embed/' + data.video +
           '?wmode=transparent');

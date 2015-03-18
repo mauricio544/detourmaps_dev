@@ -88,6 +88,26 @@
     background-color: #333;
     color: #fff;
 }
+/* Drag and Drop zone */
+.upload-drop-zone {
+  height: 200px;
+  border-width: 2px;
+  margin-bottom: 20px;
+}
+
+/* skin.css Style*/
+.upload-drop-zone {
+  color: #ccc;
+  border-style: dashed;
+  border-color: #ccc;
+  line-height: 200px;
+  text-align: center
+}
+.upload-drop-zone.drop {
+  color: #222;
+  border-color: #222;
+}
+/* end drag and drop*/
 .btn-o.btn-black {
     background-color: transparent;
     color: #333;
@@ -5625,7 +5645,7 @@ ul.submit > li{
     vertical-align: middle;
 }
 #passChange, #forgotpass {
-	padding 0 1em;
+	padding: 0 1em;
 }
 #passChange input {
 	width:100%;
@@ -5646,15 +5666,21 @@ li.toolevent a{
         margin: auto;
     }
 .panelcommunity {
-    position: absolute;
-    top: 62px;
-    right: 48%;
-    background: rgba(144, 144, 144, 0.75);
-    border-radius: 3px;
-    border: 1px solid #999;
-    color: #333;
-    padding: 5px;
+      /* position: absolute; */
+      /* top: 62px; */
+      /* right: 48%; */
+      /* background: rgba(144, 144, 144, 0.75); */
+      /* border-radius: 3px; */
+      /* border: 1px solid #999; */
+      color: #333;
+      /* padding: 5px; */
+      float: left;
+      margin-left: 27%;
+      height: 60px;
 }
+    .panelcommunity table{
+        height: 60px;
+    }
     .panelcommunity table td{
         padding: 5px;
         vertical-align: middle;
@@ -5664,6 +5690,9 @@ li.toolevent a{
         }
         .panelcommunity table td a {
             color: #333;
+        }
+        .panelcommunity table td a:hover{
+            text-decoration: underline;
         }
 /* Media Queries */
 

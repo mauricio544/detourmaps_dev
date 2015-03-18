@@ -4,25 +4,21 @@ __author__ = 'mauricio'
 from django.contrib.gis import admin
 from django.conf import settings
 #models
-from community.models import Service, Category, Subscription, Community, Business, \
-    ImageBusiness, ImageCommunity, CuponBusiness, Review, BusinessEvent, ImageBusinessEvents, \
-    BusinessMenu, BusinessSchedule, CouponOwner, Coupon, NewsletterSuscription, Usuario, \
-    Partner, LandingPartner, LandingSocialPartner, LandingTextPartner, VideoPartner, \
-    HeaderPagePartner, BusinessEventPartner, ImageBusinessEventsPartner, NewDiscover, \
-    PhoneNumber, CommunitySocial, CommunityText, HeaderCommunity, Video, HelpingShop, PromoPartner, \
-    LandingEvent, PartnerMobile, TenVisitsBusiness, FeedbackBusiness, Bookmark, TenVisitsManage, TenVisitsRecord, \
-    ReferFriendsManage, ReferFriendsRecord, CommunitySnapshot, StatisticsBusiness, ImageGallery
+from community.models import *
 
 #forms
 from community.forms import FormBusiness, PartnerForm
 #sites
 from django.contrib.sites.models import Site
+from django.db.models.base import ModelBase
+from django.contrib.admin.sites import AlreadyRegistered
 #csv
-import csv
+import csv, inspect
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
-
-
+from community.admin_extended import *
+             
+             
 def export_as_csv(modeladmin, request, queryset):
     """
     Vista para manejar la exportación de datos a Excel
@@ -378,3 +374,4 @@ admin.site.register(CommunitySnapshot, AdminSnapshot)
 admin.site.register(StatisticsBusiness)
 #unregister sites
 #admin.site.unregister(Site)
+autoregister('community')

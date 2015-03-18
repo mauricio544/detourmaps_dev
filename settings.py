@@ -41,7 +41,7 @@ USE_I18N = True
 # If you set this to False, Django will not format dates, numbers and
 # calendars according to the current locale
 USE_L10N = True
-
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
 MEDIA_ROOT = '%s/media/' % basedir
@@ -151,9 +151,11 @@ INSTALLED_APPS = (
     'easy_thumbnails',
     'community',
     'mariustest',
+    'newsletter',
     'web',
     'django.contrib.admin',
-    'localflavor'
+    'localflavor',
+    #'south'
 )
 
 # A sample logging configuration. The only tangible logging

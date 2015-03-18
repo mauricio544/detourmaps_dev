@@ -17,6 +17,7 @@ from web.models import RegisterBusiness, EmailUs, Page, Module, \
     MarketingTypes, MarketingTactics, ConductMarketing, FrecuencyMarketing, MonthMarketing, Post, \
     PostCategory, Newsletter
 from community.models import Business
+from community.admin_extended import *
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 
@@ -291,3 +292,4 @@ admin.site.register(LandingPage, AdminLandingPage)
 admin.site.register(Post, AdminPost)
 admin.site.register(PostCategory, AdminPostCategory)
 admin.site.register(Newsletter, AdminNewsletter)
+autoregister('web')

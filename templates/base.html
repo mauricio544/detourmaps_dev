@@ -101,6 +101,20 @@
                     <option ng-repeat="biz in model.business" value="[[ biz.name ]]"></option>
                 </datalist>
             </div>
+            <div class="panelcommunity" ng-show="panel==true">
+                <table>
+                    <tr>
+                        <td>[[ community_name ]]</td>
+                        <td>[[ zip ]]</td>
+                        <td><a href="[[ discover ]]" target="_blank">Discover</a></td>
+                        <td>
+                            <ul class="list-unstyled">
+                                <li ng-repeat="partner in partners"><a href="[[ partner.url ]]">[[ partner.name ]]</a></li>
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
+            </div>
             <div class="headerUserWraper">
                 <a href="#" class="userHandler dropdown-toggle" data-toggle="dropdown">
                     <img src="{{ STATIC_URL }}images/user-account.png" alt="User">
@@ -198,26 +212,32 @@
                     <div class="clearfix"></div>
                 </div>
                 <ul>
-                    <li><a href="explore.html"><span class="navIcon"><img src="{{ STATIC_URL }}images/neighborhood-icon.png" alt="Neighborhoods"></span><span class="navLabel">Communities</span></a></li>
-                    <li><a href="single.html"><span class="navIcon"><img src="{{ STATIC_URL }}images/orange-deals-icon.png" alt="Orange Deals"></span><span class="navLabel">Orange Deals</span></a></li>
-                    <li><a href="add.html"><span class="navIcon"><img src="{{ STATIC_URL }}images/how-it-works-icon.png" alt="How It Works"></span><span class="navLabel">How it Works</span></a></li>
+                    <li class="hasSub">
+                        <a href=""><span class="navIcon"><img src="{{ STATIC_URL }}images/neighborhood-icon.png" alt="Neighborhoods"></span><span class="navLabel">Communities</span></a>
+                        <ul>
+                            <li ng-repeat="community in communities"> <a ng-click="getCommunity()">[[ community.label ]]<span ng-class="isChecked(community.id)"></span></a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><a href="/deals"><span class="navIcon"><img src="{{ STATIC_URL }}images/orange-deals-icon.png" alt="Orange Deals"></span><span class="navLabel">Orange Deals</span></a></li>
+                    <li><a href="{% url 'how-it-works' %}"><span class="navIcon"><img src="{{ STATIC_URL }}images/how-it-works-icon.png" alt="How It Works"></span><span class="navLabel">How it Works</span></a></li>
                     <li>
-                        <a href="#"><span class="navIcon"><img src="{{ STATIC_URL }}images/events-icon.png" alt="Events"></span><span class="navLabel">Events</span></a>
+                        <a href="{% url 'events' %}"><span class="navIcon"><img src="{{ STATIC_URL }}images/events-icon.png" alt="Events"></span><span class="navLabel">Events</span></a>
                     </li>
                     <li>
-                        <a href="#"><span class="navIcon"><img src="{{ STATIC_URL }}images/blog-icon.png" alt="Blog"></span><span class="navLabel">Blog</span></a>
+                        <a href="http://blog.detourmaps.com" target="_blank"><span class="navIcon"><img src="{{ STATIC_URL }}images/blog-icon.png" alt="Blog"></span><span class="navLabel">Blog</span></a>
                     </li>
                     <li>
-                        <a href="#"><span class="navIcon"><img src="{{ STATIC_URL }}images/about-us-icon.png" alt="About Us"></span><span class="navLabel">About Us</span></a>
+                        <a href="/about-us"><span class="navIcon"><img src="{{ STATIC_URL }}images/about-us-icon.png" alt="About Us"></span><span class="navLabel">About Us</span></a>
                     </li>
                     <li ng-show="cat==true" class="hasSub">
                         <a href="#"><span class="navIcon"><img src="{{ STATIC_URL }}images/cat-icon.png" alt="Categories" style="height: 20px;"></span><span class="navLabel">Categories</span></a>
                         <ul>
-                            <li><a href="buttons.html"><img src="{{ STATIC_URL }}images/menu-auto.png" alt="Auto" style="height: 19px"> Auto</a></li>
-                            <li><a href="icons.html"><img src="{{ STATIC_URL }}images/menu-beauty.png" alt="Beauty" style="height: 19px"> Beauty</a></li>
-                            <li><a href="grid.html"><img src="{{ STATIC_URL }}images/menu-health.png" alt="Health" style="height: 19px"> Health</a></li>
-                            <li><a href="widgets.html"><img src="{{ STATIC_URL }}images/menu-food.png" alt="Food" style="height: 19px"> Food</a></li>
-                            <li><a href="components.html"><img src="{{ STATIC_URL }}images/menu-services.png" alt="Services" style="height: 19px"> Services</a></li>
+                            <li><a href=""><img src="{{ STATIC_URL }}images/menu-auto.png" alt="Auto" style="height: 19px"> Auto</a></li>
+                            <li><a href=""><img src="{{ STATIC_URL }}images/menu-beauty.png" alt="Beauty" style="height: 19px"> Beauty</a></li>
+                            <li><a href=""><img src="{{ STATIC_URL }}images/menu-health.png" alt="Health" style="height: 19px"> Health</a></li>
+                            <li><a href=""><img src="{{ STATIC_URL }}images/menu-food.png" alt="Food" style="height: 19px"> Food</a></li>
+                            <li><a href=""><img src="{{ STATIC_URL }}images/menu-services.png" alt="Services" style="height: 19px"> Services</a></li>
                             <li><a href="lists.html"><img src="{{ STATIC_URL }}images/menu-orange.png" alt="Orange Deals" style="height: 19px"> Orange Deals</a></li>
                             <li><a href="tables.html"><img src="{{ STATIC_URL }}images/menu-promotions.png" alt="Promotions" style="height: 19px"> Monthly Promotions</a></li>
                         </ul>
