@@ -1,0 +1,534 @@
+{% load filter_tags %}
+{% load thumbnail %}
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>Settings Newsletter</title>
+    <link href='http://fonts.googleapis.com/css?family=Terminal+Dosis' rel='stylesheet' type='text/css'>
+    <link href='/media/js/colorbox/example1/colorbox.css' rel='stylesheet' type='text/css'>
+    <link href="/media/css/style.css" rel="stylesheet" media="screen"/>
+    <link type="text/css" href="/media/jquery-ui-1.8.16.custom/development-bundle/themes/sunny/jquery.ui.all.css" rel="stylesheet" />
+    <script src="https://www.google.com/jsapi?key=ABQIAAAAMRdj9lILtQvXkiEUNZPsEBS0N4cxRsm8qOjvXk6GiBtD-X9OIBRvd0WVJ_z0HS6K7ZEs2t5TlJKQTg" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        google.load("jquery","1.7.1");
+    </script>
+    <script type="text/javascript" src="/media/jquery-ui-1.8.16.custom/development-bundle/ui/jquery-ui-1.8.16.custom.js"></script>
+    <script type="text/javascript" src="/media/jquery-ui-1.8.16.custom/development-bundle/ui/jquery.ui.core.js"></script>
+    <script type="text/javascript" src="/media/jquery-ui-1.8.16.custom/development-bundle/ui/jquery.ui.widget.js"></script>
+    <script type="text/javascript" src="/media/jquery-ui-1.8.16.custom/development-bundle/ui/jquery.ui.tabs.js"></script>
+    <script type="text/javascript" src="/media/jquery-ui-1.8.16.custom/development-bundle/ui/jquery.ui.droppable.js"></script>
+    <script type="text/javascript" src="/media/jquery-ui-1.8.16.custom/development-bundle/ui/jquery.ui.draggable.js"></script>
+    <script type="text/javascript" src="/media/jquery-ui-1.8.16.custom/development-bundle/ui/jquery.ui.sortable.js"></script>
+    <script type="text/javascript" src="/media/js/colorbox/colorbox/jquery.colorbox.js"></script>
+    <script type="text/javascript" src="/media/js/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>
+    <script type="text/javascript" src="/media/jquery.copy.1.3.2/jquery.copy.js"></script>
+    <script type="text/javascript">
+        tinyMCE.init({
+                         // General options
+                         mode : "exact",
+                         elements : "id_text,id_review",
+                         theme : "advanced",
+                         plugins : "autolink,lists,spellchecker,pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template",
+                         height: "800",
+                         // Theme options
+                         theme_advanced_buttons1 : "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect",
+                         theme_advanced_buttons2 : "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor",
+                         theme_advanced_buttons3 : "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen",
+                         theme_advanced_buttons4 : "insertlayer,moveforward,movebackward,absolute,|,styleprops,spellchecker,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,blockquote,pagebreak,|,insertfile,insertimage",
+                         theme_advanced_toolbar_location : "top",
+                         theme_advanced_toolbar_align : "left",
+                         theme_advanced_statusbar_location : "bottom",
+                         theme_advanced_resizing : true,
+
+                         // Skin options
+                         skin : "o2k7",
+                         skin_variant : "black",
+
+                         // Example content CSS (should be your site CSS)
+                         content_css : "css/example.css",
+
+                         relative_urls : false,
+                         remove_script_host : false,
+                         document_base_url : "http://e-news.detourmaps.com/",
+                         // Drop lists for link/image/media/template dialogs
+                         template_external_list_url : "/news/templates",
+                         external_link_list_url : "js/link_list.js",
+                         external_image_list_url : "/news/list",
+                         media_external_list_url : "js/media_list.js",
+
+                         // Replace values for the template plugin
+                         template_replace_values : {
+                             username : "Some User",
+                             staffid : "991234"
+                         },
+                         file_browser_callback: function(field_name, url, type, win){
+
+                             /* If you work with sessions in PHP and your client doesn't accept cookies you might need to carry
+                              the session name and session ID in the request string (can look like this: "?PHPSESSID=88p0n70s9dsknra96qhuk6etm5").
+                              These lines of code extract the necessary parameters and add them back to the filebrowser URL again. */
+
+                             /* Here goes the URL to your server-side script which manages all file browser things. */
+                             var ventana = window.open('/news/form',null,'width=600,height=150');
+                             ventana.tinymceFileField = field_name;
+                             ventana.tinymceFileWin = win;
+                         },
+                        forced_root_block : false,
+                        force_br_newlines : true,
+                        force_p_newlines : true
+                     });
+        $(document).ready(function(){
+            function areas(){
+                $.get("/news/area",function(datos){
+                    option = "";
+                    for(var i = 0; i < datos.length; i++){
+                        option += "<div><input class='checkAreas' type='checkbox' name='area' id='area" + datos[i].id + "' coords='" + datos[i].coords + "' shape='" + datos[i].shape + "' idb='" + datos[i].id + "' svg='" + datos[i].svg + "'/>" + datos[i].url; + "</div>";
+                    }
+                    $("div.areasHall").html(option);
+                },'json');
+            }
+            function getMaps(){
+                $.get("{% url "map_only" %}",function(data){
+                    check = "<h2>Choose the map to include it in the code</h2>";
+                    for(var ck = 0; ck < data.maps.length; ck++){
+                        check += "<div><label><input type='checkbox' class='mapHole' name='maps' id='map" + data.maps[ck].id + "' value='" + data.maps[ck].id + "'/>" + data.maps[ck].nombre + "</label></div>";
+                    }
+                    $("#allMaps").html(check);
+                },"json");
+            }
+            function getImages(){
+                $.get("/news/get_images/",function(datos){
+                    option = "";
+                    for (var y = 0; y < datos.length; y++){
+                        option += '<option value="/media/' + datos[y].url + '" alto="' + datos[y].height + '" idb="' + datos[y].id + '" nombre="' + datos[y].name + '">' + datos[y].name + '</option>';
+                    }
+                    $("#images option:first").after(option);
+                },'json');
+            }
+            getImages();
+            $(function(){
+                $("#tabs").tabs(
+                        {
+                            select: function(event,ui){
+                                getMaps();
+                            }
+                        }
+                );
+            });
+            $("#save_area").click(function(e){
+                var nombre_area = $("#id_nombre").val();
+                var shape_area = $("#id_shape option:selected").val();
+                var coords_area = $("#id_coords").val();
+                var link_area = $("#id_link").val();
+                var url_save = '{% url "save_area" %}';
+                $.post(url_save,{
+                    'nombre':nombre_area,
+                    'shape':shape_area,
+                    'coords':coords_area,
+                    'link':link_area
+                },function(data){
+                    alert(data);
+                });
+                return false;
+                e.returnValue = false;
+            });
+            $("#save_map").click(function(){
+                var map_nombre = $("#map_nombre").val();
+                if ($("#id_area :selected").length > 0){
+                    var selectedAreas = [];
+                    $("#id_area :selected").each(function(i,selected){
+                        selectedAreas[i] = parseInt($(selected).val());
+                    });
+                    var url_save = '{% url "save_map" %}';
+                    $.post(url_save,{
+                        'nombre':map_nombre,
+                        'area':JSON.stringify(selectedAreas)
+                    },function(data){
+                        alert(data);
+                    });
+                }
+            });
+            $("#get_map").click(function(e){
+               $.getJSON('{% url "get_map" %}',function(data){
+                   var areas = "";
+                   for(i=0;i<data.areas.length;i++){
+                       areas += "<area shape='" + data.areas[i].shape + "' coords='" + data.areas[i].coords + "' href='" + data.areas[i].link + "' target='blank' />\n";
+                   }
+                   $("#textMap").val("<map name='" + data.nombre + "' id='" + data.nombre +"'>" + areas + "</map>");
+                   $("#textMap").parent("div").slideToggle();
+               });
+                return false;
+                e.returnValue = false;
+            });
+            $("#has_map").click(function(e){
+                if ($(this).is(':checked')){
+                    var url = '{% url "map_only" %}';
+                    $.getJSON(url,function(data){
+                        var checks = "";
+                        for(i=0;i<data.maps.length;i++){
+                            checks += "<input type='checkbox' value='" + data.maps[i].id + "'/>" + data.maps[i].nombre;
+                        }
+                        $("#mapas li ul div").html("Cantidad total de mapas - " + data.total + "<br/>" + checks);
+                    });
+                    $("#mapas").slideDown();
+                }else{
+                    $("#mapas").slideUp();
+                }
+            });
+            $("#get_copy").click(function(e){
+                $("#textMap").select();
+                return false;
+                e.returnValue = false;
+            });
+            $("#save_image").click(function(){
+                alert("hola imagen");
+            });
+
+            var $dropper = $("#droppEnd");
+            var $source = $("#source");
+            $("li", $source).draggable({
+                appendTo:'body',
+                helper:'clone',
+                cursor:'move',
+                revert:'invalid'
+            });
+            $("#dropper div#droppEnd").droppable({
+                activeClass:'ui-state-highlight',
+                hoverClass:'ui-state-hover',
+                accept:'#source > li',
+                drop:function(event,ui){
+                    deleteImage(ui.draggable);
+                }
+            }).sortable({
+                        items:'li'
+                    });
+            $("#source").droppable({
+                accept:'#droppEnd li',
+                activeClass:'ui-state-highlight',
+                drop:function(event,ui){
+                    resetImage(ui.draggable);
+                }
+            }).sortable({
+                        items:'li'
+                    });
+            function deleteImage( $item ) {
+                $item.fadeOut(function() {
+                    var $list = $( "ul", $dropper ).length ?
+                        $( "ul", $dropper ) :
+                        $( "<ul class='gallery ui-helper-reset'/>" ).appendTo( $dropper );
+                        var img = $item.attr("idb");
+                        $item.find("img").attr("src",img);
+                        $item.appendTo($list).fadeIn();
+                        var height = $item.height();
+                        $("#droppEnd").animate({
+                            height:height
+                        });
+                });
+            }
+            function resetImage($item){
+                $item.fadeOut(function(){
+                   var img = $item.attr("idc");
+                   $item.find("img").attr("src",img);
+                   $item.appendTo($source).fadeIn();
+                });
+            }
+            $(".revert").draggable({
+                appendTo:'body',
+                helper:'clone',
+                cursor:'move'
+            });
+            var listaPuntosX = [];
+            var listaPuntosY = [];
+            var listaPuntosGuardar = [];
+            var canvas = document.createElement("canvas");
+            $("#testy").append(canvas);
+            var ctx = canvas.getContext("2d");
+            $(".dragger div").bind("click",function(e){
+                if (listaPuntosX.length<=4){
+                    var newPageX = e.pageX - $(this).offset().left;
+                    var newPageY = e.pageY - $(this).offset().top;
+                    listaPuntosX.push(newPageX);
+                    listaPuntosY.push(newPageY);
+                    listaPuntosGuardar = listaPuntosX;
+                    canvas.setAttribute("width",window.innerWidth);
+                    canvas.setAttribute("height",window.innerHeight);
+                    canvas.setAttribute("style","position: absolute; x:0;y:0;");
+                    $(this).append(canvas);
+                    var ctx = canvas.getContext("2d");
+                    ctx.fillRect(newPageX,newPageY,1,1);
+                }
+                if (listaPuntosGuardar.length == 4){
+                    var pos = $("img",this).position();
+                    var ancho = (parseInt(listaPuntosX[1]) - parseInt(listaPuntosX[0])) + 50;
+                    var alto = (parseInt(listaPuntosY[3]) - parseInt(listaPuntosY[0])) + 50;
+                    var newX = parseInt(listaPuntosX[0]);
+                    var newY = parseInt(listaPuntosY[0]);
+                    var newH = $(this).outerHeight();
+                    console.log(pos.left);
+                    console.log(pos.top);
+                    console.log(listaPuntosX[0]);
+                    console.log(listaPuntosY[0]);
+                    console.log(ancho);
+                    console.log(alto);
+                    $(this).append("<svg><rect x='" + newX + "' y='" + newY.toString() + "' width='" + ancho.toString() + "' height='" + alto.toString() + "' style='fill:red;stroke:pink;stroke-width:5;fill-opacity:0.1;stroke-opacity:0.9'/>/></svg>");
+                    $("svg",this).css('top',-newH);
+                }
+            });
+            $("#testy").bind("click",function(e){
+                if (listaPuntosX.length<=4){
+                    var newPageX = e.pageX - $(this).offset().left;
+                    var newPageY = e.pageY - $(this).offset().top;
+                    e.stopPropagation();
+                    listaPuntosX.push(newPageX);
+                    listaPuntosY.push(newPageY);
+                    listaPuntosGuardar = listaPuntosX;
+                    canvas.setAttribute("width",window.innerWidth);
+                    canvas.setAttribute("height",window.innerHeight);
+                    canvas.setAttribute("style","position: absolute; x:0;y:0;");
+                    ctx.fillRect(newPageX,newPageY,6,6);
+                }
+                if (listaPuntosGuardar.length == 4){
+                    var pos = $(this).position();
+                    var ancho = (parseInt(listaPuntosX[1]) - parseInt(listaPuntosX[0]));
+                    var alto = (parseInt(listaPuntosY[3]) - parseInt(listaPuntosY[0]));
+                    var newX = parseInt(listaPuntosX[0]);
+                    var newY = parseInt(listaPuntosY[0]);
+                    var newH = $(this).outerHeight();
+                    console.log(pos.left);
+                    console.log(pos.top);
+                    console.log(listaPuntosX[0]);
+                    console.log(listaPuntosY[0]);
+                    console.log(ancho);
+                    console.log(alto);
+                    $(this).append("<svg id='forma'><rect x='" + newX + "' y='" + newY.toString() + "' width='" + ancho.toString() + "' height='" + alto.toString() + "' style='fill:red;stroke:pink;stroke-width:5;fill-opacity:0.1;stroke-opacity:0.9'/></svg>");
+                    $("#areas").css("display","inline-block");
+                    var coords = newX + "," + newY + "," + listaPuntosX[2] + "," + listaPuntosY[2];
+                    var svg = newX + "," + newY + "," + ancho + "," + alto;
+                    $("#coords").val(coords);
+                    $("#svg").val(svg);
+                }
+            });
+            $("#saveArea").click(function(e){
+                listaPuntosX = [];
+                listaPuntosY = [];
+                listaPuntosGuardar = [];
+                $.post(
+                        "{% url "home" %}",
+                        {
+                            'shape':$("#shape").val(),
+                            'coords':$("#coords").val(),
+                            'link':$("#link").val(),
+                            'svg': $("#svg").val(),
+                            'saveArea':$("#saver").val()
+                        },
+                        function(data){
+                            $("#msg").text(data);
+                            $("#testy").find("svg").remove();
+                            $("#link").val(" ");
+                            areas();
+                        }
+                );
+                return false;
+                e.returnValue = false;
+            });
+            var idb;
+            $("#images").change(function(){
+                listaPuntosX = [];
+                listaPuntosY = [];
+                listaPuntosGuardar = [];
+                $("#images option:selected").each(function(){
+                    src = $(this).val();
+                    tall = $(this).attr("alto")
+                    $("#testy").css("height",tall);
+                    $("#testy").css("background","url(" + src + ") no-repeat");
+                    $("#testy").find("svg").remove();
+                    idb = $(this).attr("idb");
+                });
+            });
+            var idAreas = [];
+            $(".checkAreas").live("click",function(){
+                var id = $(this).attr("id");
+                var check = $("#" + id).attr("checked");
+                var coords = $("#" + id).attr("coords");
+                var shape = $("#" + id).attr("shape");
+                var idb = $("#" + id).attr("idb");
+                var svgCoords = $("#" + id).attr("svg");
+                if (check){
+                    var arrayCoords = svgCoords.split(",");
+                    svg = "<svg id='svg" + idb + "'><rect x='" + arrayCoords[0] + "' y='" + arrayCoords[1] + "' width='" + arrayCoords[2] + "' height='" + arrayCoords[3] + "' style='fill:green;stroke:green;stroke-width:5;fill-opacity:0.1;stroke-opacity:0.9'/></svg>";
+                    $("#testy").append(svg);
+                    idAreas.push(parseInt(idb));
+                }else{
+                    $("#svg" + idb).remove();
+                    indice = idAreas.indexOf(parseInt(idb));
+                    idAreas.splice(indice,1);
+                }
+            });
+            var listIds = "";
+            $(".mapHole").live("click",function(){
+                var id = $(this).val();
+                listIds += id + ","
+                $("#mapHoleHide").val(listIds);
+            });
+            $("#saveMap").click(function(){
+                $("#listAreas").val(idAreas);
+                var nombre = $("#images option:selected").attr("nombre");
+                var area = $("#listAreas").val();
+                var listaJson = "'[" + area + "]'";
+                $.post("/news/save_map", {
+                    'nombre': nombre,
+                    'area': JSON.stringify(idAreas),
+                    'valorImg': idb
+                }, function(data){
+                    $("#msg").text(data[0].response);
+                    $("#preview").show();
+                    img = "<img src='" + $("#images option:selected").val() + "' usemap='#" + data[0].nombre + "'/>"
+                    var mapOpen = "<map name='" + data[0].nombre + "' id='social'>";
+                    var mapAreas = "";
+                    for(var x = 0; x < data[0].areas.length; x++){
+                        mapAreas += '<area shape="rect" coords="' + data[0].areas[x].coords + '" href="' + data[0].areas[x].link + '" target="_blank" />';
+                    }
+                    var mapClose = "</map>";
+                    var mapAll = img + mapOpen + mapAreas + mapClose;
+                    $("#mapPreview").html(mapAll);
+                },'json')
+            });
+            $("#allLink").click(function(e){
+                areas();
+                return false;
+                e.returnValue = false;
+            });
+            $("#hideLink").click(function(e){
+                $(".areasHall").html(" ");
+                return false;
+                e.returnValue = false;
+            });
+            $("#previewLink").colorbox({inline:true, href:"#mapPreview"});
+        });
+    </script>
+    <style type="text/css">
+        #droppEnd{
+            width: 620px;
+            list-style: none;
+            height: 200px;
+        }
+        #source{
+            list-style: none;
+        }
+        svg{
+            position: absolute;
+        }
+        .personalHeader{
+            background: #{{ back_logo }};
+            padding: 20px 5px;
+            color: #{{ font_color }};
+        }
+    </style>
+</head>
+<body>
+
+    <div id="wrapper">
+    {% if name_biz %}
+        <h1 class="personalHeader" style="background: #{{ back_logo }}; color: #{{ font_color }};">{% if logo_biz %}<img src="{{ logo_biz }}" alt="{{ name_biz }}"/><span class="titleNews" style="position: relative; float: right; padding: 15px 35px; background-color: #5e5e5e; border-radius: 10px; right: 20px;">My Newsletter V1.0</span>{% endif %}</h1>
+    {% else %}
+        <h1 style="padding: 15px 35px; background-color: #5e5e5e; border-radius: 10px;">My Newsletter V1.0</h1>
+    {% endif %}
+    <span>{% if user.is_authenticated %}Welcome {{ user.username }} | <a href="{% url "Out" %}"> Log Out </a>{% endif %}</span>
+    <div id="tabs">
+        <ul>
+            <li><a href="#test">Test draw areas</a></li>
+            <li><a href="#news">Newsletter</a></li>
+        </ul>
+        <div id="news">
+            <h2>Body to edit</h2>
+            <hr>
+            <div>
+                <div id="allMaps">
+
+                </div>
+                <ul>
+                    <form action="" method="post">
+                        {{ body.as_ul }}
+                        <input type="hidden" value="0" name="mapHide" id="mapHoleHide">
+                        <input type="submit" value="Save Newsletter template"/>
+                    </form>
+                </ul>
+            </div>
+        </div>
+        <div id="test" style="position: relative;display: block;vertical-align: top;">
+
+            <div class="wizard">
+                <h2>Dashboard</h2>
+                <div id="manageImages">
+                    <div id="firstStep">
+                        <div class="step">Step 1 : Choose the image from the list or upload a new image</div>
+                        <div class="space"></div>
+                        <label>Image :</label>
+                        <select name="img" id="images">
+                            <option>--Choose one image--</option>
+                        </select>
+                        <div class="space"></div>
+                        <div class="step">Or</div>
+                        <h3>Upload a new image</h3>
+                        <form action="{% url "save_img" %}" method="post" enctype="multipart/form-data">
+                            <label>Name :</label><input type="text" name="nombre"/>
+                            <label>Image :</label><input type="file" name="imagen"/>
+                            <input type="submit" value="Save New Image"/>
+                        </form>
+                    </div>
+
+                </div>
+                <div id="dashboard">
+                    <div class="step">Step 2 : Select URL or Insert a new URL</div>
+                    <div class="space"></div>
+                    <div id="allLink">View all Links</div>
+                    <div id="hideLink">Hide all Links</div>
+                    <div id="undo">Undo</div>
+                    <div class="areasHall" style="overflow-y: scroll;font-size: 0.6em;">
+
+                    </div>
+                    <div class="space"></div>
+                </div>
+                <div id="areas" style="position: relative;width: 275px; display: none;">
+                    <div class="step">Step 4 : For that you insert a new URL and save it</div>
+                    <div class="space"></div>
+                    <form action="" method="post">
+                        <div style="display: block;"><label for="link" style="width: 120px;text-align: left;">Url : </label><input type="text" name="link" id="link"/></div>
+                        <div style="display: block;"><button id="saveArea">Save Area</button></div>
+                        <input type="hidden" name="shape" value="rect" id="shape"/>
+                        <input type="hidden" name="coords" value="" id="coords"/>
+                        <input type="hidden" name="svg" value="" id="svg"/>
+                        <input type="hidden" name="saveArea" value="save" id="saver"/>
+                    </form>
+                    <span id="msg"></span>
+
+                    <div style="">
+                        <div class="step">Step 5 : Save the map (various URL)</div>
+                        <div class="space"></div>
+                        <input type="hidden" name="areas" id="listAreas"/>
+                        <button id="saveMap">Save Map for the Image</button>
+                    </div>
+                    <div id="preview" >
+                        <div class="step">Step 6 : Preview the image with the links working</div>
+                        <div class="space"></div>
+                        <a href="#mapPreview" id="previewLink">Preview</a>
+                        <div style="display: none;">
+                            <div id="mapPreview">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="testy" style="width:620px;height:620px;background: #fff;border: 1px solid #444;background-repeat: no-repeat; display: inline-block;">
+
+            </div>
+        </div>
+
+
+    </div>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>Settings Newsletter | Log In</title>
+    <link href='http://fonts.googleapis.com/css?family=Terminal+Dosis' rel='stylesheet' type='text/css'>
+    <link href='/media/js/colorbox/example1/colorbox.css' rel='stylesheet' type='text/css'>
+    <link href="/media/css/style.css" rel="stylesheet" media="screen"/>
+</head>
+<body>
+<div>
+    <div id="wrapperLog">
+        <div id="access">
+            {% if logo_biz %}
+                <img src="{{ logo_biz }}" alt="Logo" width="200" style="background: #{{ back_logo }}; padding: 45px 100px;"/>
+            {% endif %}
+            {% if name_biz %}
+                <h1>{{ name_biz }}</h1>
+            {% else %}
+                <h1>My Newsletter V1.0</h1>
+            {% endif %}
+            <form action="" method="post">{% csrf_token %}
+                {{ form.as_ul }}
+                <input type="submit" value="Log In"/>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

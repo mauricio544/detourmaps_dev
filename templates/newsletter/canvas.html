@@ -1,0 +1,46 @@
+<html>
+<head>
+<title>Tutorial de HTML5 – Elemento Canvas</title>
+<script>
+window.onload = function(){
+//cargamos el elemento canvas
+var canvas = document.getElementById('tutorial-canvas');
+
+//una vez cargado el elemento, le digo en que contexto trabajaremos, en este caso 2d
+var contexto = canvas.getContext('2d');
+
+//Ya que tenemos el contexto del canvas cargado, lo utilizo para dibujar
+//cambiamos el color de relleno
+contexto.fillStyle = '#003366';
+
+//comenzamos con el camino
+contexto.beginPath();
+//situo el cursor en la posición x, y (50×90)
+contexto.moveTo(50,90);
+
+//empiezo a trazar lineas diciendole las posiciones que quiero recorrer
+contexto.lineTo(100,200);
+contexto.lineTo(150,120);
+contexto.lineTo(200,120);
+contexto.lineTo(200,200);
+contexto.lineTo(230,200);
+contexto.lineTo(230,120);
+contexto.lineTo(280,120);
+contexto.lineTo(280,90);
+//una vez trazadas todas las lineas, cierro con fill
+contexto.fill();
+}
+
+</script>
+</head>
+
+<body>
+
+<canvas id="tutorial-canvas" width="500" height="500">
+Este texto será el que muestre el navegador no compatible.
+<br>
+Por favor, actualiza a una versión que soporte HTML5.
+</canvas>
+
+</body>
+</html>

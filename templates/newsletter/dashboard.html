@@ -1,0 +1,79 @@
+{% extends "base_structure.html" %}
+{% block title %}
+	Newsletter
+{% endblock %}
+{% block content %}
+	<div class="container">
+		<nav class="navbar navbar-default">
+		  <div class="container-fluid">
+		    <!-- Brand and toggle get grouped for better mobile display -->
+		    <div class="navbar-header">
+		      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+			<span class="sr-only">Toggle navigation</span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+		      </button>
+		      <a class="navbar-brand" href="#">DetourMaps</a>
+		    </div>
+
+		    <!-- Collect the nav links, forms, and other content for toggling -->
+		    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+		      <ul class="nav navbar-nav">
+                  <li class="active"><a href="#">Create rectangle map <i class="fa fa-square"></i><span class="sr-only">(current)</span></a></li>
+                  <li><a href="#">Create circle map <i class="fa fa-circle"></i></a></li>
+                  <li><a href="#">Edit <i class="fa fa-edit"></i></a></li>
+                  <li><a href="#">Preview <i class="fa fa-terminal"></i></a></li>
+                  <li><a href="#">To HTML <i class="fa fa-code"></i></a></li>
+		      </ul>
+
+		      <ul class="nav navbar-nav navbar-right">
+                <li><a href="#">Logout <i class="fa fa-sign-out"></i></a></li>
+		      </ul>
+		    </div><!-- /.navbar-collapse -->
+		  </div><!-- /.container-fluid -->
+		</nav>
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading"><strong>Upload Files</strong> <small>Newsletter - DetourMaps</small></div>
+                    <div class="panel-body">
+
+                      <!-- Standar Form -->
+                      <h4>Select files from your computer</h4>
+                      <form action="" method="post" enctype="multipart/form-data" id="js-upload-form">
+                        <div class="form-inline">
+                          <div class="form-group">
+                            <input type="file" name="files[]" id="js-upload-files" multiple>
+                          </div>
+                          <button type="submit" class="btn btn-sm btn-primary" id="js-upload-submit">Upload files <i class="fa fa-upload"></i></button>
+                        </div>
+                      </form>
+
+                      <!-- Drop Zone -->
+                      <h4>Or drag and drop files below</h4>
+                      <div class="upload-drop-zone" id="drop-zone">
+                        Just drag and drop files here <i class="fa fa-picture-o"></i>
+                      </div>
+
+                      <!-- Progress Bar -->
+                      <div class="progress">
+                        <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
+                          <span class="sr-only">60% Complete</span>
+                        </div>
+                      </div>
+
+                      <!-- Upload Finished -->
+                      <div class="js-upload-finished">
+                        <h3>Processed files</h3>
+                        <div class="list-group">
+                          <a href="#" class="list-group-item list-group-item-success"><i class="fa fa-image"></i><span class="badge alert-success pull-right">Success</span>image-01.jpg</a>
+                          <a href="#" class="list-group-item list-group-item-success"><i class="fa fa-image"></i><span class="badge alert-success pull-right">Success</span>image-02.jpg</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+            </div>
+        </div>
+	</div>
+{% endblock %}
