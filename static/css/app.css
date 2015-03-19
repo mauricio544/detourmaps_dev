@@ -2137,7 +2137,6 @@ h1.pageTitle {
 #deals ul {
     list-style: none;
     overflow: hidden;
-    margin-left: -40px;
 }
 .appcat{
     display: none;
@@ -5677,6 +5676,10 @@ li.toolevent a{
       float: left;
       margin-left: 27%;
       height: 60px;
+      font-family: 'Open Sans', sans-serif;
+      color: #999;
+      font-weight: lighter;
+      font-size: 16px;
 }
     .panelcommunity table{
         height: 60px;
@@ -5689,7 +5692,7 @@ li.toolevent a{
             margin-bottom: 0 !important;
         }
         .panelcommunity table td a {
-            color: #333;
+            color: #999;
         }
         .panelcommunity table td a:hover{
             text-decoration: underline;

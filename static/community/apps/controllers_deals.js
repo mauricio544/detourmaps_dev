@@ -50,6 +50,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
     $scope.$routeParams = $routeParams;
     $rootScope.business;
     $rootScope.businesstmp;
+    $rootScope.user;
     $rootScope.cat = false;
     $rootScope.panel = false;
     $scope.styles = [{
@@ -223,7 +224,8 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
         $scope.communities = data.communities;
         $scope.categories = data.categories;
         $scope.model.businesstmp = data.businesses;
-        $scope.bizrandom = data.business
+        $scope.bizrandom = data.business;
+        $rootScope.user = data.user;
         $scope.placeholder_nosearch =
           "Search for pizza, hair salons, mexican food ...";
         angular.forEach($scope.model.businesstmp, function(bizmarker) {
@@ -753,6 +755,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
         $('input, textarea').placeholder();
 
         $scope.addMarkers($scope.props, $scope.map, true);
+        $scope.markerCluster = new MarkerClusterer($scope.map, $scope.markers);
         $scope.map.setCenter(new google.maps.LatLng(41.8337329, -
           87.7321555));
         $scope.map.setZoom(12);
@@ -3152,7 +3155,8 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope', '$routeParams',
           'http://www.youtube.com/embed/' + data.video +
           '?wmode=transparent');
         $scope.menu = $sce.trustAsHtml(data.menu);
-        $scope.there_is_user = data.user;
+        //$scope.there_is_user = data.user;
+        $rootScope.user = data.user;
         $scope.rendermenu = function(menu) {
           $("#menulistfake").html(menu);
           $(".panelcommunity").show();
@@ -3246,11 +3250,7 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope', '$routeParams',
     $scope.requestactions = function() {
       if ($scope.bizInfo.user === true) {
         if ($scope.bizInfo.smart_buys === true) {
-          $scope.alert.message =
-            "This Business is already participating in this promo, Thanks!! :)."
-          $("#alert").modal({
-            keyboard: true
-          });
+          sweetAlert("Oops...", "This Business is already participating in this promo, Thanks!! :).", "error");
         } else {
           $http({
               method: 'POST',
@@ -3264,10 +3264,7 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope', '$routeParams',
               }
             })
             .success(function(data) {
-              $scope.alert.message = data.message;
-              $("#alert").modal({
-                keyboard: true
-              });
+              sweetAlert("Good job!", data.message, "success");
             });
         }
       } else {
@@ -3278,46 +3275,57 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope', '$routeParams',
     };
     $scope.saveactions = function() {
       if ($scope.bizInfo.user === true) {
-        $http({
-            method: 'POST',
-            url: '/communities/save-promo/',
-            data: $.param({
-              id: $scope.bizInfo.coupon.id
-            }),
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded'
-            }
-          })
-          .success(function(data) {
-            $scope.promo.image = data.image;
-            $scope.promo.voucher = data.voucher;
-            $scope.promo.message = data.message;
-            $scope.promo.show = true
-          });
+          if($scope.bizInfo.smart_buys === false){
+            sweetAlert("Oops...", "This Business is not participating in this promo, Thanks!! :).", "error");
+          }else{
+            $http({
+                method: 'POST',
+                url: '/communities/save-promo/',
+                data: $.param({
+                  id: $scope.bizInfo.coupon.id
+                }),
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded'
+                }
+              })
+              .success(function(data) {
+                $scope.promo.image = data.image;
+                $scope.promo.voucher = data.voucher;
+                $scope.promo.message = data.message;
+                $scope.promo.show = true
+              });
+          }
       } else {
         $('#loginusersmart').modal({
           keyboard: true
         });
       }
     };
+    $scope.shareactions = function(){
+        sweetAlert("Oops...", "This functionality is not active, Thanks!! :).", "error");
+    };
     $scope.redeemactions = function() {
       if ($scope.bizInfo.user === true) {
-        $http({
-            method: 'POST',
-            url: '/communities/get-promo/',
-            data: $.param({
-              cpid: $scope.bizInfo.coupon.id
-            }),
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded'
-            }
-          })
-          .success(function(data) {
-            $scope.promo.image = data.image;
-            $scope.promo.voucher = data.voucher;
-            $scope.promo.message = data.message;
-            $scope.promo.show = true
-          });
+          if($scope.bizInfo.smart_buys === false){
+            sweetAlert("Oops...", "This Business is not participating in this promo, Thanks!! :).", "error");
+          }else{
+            $http({
+                method: 'POST',
+                url: '/communities/get-promo/',
+                data: $.param({
+                  cpid: $scope.bizInfo.coupon.id
+                }),
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded'
+                }
+              })
+              .success(function(data) {
+                $scope.promo.image = data.image;
+                $scope.promo.voucher = data.voucher;
+                $scope.promo.message = data.message;
+                $scope.promo.show = true
+              });
+          }
       } else {
         $('#loginusersmart').modal({
           keyboard: true
@@ -3340,8 +3348,9 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope', '$routeParams',
         })
         .success(function(data) {
           if (data.confirm) {
-            $scope.message = data.messageg;
+            sweetAlert("Good job!", data.msg, "success");
             $scope.actionconfirm = true;
+            $rootScope.user = true;
             setTimeout(function() {
               $scope.actionconfirm = false;
               $('#loginusersmart').modal('hide');
@@ -3363,7 +3372,7 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope', '$routeParams',
                 $scope.promo.show = true
               });
           } else {
-            $scope.promo.message = data.message;
+            sweetAlert("Oops...", data.msg, "error");
           }
         });
     };

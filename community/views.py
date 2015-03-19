@@ -3310,6 +3310,8 @@ def business_one_json(request):
 
 @csrf_exempt
 def all_business_json(request):
+    user_session = False
+    if request.session.get("user"): user_session = True
     community_object = Community.objects.filter(active=True).order_by('name')
     lista_communities = []
     for i in community_object:
@@ -3455,7 +3457,8 @@ def all_business_json(request):
         'communities': lista_communities,
         'categories': lista_categories,
         'businesses': lista_business,
-        'business': dict_biz
+        'business': dict_biz,
+        'user': user_session
     }
     return HttpResponse(simplejson.dumps(dict_super_dupper))
 
