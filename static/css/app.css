@@ -5665,7 +5665,7 @@ li.toolevent a{
         margin: auto;
     }
 .panelcommunity {
-      /* position: absolute; */
+      position: absolute;
       /* top: 62px; */
       /* right: 48%; */
       /* background: rgba(144, 144, 144, 0.75); */
@@ -5673,8 +5673,7 @@ li.toolevent a{
       /* border: 1px solid #999; */
       color: #333;
       /* padding: 5px; */
-      float: left;
-      margin-left: 27%;
+      margin-left: 53%;
       height: 60px;
       font-family: 'Open Sans', sans-serif;
       color: #999;

@@ -558,7 +558,7 @@ $(document).ready(function () {
             $(lista[x]).find("img").attr("src", $(lista[x]).attr("inactive"));
         }
         var active = _this.find("a").attr("active");
-        +}+{}{
+
         _this.find("a").find("img").attr("src", active);
         var tabNameDeals = _this.find("a").attr("name");
         var uri = updateQueryStringParameter(location.href, "tab", "deals|" + tabNameDeals);

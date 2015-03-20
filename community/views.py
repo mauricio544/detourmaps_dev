@@ -3317,7 +3317,8 @@ def all_business_json(request):
     for i in community_object:
         dict_community = {
             'id': i.id,
-            'label': i.name
+            'label': i.name,
+            'border': force_unicode(GEOSGeometry(i.borders).json)
         }
         lista_communities.append(dict_community)#communities
     categories_object = Category.objects.all().order_by('name')

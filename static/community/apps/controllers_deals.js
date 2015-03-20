@@ -48,6 +48,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
     $scope.catmenu = false;
     $scope.$route = $route;
     $scope.$routeParams = $routeParams;
+    $scope.notOverMarker = true;
     $rootScope.business;
     $rootScope.businesstmp;
     $rootScope.user;
@@ -145,6 +146,52 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
       }
     }
 
+    // Añadir poligonos al mapa
+    $scope.addPolygones = function(communities, map){
+        for (var x=0; x<communities.length; x++){
+            var bounds = new google.maps.LatLngBounds();
+            var latlng;
+            if (!$.isPlainObject(communities[x].border)) {
+                communities[x].border = $.parseJSON(communities[x].border);
+            }
+            var commCoords = [];
+            var coords = communities[x].border.coordinates;
+            for (var n = 0; n < coords[0][0].length; n++) {
+                latlng = new google.maps.LatLng(coords[0][0][n][1], coords[0][0][n][0]);
+                commCoords.push(latlng);
+                bounds.extend(latlng);
+            };
+            map.fitBounds(bounds);
+
+            var polygon = new google.maps.Polygon({
+                paths: commCoords,
+                strokeColor: "#999999",
+                strokeOpacity: 1,
+                strokeWeight: 2,
+                fillColor: "#dddddd",
+                fillOpacity: 0.1,
+                community: {id: communities[x].id}
+            });
+            polygon.setMap(map);
+            google.maps.event.addListener(polygon, 'click', function () {
+                if ($scope.notOverMarker) {
+                    $scope.getCommunity(this);
+                }
+            });
+            google.maps.event.addListener(polygon, 'mouseover', function () {
+                this.setOptions({
+                    fillColor: "#ffffff",
+                    fillOpacity: 0.5
+                });
+            });
+            google.maps.event.addListener(polygon, 'mouseout', function () {
+                this.setOptions({
+                    fillColor: "#dddddd",
+                    fillOpacity: 0.1
+                });
+            });
+        };
+    };
     // Añadir marcadores al mapa
     $scope.addMarkers = function(props, map, global) {
       $.each(props, function(i, prop) {
@@ -212,9 +259,6 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
         });
 
         $scope.markers.push(marker);
-        if(global){
-          $scope.markerCluster = new MarkerClusterer($scope.map, $scope.markers);        
-        }        
       });
     };
     // Llenar el mapa con la totalidad de los negocios
@@ -754,8 +798,9 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
 
         $('input, textarea').placeholder();
 
-        $scope.addMarkers($scope.props, $scope.map, true);
-        $scope.markerCluster = new MarkerClusterer($scope.map, $scope.markers);
+        //$scope.addMarkers($scope.props, $scope.map, true);
+        //$scope.markerCluster = new MarkerClusterer($scope.map, $scope.markers);
+        $scope.addPolygones($scope.communities, $scope.map);
         $scope.map.setCenter(new google.maps.LatLng(41.8337329, -
           87.7321555));
         $scope.map.setZoom(12);
