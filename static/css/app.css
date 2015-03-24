@@ -1010,6 +1010,17 @@ a.userHandler .counter {
     bottom: 10px;
     left: -70px;
 }
+    .leftNav ul li a span.navLabel.first {
+        font-size: 10px !important;
+        bottom: 10px;
+        left: -70px;
+    }
+.btn-full, .ddmenu {
+    width: 90%;
+}
+.btn-group-full {
+    width: 100%;
+}
 .expanded .leftNav ul li a span.navLabel {
     bottom: 2px;
     left: 0;
@@ -1999,14 +2010,14 @@ a.card ul.cardFeat li span, div.card ul.cardFeat li span {
         color: #333333;
     }
     select.app-select {
-        border: 2px solid #d1d3d4;
-        outline: none;
-        width: 96%;
-        padding: 2% 2%;
-        color: #333;
-        font-family: 'Open Sans', sans-serif;
-        border-radius: 4px;
-        background: #ffffff;
+          border: 2px solid #f48031;
+          outline: none;
+          width: 96%;
+          padding: 2% 2%;
+          color: #fff;
+          font-family: 'Open Sans', sans-serif;
+          border-radius: 4px;
+          background: #F97441;
     }
 h1.pageTitle {
     margin: 0;
@@ -5664,6 +5675,10 @@ li.toolevent a{
         display: block;
         margin: auto;
     }
+.app-select{
+    background: #f48031;
+    color: #fff;
+}
 .panelcommunity {
       position: absolute;
       /* top: 62px; */

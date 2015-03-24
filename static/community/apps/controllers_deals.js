@@ -21,7 +21,13 @@ myApp.config(
         }
       )
       .when(
-        "/:bizName/:bizCode", {
+          "/c/:commUrl", {
+          templateUrl: '/marius/community/',
+          controller: 'commonectrl'
+        }
+      )
+      .when(
+        "/b/:bizName/:bizCode", {
           templateUrl: '/marius/business/',
           controller: 'bizonectrl'
         }
@@ -34,9 +40,9 @@ myApp.config(
 );
 
 myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
-  'businessScope', 'search', '$rootScope', 'catmenu',
+  'businessScope', 'search', '$rootScope', 'catmenu', 'login', 'register',
   function($scope, $route, $routeParams, $http, businessScope, search,
-    $rootScope, catmenu) {
+    $rootScope, catmenu, login, register) {
     $scope.options = {
       zoom: 14,
       mapTypeId: 'Styled',
@@ -108,11 +114,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
       pane: "floatPane",
       enableEventPropagation: false
     });
-    var windowHeight;
-    var windowWidth;
-    var contentHeight;
-    var contentWidth;
-    var isDevice = true;
+    var infoWindow;
     $scope.selectedCommunity = [];
     $scope.currentPage = 0;
     $scope.pageSize = 6;
@@ -147,50 +149,54 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
     }
 
     // Añadir poligonos al mapa
-    $scope.addPolygones = function(communities, map){
-        for (var x=0; x<communities.length; x++){
-            var bounds = new google.maps.LatLngBounds();
-            var latlng;
-            if (!$.isPlainObject(communities[x].border)) {
-                communities[x].border = $.parseJSON(communities[x].border);
-            }
-            var commCoords = [];
-            var coords = communities[x].border.coordinates;
-            for (var n = 0; n < coords[0][0].length; n++) {
-                latlng = new google.maps.LatLng(coords[0][0][n][1], coords[0][0][n][0]);
-                commCoords.push(latlng);
-                bounds.extend(latlng);
-            };
-            map.fitBounds(bounds);
-
-            var polygon = new google.maps.Polygon({
-                paths: commCoords,
-                strokeColor: "#999999",
-                strokeOpacity: 1,
-                strokeWeight: 2,
-                fillColor: "#dddddd",
-                fillOpacity: 0.1,
-                community: {id: communities[x].id}
-            });
-            polygon.setMap(map);
-            google.maps.event.addListener(polygon, 'click', function () {
-                if ($scope.notOverMarker) {
-                    $scope.getCommunity(this);
-                }
-            });
-            google.maps.event.addListener(polygon, 'mouseover', function () {
-                this.setOptions({
-                    fillColor: "#ffffff",
-                    fillOpacity: 0.5
-                });
-            });
-            google.maps.event.addListener(polygon, 'mouseout', function () {
-                this.setOptions({
-                    fillColor: "#dddddd",
-                    fillOpacity: 0.1
-                });
-            });
+    $scope.addPolygones = function(community, map){;
+        var bounds = new google.maps.LatLngBounds();
+        var latlng;
+        if (!$.isPlainObject(community.border)) {
+            community.border = $.parseJSON(community.border);
+        }
+        var commCoords = [];
+        var coords = community.border.coordinates;
+        for (var n = 0; n < coords[0][0].length; n++) {
+            latlng = new google.maps.LatLng(coords[0][0][n][1], coords[0][0][n][0]);
+            commCoords.push(latlng);
+            bounds.extend(latlng);
         };
+        map.fitBounds(bounds);
+        var infoboxContentPol = '<div>' +
+          '<div>' +
+          '<div>' + community.label + '</div>' +
+          '</div>' +
+          '</div>';
+
+        var polygon = new google.maps.Polygon({
+            paths: commCoords,
+            strokeColor: "#ec5b24",
+            strokeOpacity: 1,
+            strokeWeight: 3,
+            fillColor: "#f48031",
+            fillOpacity: 0.1,
+            community: {id: community.id, label: community.label}
+        });
+
+        google.maps.event.addListener(polygon, 'mouseover', function(event){
+            infoWindow.setContent(community.label);
+            infoWindow.setPosition(bounds.getCenter());
+            infoWindow.open(map);
+        });
+        google.maps.event.addListener(polygon, 'mouseout', function () {
+            this.setOptions({
+                fillColor: "#f48031",
+                fillOpacity: 0.1
+            });
+            infoWindow.close();
+        });
+        google.maps.event.addListener(polygon, 'click', function(){
+            window.location.href = "#/c/" + community.url;
+            map.setCenter(bounds.getCenter());
+            map.setZoom(14);
+        })
+        polygon.setMap(map);
     };
     // Añadir marcadores al mapa
     $scope.addMarkers = function(props, map, global) {
@@ -208,13 +214,12 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
             new google.maps.Size(36, 36)
           ),
           draggable: false,
-          animation: google.maps.Animation.DROP,
+          animation: google.maps.Animation.DROP
         });
         var infoboxContent = '<div class="infoW">' +
           '<div class="propImg">' +
           '<img src="' + prop.image + '">' +
           '<div class="propBg">' +
-          '<div class="propPrice">' + prop.price + '</div>' +
           '<div class="propType">' + prop.type + '</div>' +
           '</div>' +
           '</div>' +
@@ -229,14 +234,6 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
           '<span class="fa fa-star"></span>' +
           '<span class="fa fa-star-o"></span>' +
           '</div>' +
-          '<ul class="propFeat">' +
-          '<li><span class="fa fa-moon-o"></span> ' + prop.bedrooms +
-          '</li>' +
-          '<li><span class="icon-drop"></span> ' + prop.bathrooms +
-          '</li>' +
-          '<li><span class="icon-frame"></span> ' + prop.area +
-          '</li>' +
-          '</ul>' +
           '<div class="clearfix"></div>' +
           '<div class="infoButtons">' +
           '<a class="btn btn-sm btn-round btn-gray btn-o closeInfo">Close</a>' +
@@ -291,16 +288,12 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
           var dict_marker = {
             id: bizmarker.id,
             title: bizmarker.name,
-            url: bizmarker.slug + '/' + bizmarker.code,
+            url: 'b/' + bizmarker.slug + '/' + bizmarker.code,
             code: bizmarker.code,
             image: '/media/' + bizmarker.image,
             type: bizmarker.category,
             view: bizmarker.url,
-            price: '$1,550,000',
             address: bizmarker.address,
-            bedrooms: '3',
-            bathrooms: '2',
-            area: '3430 Sq Ft',
             position: {
               lat: parseFloat(r[1]),
               lng: parseFloat(r[0])
@@ -310,497 +303,14 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
           $scope.props.push(dict_marker);
         });
 
-        // calculations for elements that changes size on window resize
-        var windowResizeHandler = function() {
-          windowHeight = window.innerHeight;
-          windowWidth = $(window).width();
-          contentHeight = windowHeight - $('#header').height();
-          contentWidth = $('#content').width();
 
-          $('#leftSide').height(contentHeight);
-          $('.closeLeftSide').height(contentHeight);
-          $('#wrapper').height(contentHeight);
-          $('#mapView').height(contentHeight);
-          $('#content').height(contentHeight);
-          setTimeout(function() {
-            $('.commentsFormWrapper').width(contentWidth);
-          }, 300);
-
-          if ($scope.map) {
-            google.maps.event.trigger($scope.map, 'resize');
-          }
-
-          // Add custom scrollbar for left side navigation
-          if (windowWidth > 767) {
-            $('.bigNav').slimScroll({
-              height: contentHeight - $('.leftUserWraper').height()
-            });
-          } else {
-            $('.bigNav').slimScroll({
-              height: contentHeight
-            });
-          }
-          if ($('.bigNav').parent('.slimScrollDiv').size() > 0) {
-            $('.bigNav').parent().replaceWith($('.bigNav'));
-            if (windowWidth > 767) {
-              $('.bigNav').slimScroll({
-                height: contentHeight - $('.leftUserWraper').height()
-              });
-            } else {
-              $('.bigNav').slimScroll({
-                height: contentHeight
-              });
-            }
-          }
-
-          // reposition of prices and area reange sliders tooltip
-          var priceSliderRangeLeft = parseInt($(
-            '.priceSlider .ui-slider-range').css('left'));
-          var priceSliderRangeWidth = $(
-            '.priceSlider .ui-slider-range').width();
-          var priceSliderLeft = priceSliderRangeLeft + (
-            priceSliderRangeWidth / 2) - ($(
-            '.priceSlider .sliderTooltip').width() / 2);
-          $('.priceSlider .sliderTooltip').css('left',
-            priceSliderLeft);
-
-          var areaSliderRangeLeft = parseInt($(
-            '.areaSlider .ui-slider-range').css('left'));
-          var areaSliderRangeWidth = $(
-            '.areaSlider .ui-slider-range').width();
-          var areaSliderLeft = areaSliderRangeLeft + (
-            areaSliderRangeWidth / 2) - ($(
-            '.areaSlider .sliderTooltip').width() / 2);
-          $('.areaSlider .sliderTooltip').css('left',
-            areaSliderLeft);
-        }
-
-        var repositionTooltip = function(e, ui) {
-          var div = $(ui.handle).data("bs.tooltip").$tip[0];
-          var pos = $.extend({}, $(ui.handle).offset(), {
-            width: $(ui.handle).get(0).offsetWidth,
-            height: $(ui.handle).get(0).offsetHeight
-          });
-          var actualWidth = div.offsetWidth;
-
-          var tp = {
-            left: pos.left + pos.width / 2 - actualWidth / 2
-          }
-          $(div).offset(tp);
-
-          $(div).find(".tooltip-inner").text(ui.value);
-        }
-
-        windowResizeHandler();
-
-        $(window).resize(function() {
-          windowResizeHandler();
-        });
-
-        setTimeout(function() {
-          $('body').removeClass('notransition');
-
-          if ($('#address').length > 0) {
-            $scope.newMarker = new google.maps.Marker({
-              position: new google.maps.LatLng(40.6984237, -
-                73.9890044),
-              map: $scope.map,
-              icon: new google.maps.MarkerImage(
-                'images/marker-new.png',
-                null,
-                null,
-                // new google.maps.Point(0,0),
-                null,
-                new google.maps.Size(36, 36)
-              ),
-              draggable: true,
-              animation: google.maps.Animation.DROP,
-            });
-
-            google.maps.event.addListener(newMarker, "mouseup",
-              function(event) {
-                var latitude = this.position.lat();
-                var longitude = this.position.lng();
-                $('#latitude').text(this.position.lat());
-                $('#longitude').text(this.position.lng());
-              });
-          }
-
-        }, 300);
-
-        if (!(('ontouchstart' in window) || window.DocumentTouch &&
-            document instanceof DocumentTouch)) {
-          $('body').addClass('no-touch');
-          isDevice = false;
-        }
-
-        // Header search icon transition
-        $('.search input').focus(function() {
-          $('.searchIcon').addClass('active');
-        });
-        $('.search input').blur(function() {
-          $('.searchIcon').removeClass('active');
-        });
-
-        // Notifications list items pulsate animation
-        $('.notifyList a').hover(
-          function() {
-            $(this).children('.pulse').addClass('pulsate');
-          },
-          function() {
-            $(this).children('.pulse').removeClass('pulsate');
-          }
-        );
-
-        // Exapnd left side navigation
-        var navExpanded = false;
-        $('.navHandler, .closeLeftSide').click(function() {
-          if (!navExpanded) {
-            $('.logo').addClass('expanded');
-            $('#leftSide').addClass('expanded');
-            if (windowWidth < 768) {
-              $('.closeLeftSide').show();
-            }
-            $('.hasSub').addClass('hasSubActive');
-            $('.leftNav').addClass('bigNav');
-            if (windowWidth > 767) {
-              $('.full').addClass('m-full');
-            }
-            windowResizeHandler();
-            navExpanded = true;
-          } else {
-            $('.logo').removeClass('expanded');
-            $('#leftSide').removeClass('expanded');
-            $('.closeLeftSide').hide();
-            $('.hasSub').removeClass('hasSubActive');
-            $('.bigNav').slimScroll({
-              destroy: true
-            });
-            $('.leftNav').removeClass('bigNav');
-            $('.leftNav').css('overflow', 'visible');
-            $('.full').removeClass('m-full');
-            navExpanded = false;
-          }
-        });
-
-        // functionality for map manipulation icon on mobile devices
-        $('.mapHandler').click(function() {
-          if ($('#mapView').hasClass('mob-min') ||
-            $('#mapView').hasClass('mob-max') ||
-            $('#content').hasClass('mob-min') ||
-            $('#content').hasClass('mob-max')) {
-            $('#mapView').toggleClass('mob-max');
-            $('#content').toggleClass('mob-min');
-          } else {
-            $('#mapView').toggleClass('min');
-            $('#content').toggleClass('max');
-          }
-
-          setTimeout(function() {
-            var priceSliderRangeLeft = parseInt($(
-              '.priceSlider .ui-slider-range').css('left'));
-            var priceSliderRangeWidth = $(
-              '.priceSlider .ui-slider-range').width();
-            var priceSliderLeft = priceSliderRangeLeft + (
-              priceSliderRangeWidth / 2) - ($(
-              '.priceSlider .sliderTooltip').width() / 2);
-            $('.priceSlider .sliderTooltip').css('left',
-              priceSliderLeft);
-
-            var areaSliderRangeLeft = parseInt($(
-              '.areaSlider .ui-slider-range').css('left'));
-            var areaSliderRangeWidth = $(
-              '.areaSlider .ui-slider-range').width();
-            var areaSliderLeft = areaSliderRangeLeft + (
-              areaSliderRangeWidth / 2) - ($(
-              '.areaSlider .sliderTooltip').width() / 2);
-            $('.areaSlider .sliderTooltip').css('left',
-              areaSliderLeft);
-
-            if ($scope.map) {
-              google.maps.event.trigger(map, 'resize');
-            }
-
-            $('.commentsFormWrapper').width($('#content').width());
-          }, 300);
-
-        });
-
-        // Expand left side sub navigation menus
-        $(document).on("click", '.hasSubActive', function() {
-          $(this).toggleClass('active');
-          $(this).children('ul').toggleClass('bigList');
-          $(this).children('a').children('.arrowRight').toggleClass(
-            'fa-angle-down');
-        });
-
-        if (isDevice) {
-          $('.hasSub').click(function() {
-            $('.leftNav ul li').not(this).removeClass('onTap');
-            $(this).toggleClass('onTap');
-          });
-        }
-
-        // functionality for custom dropdown select list
-        $('.dropdown-select li a').click(function() {
-          if (!($(this).parent().hasClass('disabled'))) {
-            $(this).prev().prop("checked", true);
-            $(this).parent().siblings().removeClass('active');
-            $(this).parent().addClass('active');
-            $(this).parent().parent().siblings('.dropdown-toggle')
-              .children('.dropdown-label').html($(this).text());
-          }
-        });
-
-        $('.priceSlider').slider({
-          range: true,
-          min: 0,
-          max: 2000000,
-          values: [500000, 1500000],
-          step: 10000,
-          slide: function(event, ui) {
-            $('.priceSlider .sliderTooltip .stLabel').html(
-              '$' + ui.values[0].toString().replace(
-                /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") +
-              ' <span class="fa fa-arrows-h"></span> ' +
-              '$' + ui.values[1].toString().replace(
-                /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")
-            );
-            var priceSliderRangeLeft = parseInt($(
-              '.priceSlider .ui-slider-range').css('left'));
-            var priceSliderRangeWidth = $(
-              '.priceSlider .ui-slider-range').width();
-            var priceSliderLeft = priceSliderRangeLeft + (
-              priceSliderRangeWidth / 2) - ($(
-              '.priceSlider .sliderTooltip').width() / 2);
-            $('.priceSlider .sliderTooltip').css('left',
-              priceSliderLeft);
-          }
-        });
-        $('.priceSlider .sliderTooltip .stLabel').html(
-          '$' + $('.priceSlider').slider('values', 0).toString().replace(
-            /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") +
-          ' <span class="fa fa-arrows-h"></span> ' +
-          '$' + $('.priceSlider').slider('values', 1).toString().replace(
-            /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")
-        );
-        var priceSliderRangeLeft = parseInt($(
-          '.priceSlider .ui-slider-range').css('left'));
-        var priceSliderRangeWidth = $('.priceSlider .ui-slider-range')
-          .width();
-        var priceSliderLeft = priceSliderRangeLeft + (
-          priceSliderRangeWidth / 2) - ($(
-          '.priceSlider .sliderTooltip').width() / 2);
-        $('.priceSlider .sliderTooltip').css('left', priceSliderLeft);
-
-        $('.areaSlider').slider({
-          range: true,
-          min: 0,
-          max: 20000,
-          values: [5000, 10000],
-          step: 10,
-          slide: function(event, ui) {
-            $('.areaSlider .sliderTooltip .stLabel').html(
-              ui.values[0].toString().replace(
-                /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") + ' Sq Ft' +
-              ' <span class="fa fa-arrows-h"></span> ' +
-              ui.values[1].toString().replace(
-                /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") + ' Sq Ft'
-            );
-            var areaSliderRangeLeft = parseInt($(
-              '.areaSlider .ui-slider-range').css('left'));
-            var areaSliderRangeWidth = $(
-              '.areaSlider .ui-slider-range').width();
-            var areaSliderLeft = areaSliderRangeLeft + (
-              areaSliderRangeWidth / 2) - ($(
-              '.areaSlider .sliderTooltip').width() / 2);
-            $('.areaSlider .sliderTooltip').css('left',
-              areaSliderLeft);
-          }
-        });
-        $('.areaSlider .sliderTooltip .stLabel').html(
-          $('.areaSlider').slider('values', 0).toString().replace(
-            /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") + ' Sq Ft' +
-          ' <span class="fa fa-arrows-h"></span> ' +
-          $('.areaSlider').slider('values', 1).toString().replace(
-            /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") + ' Sq Ft'
-        );
-        var areaSliderRangeLeft = parseInt($(
-          '.areaSlider .ui-slider-range').css('left'));
-        var areaSliderRangeWidth = $('.areaSlider .ui-slider-range').width();
-        var areaSliderLeft = areaSliderRangeLeft + (
-          areaSliderRangeWidth / 2) - ($(
-          '.areaSlider .sliderTooltip').width() / 2);
-        $('.areaSlider .sliderTooltip').css('left', areaSliderLeft);
-
-        $('.volume .btn-round-right').click(function() {
-          var currentVal = parseInt($(this).siblings('input').val());
-          if (currentVal < 10) {
-            $(this).siblings('input').val(currentVal + 1);
-          }
-        });
-        $('.volume .btn-round-left').click(function() {
-          var currentVal = parseInt($(this).siblings('input').val());
-          if (currentVal > 1) {
-            $(this).siblings('input').val(currentVal - 1);
-          }
-        });
-
-        $('.handleFilter').click(function() {
-          $('.filterForm').slideToggle(200);
-        });
-
-        //Enable swiping
-        $(".carousel-inner").swipe({
-          swipeLeft: function(event, direction, distance,
-            duration, fingerCount) {
-            $(this).parent().carousel('next');
-          },
-          swipeRight: function() {
-            $(this).parent().carousel('prev');
-          }
-        });
-
-        $(".carousel-inner .card").click(function() {
-          window.open($(this).attr('data-linkto'), '_self');
-        });
-
-        $('#content').scroll(function() {
-          if ($('.comments').length > 0) {
-            var visible = $('.comments').visible(true);
-            if (visible) {
-              $('.commentsFormWrapper').addClass('active');
-            } else {
-              $('.commentsFormWrapper').removeClass('active');
-            }
-          }
-        });
-
-        $('.btn').click(function() {
-          if ($(this).is('[data-toggle-class]')) {
-            $(this).toggleClass('active ' + $(this).attr(
-              'data-toggle-class'));
-          }
-        });
-
-        $('.tabsWidget .tab-scroll').slimScroll({
-          height: '235px',
-          size: '5px',
-          position: 'right',
-          color: '#939393',
-          alwaysVisible: false,
-          distance: '5px',
-          railVisible: false,
-          railColor: '#222',
-          railOpacity: 0.3,
-          wheelStep: 10,
-          allowPageScroll: true,
-          disableFadeOut: false
-        });
-
-        $('.progress-bar[data-toggle="tooltip"]').tooltip();
-        $('.tooltipsContainer .btn').tooltip();
-
-        $("#slider1").slider({
-          range: "min",
-          value: 50,
-          min: 1,
-          max: 100,
-          slide: repositionTooltip,
-          stop: repositionTooltip
-        });
-        $("#slider1 .ui-slider-handle:first").tooltip({
-          title: $("#slider1").slider("value"),
-          trigger: "manual"
-        }).tooltip("show");
-
-        $("#slider2").slider({
-          range: "max",
-          value: 70,
-          min: 1,
-          max: 100,
-          slide: repositionTooltip,
-          stop: repositionTooltip
-        });
-        $("#slider2 .ui-slider-handle:first").tooltip({
-          title: $("#slider2").slider("value"),
-          trigger: "manual"
-        }).tooltip("show");
-
-        $("#slider3").slider({
-          range: true,
-          min: 0,
-          max: 500,
-          values: [190, 350],
-          slide: repositionTooltip,
-          stop: repositionTooltip
-        });
-        $("#slider3 .ui-slider-handle:first").tooltip({
-          title: $("#slider3").slider("values", 0),
-          trigger: "manual"
-        }).tooltip("show");
-        $("#slider3 .ui-slider-handle:last").tooltip({
-          title: $("#slider3").slider("values", 1),
-          trigger: "manual"
-        }).tooltip("show");
-
-        $('#autocomplete').autocomplete({
-          source: ["ActionScript", "AppleScript", "Asp", "BASIC",
-            "C", "C++", "Clojure", "COBOL", "ColdFusion",
-            "Erlang", "Fortran", "Groovy", "Haskell", "Java",
-            "JavaScript", "Lisp", "Perl", "PHP", "Python",
-            "Ruby", "Scala", "Scheme"
-          ],
-          focus: function(event, ui) {
-            var label = ui.item.label;
-            var value = ui.item.value;
-            var me = $(this);
-            setTimeout(function() {
-              me.val(value);
-            }, 1);
-          }
-        });
-
-        $('#tags').tagsInput({
-          'height': 'auto',
-          'width': '100%',
-          'defaultText': 'Add a tag',
-        });
-
-        $('#datepicker').datepicker();
-
-        // functionality for autocomplete address field
-        if ($('#address').length > 0) {
-          var address = document.getElementById('address');
-          var addressAuto = new google.maps.places.Autocomplete(
-            address);
-
-          google.maps.event.addListener(addressAuto, 'place_changed',
-            function() {
-              var place = addressAuto.getPlace();
-
-              if (!place.geometry) {
-                return;
-              }
-              if (place.geometry.viewport) {
-                $scope.map.fitBounds(place.geometry.viewport);
-              } else {
-                $scope.map.setCenter(place.geometry.location);
-              }
-              $scope.newMarker.setPosition(place.geometry.location);
-              $scope.newMarker.setVisible(true);
-              $('#latitude').text($scope.newMarker.getPosition().lat());
-              $('#longitude').text(newMarker.getPosition().lng());
-
-              return false;
-            });
-        }
-
-        $('input, textarea').placeholder();
 
         //$scope.addMarkers($scope.props, $scope.map, true);
         //$scope.markerCluster = new MarkerClusterer($scope.map, $scope.markers);
-        $scope.addPolygones($scope.communities, $scope.map);
+        angular.forEach($scope.communities, function(community){
+            infoWindow = new google.maps.InfoWindow();
+            $scope.addPolygones(community, $scope.map);
+        });
         $scope.map.setCenter(new google.maps.LatLng(41.8337329, -
           87.7321555));
         $scope.map.setZoom(12);
@@ -949,9 +459,6 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
                         price: '$1,550,000',
                         address: bizitem.address,
                         view: bizitem.url,
-                        bedrooms: '3',
-                        bathrooms: '2',
-                        area: '3430 Sq Ft',
                         position: {
                           lat: parseFloat(r[1]),
                           lng: parseFloat(r[0])
@@ -995,9 +502,6 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
                       price: '$1,550,000',
                       address: bizitem.address,
                       view: bizitem.url,
-                      bedrooms: '3',
-                      bathrooms: '2',
-                      area: '3430 Sq Ft',
                       position: {
                         lat: parseFloat(r[1]),
                         lng: parseFloat(r[0])
@@ -1038,12 +542,8 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
                   code: bizitem.code,
                   image: '/media/' + bizitem.image,
                   type: bizitem.category,
-                  price: '$1,550,000',
                   address: bizitem.address,
                   view: bizitem.url,
-                  bedrooms: '3',
-                  bathrooms: '2',
-                  area: '3430 Sq Ft',
                   position: {
                     lat: parseFloat(r[1]),
                     lng: parseFloat(r[0])
@@ -1080,12 +580,8 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
                 code: bizitem.code,
                 image: '/media/' + bizitem.image,
                 type: bizitem.category,
-                price: '$1,550,000',
                 address: bizitem.address,
                 view: bizitem.url,
-                bedrooms: '3',
-                bathrooms: '2',
-                area: '3430 Sq Ft',
                 position: {
                   lat: parseFloat(r[1]),
                   lng: parseFloat(r[0])
@@ -1153,12 +649,8 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
                         code: bizitem.code,
                         image: '/media/' + bizitem.image,
                         type: bizitem.category,
-                        price: '$1,550,000',
                         address: bizitem.address,
                         view: bizitem.url,
-                        bedrooms: '3',
-                        bathrooms: '2',
-                        area: '3430 Sq Ft',
                         position: {
                           lat: parseFloat(r[1]),
                           lng: parseFloat(r[0])
@@ -1199,12 +691,8 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
                       code: bizitem.code,
                       image: '/media/' + bizitem.image,
                       type: bizitem.category,
-                      price: '$1,550,000',
                       address: bizitem.address,
                       view: bizitem.url,
-                      bedrooms: '3',
-                      bathrooms: '2',
-                      area: '3430 Sq Ft',
                       position: {
                         lat: parseFloat(r[1]),
                         lng: parseFloat(r[0])
@@ -1245,12 +733,8 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
                   code: bizitem.code,
                   image: '/media/' + bizitem.image,
                   type: bizitem.category,
-                  price: '$1,550,000',
                   address: bizitem.address,
                   view: bizitem.url,
-                  bedrooms: '3',
-                  bathrooms: '2',
-                  area: '3430 Sq Ft',
                   position: {
                     lat: parseFloat(r[1]),
                     lng: parseFloat(r[0])
@@ -1287,12 +771,8 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
                 code: bizitem.code,
                 image: '/media/' + bizitem.image,
                 type: bizitem.category,
-                price: '$1,550,000',
                 address: bizitem.address,
                 view: bizitem.url,
-                bedrooms: '3',
-                bathrooms: '2',
-                area: '3430 Sq Ft',
                 position: {
                   lat: parseFloat(r[1]),
                   lng: parseFloat(r[0])
@@ -1360,12 +840,8 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
                         code: bizitem.code,
                         image: '/media/' + bizitem.image,
                         type: bizitem.category,
-                        price: '$1,550,000',
                         address: bizitem.address,
                         view: bizitem.url,
-                        bedrooms: '3',
-                        bathrooms: '2',
-                        area: '3430 Sq Ft',
                         position: {
                           lat: parseFloat(r[1]),
                           lng: parseFloat(r[0])
@@ -1406,12 +882,8 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
                       code: bizitem.code,
                       image: '/media/' + bizitem.image,
                       type: bizitem.category,
-                      price: '$1,550,000',
                       address: bizitem.address,
                       view: bizitem.url,
-                      bedrooms: '3',
-                      bathrooms: '2',
-                      area: '3430 Sq Ft',
                       position: {
                         lat: parseFloat(r[1]),
                         lng: parseFloat(r[0])
@@ -1452,12 +924,8 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
                   code: bizitem.code,
                   image: '/media/' + bizitem.image,
                   type: bizitem.category,
-                  price: '$1,550,000',
                   address: bizitem.address,
                   view: bizitem.url,
-                  bedrooms: '3',
-                  bathrooms: '2',
-                  area: '3430 Sq Ft',
                   position: {
                     lat: parseFloat(r[1]),
                     lng: parseFloat(r[0])
@@ -1494,12 +962,8 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
                 code: bizitem.code,
                 image: '/media/' + bizitem.image,
                 type: bizitem.category,
-                price: '$1,550,000',
                 address: bizitem.address,
                 view: bizitem.url,
-                bedrooms: '3',
-                bathrooms: '2',
-                area: '3430 Sq Ft',
                 position: {
                   lat: parseFloat(r[1]),
                   lng: parseFloat(r[0])
@@ -1567,12 +1031,8 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
                         code: bizitem.code,
                         image: '/media/' + bizitem.image,
                         type: bizitem.category,
-                        price: '$1,550,000',
                         address: bizitem.address,
                         view: bizitem.url,
-                        bedrooms: '3',
-                        bathrooms: '2',
-                        area: '3430 Sq Ft',
                         position: {
                           lat: parseFloat(r[1]),
                           lng: parseFloat(r[0])
@@ -1613,12 +1073,8 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
                       code: bizitem.code,
                       image: '/media/' + bizitem.image,
                       type: bizitem.category,
-                      price: '$1,550,000',
                       address: bizitem.address,
                       view: bizitem.url,
-                      bedrooms: '3',
-                      bathrooms: '2',
-                      area: '3430 Sq Ft',
                       position: {
                         lat: parseFloat(r[1]),
                         lng: parseFloat(r[0])
@@ -3163,9 +2619,9 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
 
 myApp.controller('bizonectrl', ['$scope', '$rootScope', '$routeParams',
   '$location', '$http', 'businessOneScope', 'search', '$sce', 'catmenu',
-  '$anchorScroll',
+  '$anchorScroll', 'login', 'register',
   function($scope, $rootScope, $routeParams, $location, $http,
-    businessOneScope, search, $sce, catmenu, $anchorScroll) {
+    businessOneScope, search, $sce, catmenu, $anchorScroll, login, register) {
     $scope.bizName = $routeParams.bizName;
     $scope.bizCode = $routeParams.bizCode;
     $scope.bizInfo;
@@ -3641,29 +3097,29 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope', '$routeParams',
           } else {
             // alert an error message when the route could nog be calculated.
             if (status == 'ZERO_RESULTS') {
-              alert(
+              console.log(
                 'No route could be found between the origin and destination.'
               );
             } else if (status == 'UNKNOWN_ERROR') {
-              alert(
+              console.log(
                 'A directions request could not be processed due to a server error. The request may succeed if you try again.'
               );
             } else if (status == 'REQUEST_DENIED') {
-              alert(
+              console.log(
                 'This webpage is not allowed to use the directions service.'
               );
             } else if (status == 'OVER_QUERY_LIMIT') {
-              alert(
+              console.log(
                 'The webpage has gone over the requests limit in too short a period of time.'
               );
             } else if (status == 'NOT_FOUND') {
-              alert(
+              console.log(
                 'At least one of the origin, destination, or waypoints could not be geocoded.'
               );
             } else if (status == 'INVALID_REQUEST') {
-              alert('The DirectionsRequest provided was invalid.');
+              console.log('The DirectionsRequest provided was invalid.');
             } else {
-              alert(
+              console.log(
                 "There was an unknown error in your request. Requeststatus: nn" +
                 status);
             }
@@ -3675,6 +3131,247 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope', '$routeParams',
     }
   }
 ]);
+
+myApp.controller('commonectrl', ['$scope', '$rootScope', '$routeParams',
+  '$location', '$http', 'communityOneScope', 'search', '$sce', 'catmenu',
+  '$anchorScroll', 'login', 'register',
+  function($scope, $rootScope, $routeParams, $location, $http,
+    communityOneScope, search, $sce, catmenu, $anchorScroll, login, register) {
+    $scope.commurl = $routeParams.commUrl;
+    $scope.communities;
+    $scope.community;
+    $scope.model = {};
+    $scope.selectedCommunity = [];
+    $scope.currentPage = 0;
+    $scope.pageSize = 6;
+    $scope.options = {
+      zoom: 14,
+      mapTypeId: 'Styled',
+      disableDefaultUI: true,
+      mapTypeControlOptions: {
+        mapTypeIds: ['Styled']
+      }
+    };
+    var infobox = new InfoBox({
+      disableAutoPan: false,
+      maxWidth: 202,
+      pixelOffset: new google.maps.Size(-101, -285),
+      zIndex: null,
+      boxStyle: {
+        background: "url('/static/images/infobox-bg.png') no-repeat",
+        opacity: 1,
+        width: "202px",
+        height: "245px"
+      },
+      closeBoxMargin: "28px 26px 0px 0px",
+      closeBoxURL: "",
+      infoBoxClearance: new google.maps.Size(1, 1),
+      pane: "floatPane",
+      enableEventPropagation: false
+    });
+    var infoWindow;
+    $scope.styles = [{
+      stylers: [{
+        hue: "#cccccc"
+      }, {
+        saturation: -100
+      }]
+    }, {
+      featureType: "road",
+      elementType: "geometry",
+      stylers: [{
+        lightness: 100
+      }, {
+        visibility: "simplified"
+      }]
+    }, {
+      featureType: "road",
+      elementType: "labels",
+      stylers: [{
+        visibility: "on"
+      }]
+    }, {
+      featureType: "poi",
+      stylers: [{
+        visibility: "off"
+      }]
+    }];
+    var styledMapType = new google.maps.StyledMapType($scope.styles, {
+      name: 'Styled'
+    });
+    $scope.map = new google.maps.Map(document.getElementById('mapView'),
+      $scope.options);
+    $scope.map.mapTypes.set('Styled', styledMapType);
+    $scope.map.setZoom(14);
+    $scope.newMarker = null;
+    $scope.selectedCommunity = [];
+    $scope.markers = [];
+    $scope.props = [];
+    $scope.addPolygones = function(community, map){;
+        var bounds = new google.maps.LatLngBounds();
+        var latlng;
+        if (!$.isPlainObject(community.border)) {
+            community.border = $.parseJSON(community.border);
+        }
+        var commCoords = [];
+        var coords = community.border.coordinates;
+        for (var n = 0; n < coords[0][0].length; n++) {
+            latlng = new google.maps.LatLng(coords[0][0][n][1], coords[0][0][n][0]);
+            commCoords.push(latlng);
+            bounds.extend(latlng);
+        };
+        map.fitBounds(bounds);
+        var infoboxContentPol = '<div>' +
+          '<div>' +
+          '<div>' + community.label + '</div>' +
+          '</div>' +
+          '</div>';
+
+        var polygon = new google.maps.Polygon({
+            paths: commCoords,
+            strokeColor: "#ec5b24",
+            strokeOpacity: 1,
+            strokeWeight: 3,
+            fillColor: "#f48031",
+            fillOpacity: 0.1,
+            community: {id: community.id, label: community.label}
+        });
+
+        google.maps.event.addListener(polygon, 'mouseover', function(event){
+            infoWindow.setContent(community.label);
+            infoWindow.setPosition(bounds.getCenter());
+            infoWindow.open(map);
+        });
+        google.maps.event.addListener(polygon, 'mouseout', function () {
+            this.setOptions({
+                fillColor: "#f48031",
+                fillOpacity: 0.1
+            });
+            infoWindow.close();
+        });
+        google.maps.event.addListener(polygon, 'click', function(){
+            window.location.href = "#/c/" + community.url;
+            map.setCenter(bounds.getCenter());
+            map.setZoom(14);
+        })
+        polygon.setMap(map);
+    };
+    // Añadir marcadores al mapa
+    $scope.addMarkers = function(props, map, global) {
+      $.each(props, function(i, prop) {
+        var latlng = new google.maps.LatLng(prop.position.lat, prop.position
+          .lng);
+        var marker = new google.maps.Marker({
+          position: latlng,
+          map: map,
+          icon: new google.maps.MarkerImage(
+            prop.markerIcon,
+            null,
+            null,
+            null,
+            new google.maps.Size(36, 36)
+          ),
+          draggable: false,
+          animation: google.maps.Animation.DROP
+        });
+        var infoboxContent = '<div class="infoW">' +
+          '<div class="propImg">' +
+          '<img src="' + prop.image + '">' +
+          '<div class="propBg">' +
+          '<div class="propType">' + prop.type + '</div>' +
+          '</div>' +
+          '</div>' +
+          '<div class="paWrapper">' +
+          '<div class="propTitle">' + prop.title + '</div>' +
+          '<div class="propAddress">' + prop.address + '</div>' +
+          '</div>' +
+          '<div class="propRating">' +
+          '<span class="fa fa-star"></span>' +
+          '<span class="fa fa-star"></span>' +
+          '<span class="fa fa-star"></span>' +
+          '<span class="fa fa-star"></span>' +
+          '<span class="fa fa-star-o"></span>' +
+          '</div>' +
+          '<div class="clearfix"></div>' +
+          '<div class="infoButtons">' +
+          '<a class="btn btn-sm btn-round btn-gray btn-o closeInfo">Close</a>' +
+          '<a href="#/' + prop.url +
+          '" class="btn btn-sm btn-round btn-green viewInfo" target="_self">View</a>' +
+          '</div>' +
+          '</div>';
+
+        google.maps.event.addListener(marker, 'click', (function(
+          marker, i) {
+          return function() {
+            infobox.setContent(infoboxContent);
+            infobox.open(map, marker);
+          }
+        })(marker, i));
+
+
+        $(document).on('click', '.closeInfo', function() {
+          infobox.open(null, null);
+        });
+
+        $scope.markers.push(marker);
+      });
+    };
+    communityOneScope.getAllItem($scope.commurl).then(function(data){
+        console.log(data);
+        $scope.communities = data.communities;
+        $scope.community = data.community;
+        $scope.model.business = data.businesses;
+        $scope.model.businesstmp = data.businesses;
+        angular.forEach($scope.model.businesstmp, function(bizmarker) {
+          var marker_icon;
+          if (bizmarker.category === "Lodging and Travel") {
+            marker_icon = "/static/images/Auto_location-01.png";
+          } else if (bizmarker.category === "Health and Medical") {
+            marker_icon = "/static/images/Health_location-01.png";
+          } else if (bizmarker.category === "Beauty and Spas") {
+            marker_icon = "/static/images/Beauty_location-01.png";
+          } else if (bizmarker.category === "Restaurants") {
+            marker_icon = "/static/images/Food_location-01.png";
+          } else {
+            marker_icon =
+              "/static/images/Services_location-01.png";
+          }
+          var geo = bizmarker.geo || undefined;
+          var r = geo.slice(7, geo.length - 1).split(' ') || [];
+          var dict_marker = {
+            id: bizmarker.id,
+            title: bizmarker.name,
+            url: 'b/' + bizmarker.slug + '/' + bizmarker.code,
+            code: bizmarker.code,
+            image: '/media/' + bizmarker.image,
+            type: bizmarker.category,
+            view: bizmarker.url,
+            address: bizmarker.address,
+            position: {
+              lat: parseFloat(r[1]),
+              lng: parseFloat(r[0])
+            },
+            markerIcon: marker_icon
+          };
+          $scope.props.push(dict_marker);
+        });
+
+        $scope.numberOfPages = function() {
+          return Math.ceil($scope.model.business.length / $scope.pageSize);
+        };
+
+        $scope.addMarkers($scope.props, $scope.map, true);
+        $scope.addPolygones($scope.community, $scope.map);
+        //$scope.markerCluster = new MarkerClusterer($scope.map, $scope.markers);
+        //angular.forEach($scope.communities, function(community){
+        //    infoWindow = new google.maps.InfoWindow();
+        //
+        //});
+        $scope.map.setZoom(14);
+    }, function(errorMessage){
+       console.log(errorMessage);
+    });
+}]);
 
 myApp.filter('startFrom', function() {
   return function(input, start) {
@@ -3731,6 +3428,58 @@ myApp.factory('businessOneScope', function($http, $q) {
         deferred.resolve(data);
       }).error(function() {
         deferred.reject("An error occured while fetching items");
+      });
+      return deferred.promise;
+    }
+  }
+});
+
+myApp.factory('communityOneScope', function($http, $q) {
+  return {
+    apiPath: '/communities/c/businesses/',
+    getAllItem: function(url_name) {
+      var deferred = $q.defer();
+      $http.get(this.apiPath, {
+        params: {
+          url: url_name
+        }
+      }).success(function(data) {
+        deferred.resolve(data);
+      }).error(function() {
+        deferred.reject("An error occured while fetching items");
+      });
+      return deferred.promise;
+    }
+  }
+});
+
+myApp.factory('login', function($http, $q) {
+  return {
+    apiPath: '/user/login/ajax',
+    signIn: function(metadata) {
+      var deferred = $q.defer();
+      $http.get(this.apiPath, {
+        params: metadata
+      }).success(function(data) {
+        deferred.resolve(data);
+      }).error(function() {
+        deferred.reject("An error occured!");
+      });
+      return deferred.promise;
+    }
+  }
+});
+myApp.factory('register', function($http, $q) {
+  return {
+    apiPath: '/communities/fake-login/',
+    signUp: function(metadata) {
+      var deferred = $q.defer();
+      $http.get(this.apiPath, {
+        params: metadata
+      }).success(function(data) {
+        deferred.resolve(data);
+      }).error(function() {
+        deferred.reject("An error occured!");
       });
       return deferred.promise;
     }

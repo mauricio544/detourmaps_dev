@@ -155,7 +155,7 @@
     <ul>
         <li class="col-xs-12 col-sm-12 col-md-6 col-lg-6 result" ng-repeat="biz in model.business | startFrom:currentPage*pageSize | limitTo:pageSize">
             <section class="app-biz">
-                <a href="#/b/[[ biz.slug ]]/[[ biz.code ]]">
+                <a href="#/[[ biz.slug ]]/[[ biz.code ]]">
                     <figure>
                         <img src="/media/[[ biz.image ]]" alt="[[ biz.name ]]" />
                     </figure>

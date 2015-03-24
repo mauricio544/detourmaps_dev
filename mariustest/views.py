@@ -14,3 +14,7 @@ def deals(request):
 
 def business(request):
     return render_to_response('community/business.html', {}, context_instance=RequestContext(request))
+
+
+def community(request):
+    return render_to_response('community/community.html', {}, context_instance=RequestContext(request))

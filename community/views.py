@@ -3318,7 +3318,8 @@ def all_business_json(request):
         dict_community = {
             'id': i.id,
             'label': i.name,
-            'border': force_unicode(GEOSGeometry(i.borders).json)
+            'border': force_unicode(GEOSGeometry(i.borders).json),
+            'url': i.url_name
         }
         lista_communities.append(dict_community)#communities
     categories_object = Category.objects.all().order_by('name')
@@ -3457,6 +3458,171 @@ def all_business_json(request):
     dict_super_dupper = {
         'communities': lista_communities,
         'categories': lista_categories,
+        'businesses': lista_business,
+        'business': dict_biz,
+        'user': user_session
+    }
+    return HttpResponse(simplejson.dumps(dict_super_dupper))
+
+
+@csrf_exempt
+def community_business_json(request):
+    user_session = False
+    if request.session.get("user"): user_session = True
+    community_object = Community.objects.filter(active=True).order_by('name')
+    lista_communities = []
+    for i in community_object:
+        dict_communities = {
+            'id': i.id,
+            'label': i.name,
+            'border': force_unicode(GEOSGeometry(i.borders).json),
+            'url': i.url_name
+        }
+        lista_communities.append(dict_communities)#communities
+    categories_object = Category.objects.all().order_by('name')
+    lista_categories = []
+    for i in categories_object:
+        dict_cat = {
+            'id': i.id,
+            'name': i.name
+        }
+        lista_categories.append(dict_cat)#categories
+    community_object = Community.objects.get(url_name=request.GET['url'])
+    dict_community = {
+        'id': community_object.id,
+        'label': community_object.name,
+        'border': force_unicode(GEOSGeometry(community_object.borders).json),
+        'url': community_object.url_name
+    }
+    business_objects = Business.objects.filter(community=community_object).order_by('local_deals', 'ten_visits', 'refer_friends')
+    lista_business = []
+    return_community = lambda biz_community: biz_community or ''
+    return_category = lambda biz_category: biz_category or ''
+    comm_id = ""
+    cat = ""
+    cat_id = ""
+    comm_name = ""
+    image = ""
+    for i in business_objects:
+        ten_off = False
+        smart_buys = False
+        monthly_promo = False
+        if i.community:
+            comm_id = i.community.id
+            comm_name = i.community.name
+        if i.category:
+            cat = i.category.name
+            cat_id = i.category.id
+        if i.imagebusiness_set.all().count() > 0:
+            thumbnailer = get_thumbnailer(i.imagebusiness_set.all()[0].img)
+            image = thumbnailer.get_thumbnail({'size': (300, 150), 'crop': True})
+            image = thumbnailer.get_thumbnail_name({'size': (300, 150), 'crop': True})
+        else:
+            thumbnailer = get_thumbnailer("newOrange.png")
+            image = thumbnailer.get_thumbnail({'size': (300, 150), 'crop': True})
+            image = thumbnailer.get_thumbnail_name({'size': (300, 150), 'crop': True})
+        local_deals = {}
+        if i.cuponbusiness_set.filter(active=1).count() > 0:
+            smart_buys = True
+        if i.local_deals == "T":
+            local_deals["msg"] = "$10 Savings Card"
+            local_deals["icon"] = "icon-yellow.png"
+            local_deals["none"] = False
+            ten_off = True
+        elif i.local_deals == "F":
+            local_deals["msg"] = "$10 Savings Card"
+            local_deals["icon"] = "icon-red.png"
+            local_deals["none"] = False
+            ten_off = True
+        elif i.local_deals == "Q":
+            local_deals["msg"] = "$10 Savings Card"
+            local_deals["icon"] = "icon-sky.png"
+            local_deals["none"] = False
+            ten_off = True
+        else:
+            local_deals["none"] = True
+            ten_off = False
+        dict_business = {
+            'id': i.id,
+            'name': i.name,
+            'url_name': i.get_absolute_url(),
+            'slug': i.url_name,
+            'code': i.getUniqueCode(),
+            'local_deals': local_deals,
+            'ten_off': ten_off,
+            'smart_buys': smart_buys,
+            'ten_visits': i.ten_visits,
+            'monthly_promo': monthly_promo,
+            'refer_friends': i.refer_friends,
+            'community': comm_id,
+            'community_name': comm_name,
+            'category': cat,
+            'cat_id': cat_id,
+            'description': force_unicode(i.description),
+            'image': force_unicode(image),
+            'url': force_unicode(i.get_absolute_url()),
+            'geo': force_unicode(i.geo), # paso del geo a la vista en json
+            'address': i.address
+        }
+        lista_business.append(dict_business)
+    biz = Business.objects.filter(Q(local_deals='T') | Q(local_deals="Q") | Q(local_deals='F') | Q(ten_visits=1)| Q(refer_friends=1)).order_by("?")[0]
+    comm_biz_id = ""
+    comm_biz_name = ""
+    cat_biz_name = ""
+    cat_biz_id = ""
+    image_biz = ""
+    smart_biz = False
+    if biz.cuponbusiness_set.filter(active=1).count() > 0:
+        smart_biz = True
+    if biz.community:
+        comm_biz_id = biz.community.id
+        comm_biz_name = biz.community.name
+        if biz.category:
+            cat_biz_id = biz.category.id
+            cat_biz_name = biz.category.name
+        if biz.imagebusiness_set.all().count() > 0:
+            thumbnailer = get_thumbnailer(biz.imagebusiness_set.all()[0].img)
+            image_biz = thumbnailer.get_thumbnail({'size': (800, 180), 'crop': True})
+            image_biz = thumbnailer.get_thumbnail_name({'size': (800, 180), 'crop': True})
+        else:
+            image_biz = ""
+        local_deals_biz = {}
+        if biz.local_deals == "T":
+            local_deals_biz["msg"] = "$10 Savings Card"
+            local_deals_biz["icon"] = "icon-yellow.png"
+            local_deals_biz["none"] = False
+        elif biz.local_deals == "F":
+            local_deals_biz["msg"] = "$10 Savings Card"
+            local_deals_biz["icon"] = "icon-red.png"
+            local_deals_biz["none"] = False
+        elif biz.local_deals == "Q":
+            local_deals_biz["msg"] = "$10 Savings Card"
+            local_deals_biz["icon"] = "icon-sky.png"
+            local_deals_biz["none"] = False
+        else:
+            local_deals_biz["none"] = True
+        dict_biz = {
+            'id': biz.id,
+            'name': biz.name,
+            'url_name': biz.get_absolute_url(),
+            'local_deals': local_deals_biz,
+            'ten_off': True,
+            'smart_buys': smart_biz,
+            'monthly_promo': monthly_promo,
+            'ten_visits': biz.ten_visits,
+            'refer_friends': biz.refer_friends,
+            'community': comm_biz_id,
+            'community_name': comm_biz_name,
+            'category': cat_biz_name,
+            'cat_id': cat_biz_id,
+            'description': force_unicode(biz.description),
+            'image': force_unicode(image_biz),
+            'url': force_unicode(biz.get_absolute_url())
+        }
+    dict_super_dupper = {
+        'communities': lista_communities,
+        'categories': lista_categories,
+        'community': dict_community,
         'businesses': lista_business,
         'business': dict_biz,
         'user': user_session

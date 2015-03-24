@@ -5,6 +5,7 @@ urlpatterns = patterns('mariustest.views',
 	url(r'^$', 'single'),
     url(r'^deals/$', 'deals', name='deals'),
     url(r'^business/$', 'business', name='business'),
+    url(r'^community/$', 'community', name='community'),
 )
 
 urlpatterns += staticfiles_urlpatterns()
