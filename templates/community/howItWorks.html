@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% block title %} How it Works {% endblock %}
+{% block css %}
+	<!--add owl -->
+	<link href="//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&amp;subset=latin" rel="stylesheet">
+    <link rel="stylesheet" href="{{ STATIC_URL }}owl/css/owl.carousel.css" >
+    <link rel="stylesheet" href="{{ STATIC_URL }}owl/css/owl.theme.css" >
+	<link rel="stylesheet" href="{{ STATIC_URL }}css/howItWorks/styles.css" >
+
+{% endblock %}
+{% block content %}
+<!--=================== Wrapper ==================-->
+<div id="wrapper">
+	<div class="cust7">
+		<div class="custContent">
+			<div class="explainDescription">
+				<div id="owl-demo" class="owl-carousel owl-theme">
+					<div class="item" style="background-image: url({{ STATIC_URL }}images/HowitWorks/QRImages/QRHeaderImages/QRWorksImage.png);"><div class="fancyBg2"></div>
+						<div class="fancyBg">
+							<div class="row">
+								<div class="col-lg-1"></div>
+								<div class="col-lg-1"></div>
+								<div class="col-lg-6">
+									<h1>Access Local Businesses With Our ALL ACCESS QR+ Code</h1>
+									<h3>Each ad or coupon in our marketing materials willfeatures a QR code that lets you scan and Keep coupons on your phone! You cal also see pictures, menus, business hours, and get directions of the places you'll use.</h3>
+								</div>
+								<div class="col-lg-2">
+									<img src="{{ STATIC_URL }}images/HowitWorks/QRIcons/QRCode.png" alt="">
+								</div>
+								<div class="col-lg-1"></div>
+								<div class="col-lg-1"></div>
+							</div>
+							<a class="seeMore" href="">How All Access QR+ Works</a>
+						</div>
+
+					</div>
+					<div class="item" style="background-image: url({{ STATIC_URL }}images/AboutUs/images/WebMobile.png);"><div class="tela"></div>
+						<h1>Web & Mobile</h1>
+						<h3>Discover and xplore places within your community</h3>
+					</div>
+					<div class="item" style="background-image: url({{ STATIC_URL }}images/AboutUs/images/OrangeDeals.png);"><div class="tela"></div>
+						<h1>Orange Deals</h1>
+						<h3>Support the shop local campaign and save</h3>
+					</div>
+					<div class="item" style="background-image: url({{ STATIC_URL }}images/AboutUs/images/Multimedia.png);"><div class="tela"></div>
+						<h1>Multi-Media</h1>
+						<h3>Interact with us ... Photography, Video, Scoail Media and much more.</h3>
+					</div>
+					<div class="item" style="background-image: url({{ STATIC_URL }}images/AboutUs/images/DetourFront.png);"><div class="tela"></div>
+						<h1>We are a <span>Local Evolution</span></h1>
+						<h3>Together we can create a stronger economy, a more vibrant community, and better job opportunities for local residents.</h3>
+					</div>
+				</div>
+			</div>
+			<div class="explainMoreDescription">
+				<div id="owl-demo" class="owl-carousel owl-theme">
+					<div class="item" style="background-image: url({{ STATIC_URL }}images/HowitWorks/QRImages/QRHeaderImages/QRWorksImage.png);"><div class="fancyBg2"></div>
+						<div class="fancyBg">
+							<div class="row">
+								<div class="col-lg-1"></div>
+								<div class="col-lg-1"></div>
+								<div class="col-lg-6">
+									<h1>Access Local Businesses With Our ALL ACCESS QR+ Code</h1>
+									<h3>Each ad or coupon in our marketing materials willfeatures a QR code that lets you scan and Keep coupons on your phone! You cal also see pictures, menus, business hours, and get directions of the places you'll use.</h3>
+								</div>
+								<div class="col-lg-2">
+									<img src="{{ STATIC_URL }}images/HowitWorks/QRIcons/QRCode.png" alt="">
+								</div>
+								<div class="col-lg-1"></div>
+								<div class="col-lg-1"></div>
+							</div>
+							<a class="seeMore" href="">How All Access QR+ Works</a>
+						</div>
+
+					</div>
+					<div class="item" style="background-image: url({{ STATIC_URL }}images/AboutUs/images/WebMobile.png);"><div class="tela"></div>
+						<h1>Web & Mobile</h1>
+						<h3>Discover and xplore places within your community</h3>
+					</div>
+					<div class="item" style="background-image: url({{ STATIC_URL }}images/AboutUs/images/OrangeDeals.png);"><div class="tela"></div>
+						<h1>Orange Deals</h1>
+						<h3>Support the shop local campaign and save</h3>
+					</div>
+					<div class="item" style="background-image: url({{ STATIC_URL }}images/AboutUs/images/Multimedia.png);"><div class="tela"></div>
+						<h1>Multi-Media</h1>
+						<h3>Interact with us ... Photography, Video, Scoail Media and much more.</h3>
+					</div>
+					<div class="item" style="background-image: url({{ STATIC_URL }}images/AboutUs/images/DetourFront.png);"><div class="tela"></div>
+						<h1>We are a <span>Local Evolution</span></h1>
+						<h3>Together we can create a stronger economy, a more vibrant community, and better job opportunities for local residents.</h3>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+<!--=================== Wrapper end ==================-->
+		{% block script %}
+			<script src="{{ STATIC_URL }}js/jquery-2.1.1.min.js"></script>
+			<script src="{{ STATIC_URL }}js/AboutUs/main.js"></script>
+			<script src="{{ STATIC_URL }}owl/js/owl.carousel.js"></script>
+			<script>
+					$(document).ready(function() {
+	 					$('.leftNav').css("height", $(document).height());
+						  var owl = $("#owl-demo");
+						 
+						  owl.owlCarousel({
+						      items : 1, //10 items above 1000px browser width
+						      itemsDesktop : [1000,1], //5 items between 1000px and 901px
+						      itemsDesktopSmall : [900,1], // betweem 900px and 601px
+						      itemsTablet: [600,1], //2 items between 600 and 0
+						      itemsMobile : true, // itemsMobile disabled - inherit from itemsTablet option
+						      navigation:true,
+						      navigationText: [
+						      	"<img class='cust77' src='{{ STATIC_URL }}images/IconsGenerics/nx.png'>",
+						      	"<img class='cust77' src='{{ STATIC_URL }}images/IconsGenerics/pr.png'>"
+						      ]
+						  });
+
+						  
+						  // Custom Navigation Events
+						  $(".next").click(function(){
+						    owl.trigger('owl.next');
+						  })
+						  $(".prev").click(function(){
+						    owl.trigger('owl.prev');
+						  })
+						  $(".play").click(function(){
+						    owl.trigger('owl.play',3000); //owl.play event accept autoPlay speed as second parameter
+						  })
+						  $(".stop").click(function(){
+						    owl.trigger('owl.stop');
+						  })
+
+						});
+					</script>
+		{% endblock %}
+{% endblock %}
+
+

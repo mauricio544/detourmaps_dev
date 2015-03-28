@@ -1,0 +1,506 @@
+{% extends 'base.html' %}
+{% block title %} About {% endblock %}
+{% block css %}
+	<!--add owl -->
+    <link rel="stylesheet" href="{{ STATIC_URL }}owl/css/owl.carousel.css" >
+    <link rel="stylesheet" href="{{ STATIC_URL }}owl/css/owl.theme.css" >
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&amp;subset=latin" rel="stylesheet">
+	<link rel="stylesheet" href="{{ STATIC_URL }}css/AboutUs/styles.css" >
+    
+{% endblock %}
+{% block content %}
+<!--=================== Wrapper ==================-->
+<div id="wrapper">
+	<div class="cust7">
+		<div class="custContent">
+			<div id="owl-demo" class="owl-carousel owl-theme">
+				<div class="item" style="background-image: url({{ STATIC_URL }}images/AboutUs/images/CommunityPrintMaps.png);">
+					<h1>Community Print Maps</h1>
+					<h3>Your neighborhood at the palm of your hand.</h3>
+				</div>
+				<div class="item" style="background-image: url({{ STATIC_URL }}images/AboutUs/images/WebMobile.png);">
+					<h1>Web & Mobile</h1>
+					<h3>Discover and xplore places within your community</h3>
+				</div>
+				<div class="item" style="background-image: url({{ STATIC_URL }}images/AboutUs/images/OrangeDeals.png);">
+					<h1>Orange Deals</h1>
+					<h3>Support the shop local campaign and save</h3>
+				</div>
+				<div class="item" style="background-image: url({{ STATIC_URL }}images/AboutUs/images/Multimedia.png);">
+					<h1>Multi-Media</h1>
+					<h3>Interact with us ... Photography, Video, Scoail Media and much more.</h3>
+				</div>
+				<div class="item" style="background-image: url({{ STATIC_URL }}images/AboutUs/images/DetourFront.png);">
+					<h1>We are a <span>Local Evolution</span></h1>
+					<h3>Together we can create a stronger economy, a more vibrant community, and better job opportunities for local residents.</h3>
+				</div>
+			</div>
+	 
+			<div class="customNavigation">
+			  	<a class="btn prev"><i class="fa fa-chevron-left"></i></a>
+			 	<a class="btn next"><i class="fa fa-chevron-right"></i></a>
+			  	<a class="btn play"><i class="fa fa-play"></i></a>
+			 	<a class="btn stop"><i class="fa fa-stop"></i></a>
+			</div>
+		</div>
+		<div class="custDescription">
+			<div class="row">
+				<div class="col-md-1">
+			
+				</div>
+				<div class="col-md-10">
+					<div class="row">
+						<div class="col-md-7">
+							<p>
+								<img src="{{ STATIC_URL }}images/AboutUs/icons/Logo.PNG" alt="" style="width:60%; height:50%;">
+							</p>
+						</div>
+						<div class="col-md-5">
+							<div id="social">
+								<a class="facebookBtn smGlobalBtn" href="#" ><i class="fa fa-facebook"></i></a>
+								<a class="twitterBtn smGlobalBtn" href="#" ><i class="fa fa-twitter"></i></a>
+								<a class="googleplusBtn smGlobalBtn" href="#" ><i class="fa fa-google-plus"></i></a>
+								<a class="linkedinBtn smGlobalBtn" href="#" ><i class="fa fa-linkedin"></i></a>
+							</div>
+							<div class="cust8">
+								<p><h2>245 <span>Shares</span> 45 <span>Comments</span></h2></p>	
+							</div>
+						</div>
+					</div>
+					<hr>
+					<div class="description">
+						<div class="subTitle">
+							Locally owned businesses are the backbone of any comminity's economy. Join DetourMaps and other locall businesses and organizations to support your community by joining The Local Evolution
+						</div><br>
+
+						<p>
+							This campaign encourages residents to shop local versus shopping at a corporate or chain store. REsources suggest that for each dollar you spend at an independent business in your community, three or more times goes back into the local economy compared to a dollar spent at retailer owned by a chain. This menas better school, security, resources, and an overall better community.
+						</p><br>
+						<p>
+							We encourage to mpower individuals to become one with their local communities. Togethr we can create a stronger economy, a more vibrant community, and better job opportunities for local residents.
+						</p><br>
+						<div class="verticalLine">
+							<p>Together We Can Do It</p>
+						</div>
+					</div>
+					
+				</div>
+				<div class="col-md-1">
+					
+				</div>
+			</div>
+		</div>
+		<!--
+		================================= WHAT WE DO ============================-->
+		<div class="explainDescription">
+			<div class="row">
+				<div class="col-md-1"></div>
+				<div class="col-md-10">
+					<div class="headExplain">
+						<div class="lineL"></div><div class="context">WHAT WE DO</div><div class="lineR"></div>
+						<div class="row contentExplain">
+							<div class="col-md-3">
+								<img src="{{ STATIC_URL }}images/AboutUs/icons/Print.png" alt="Print">
+								<h2>Print</h2><br>
+								<p>
+									Community print maps area gerat way to have everythings at the palm of you hand. Inside the printed maps include a maps of your community with different local business advertisements which help businesses promote and help residents know where the business or resources is located.
+								</p><br>
+								<a class="seeMore" href="">See More</a>
+							</div>
+							<div class="col-md-3">
+								<img src="{{ STATIC_URL }}images/AboutUs/icons/webMobile.png" alt="webMobile">
+								<h2>Web & Mobile</h2><br>
+								<p>
+									With the Detour Maps platform you can search and explore places within your community. You will be excited to find friendly local organizations and businesses in your computer or phone and find their information and deals offereted by local businesses.
+								</p><br>
+								<a class="seeMore" href="">See More</a>
+							</div>
+							<div class="col-md-3">
+								<img src="{{ STATIC_URL }}images/AboutUs/icons/orangeDeals.png" alt="orangeDeals">
+								<h2>Orange Deals</h2><br>
+								<p>
+									We make it easy for residents to find local deals while provinding an original concept of printed maps. Support the Shop Local camping and save!
+								</p><br>
+								<a class="seeMore" href="">See More</a>
+							</div>
+							<div class="col-md-3">
+								<img src="{{ STATIC_URL }}images/AboutUs/icons/multimedia.png" alt="multimedia">
+								<h2>Multi-Media</h2><br>
+								<p>
+									Besides having many community resources on our website we are actively involved in promoting local businesses with short video exclusives as well as different social media platforms.
+								</p><br>
+								<a class="seeMore" href="">See More</a>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-1"></div>
+			</div>
+		</div>
+
+		<!--
+		================================= SEE MORE Print ============================-->
+		<div class="explainMoreDescription">
+			<div class="row">
+				<div class="col-md-1"></div>
+				<div class="col-md-10">
+					<div class="headExplain">
+						<div class="lineL"></div><div class="context"><img src="{{ STATIC_URL }}images/AboutUs/icons/Print.png" alt="Print"></div><div class="lineR"></div>
+						<div class="row contentExplain">
+							<div class="col-md-2"></div>
+							<div class="col-md-8">
+								<h2>Print</h2><br>
+								<p>
+									Detour's printed map is a way have to have everthing there is to know about the community in the palm of you hand. With 2 publications each year for each community and over 40,000 maps distributed you will be well informed with our printed maps. Inside the printed maps include a map of your community with different local business advertisements. The map pin points each business giving the user a better idea of where the business or resource is located in the community. We do not just have business locations on the map; we also have locations of parks, bus routes, schools, useful phone numbers, events and basically all public assets in the community. The printed map also is color coded so that residents may know which business is participating in the $10 Savings Card promotion
+								</p>
+								<br>
+								<a class="seeLess" href=""><i class="fa fa-2x fa-long-arrow-left"></i></a>
+							</div>
+							<div class="col-md-2"></div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-1"></div>
+			</div>
+		</div>
+		<!--
+		================================= SEE MORE Web & Mobile ============================-->
+		<div class="explainMoreDescriptionWeb">
+			<div class="row">
+				<div class="col-md-1"></div>
+				<div class="col-md-10">
+					<div class="headExplain">
+						<div class="lineL"></div><div class="context"><img src="{{ STATIC_URL }}images/AboutUs/icons/Print.png" alt="Print"></div><div class="lineR"></div>
+						<div class="row contentExplain">
+							<div class="col-md-2"></div>
+							<div class="col-md-8">
+								<h2>Print</h2><br>
+								<p>
+									Detour's printed map is a way have to have everthing there is to know about the community in the palm of you hand. With 2 publications each year for each community and over 40,000 maps distributed you will be well informed with our printed maps. Inside the printed maps include a map of your community with different local business advertisements. The map pin points each business giving the user a better idea of where the business or resource is located in the community. We do not just have business locations on the map; we also have locations of parks, bus routes, schools, useful phone numbers, events and basically all public assets in the community. The printed map also is color coded so that residents may know which business is participating in the $10 Savings Card promotion
+								</p>
+								<br>
+								<a class="seeLess" href=""><i class="fa fa-2x fa-long-arrow-left"></i></a>
+							</div>
+							<div class="col-md-2"></div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-1"></div>
+			</div>
+		</div>
+		<!--
+		================================= SEE MORE Orage Deals ============================-->
+		<div class="explainMoreDescriptionOrD">
+			<div class="row">
+				<div class="col-md-1"></div>
+				<div class="col-md-10">
+					<div class="headExplain">
+						<div class="lineL"></div><div class="context"><img src="{{ STATIC_URL }}images/AboutUs/icons/Print.png" alt="Print"></div><div class="lineR"></div>
+						<div class="row contentExplain">
+							<div class="col-md-2"></div>
+							<div class="col-md-8">
+								<h2>Print</h2><br>
+								<p>
+									Detour's printed map is a way have to have everthing there is to know about the community in the palm of you hand. With 2 publications each year for each community and over 40,000 maps distributed you will be well informed with our printed maps. Inside the printed maps include a map of your community with different local business advertisements. The map pin points each business giving the user a better idea of where the business or resource is located in the community. We do not just have business locations on the map; we also have locations of parks, bus routes, schools, useful phone numbers, events and basically all public assets in the community. The printed map also is color coded so that residents may know which business is participating in the $10 Savings Card promotion
+								</p>
+								<br>
+								<a class="seeLess" href=""><i class="fa fa-2x fa-long-arrow-left"></i></a>
+							</div>
+							<div class="col-md-2"></div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-1"></div>
+			</div>
+		</div>
+		<!--
+		================================= SEE MORE Multi-Media ============================-->
+		<div class="explainMoreDescriptionMulM">
+			<div class="row">
+				<div class="col-md-1"></div>
+				<div class="col-md-10">
+					<div class="headExplain">
+						<div class="lineL"></div><div class="context"><img src="{{ STATIC_URL }}images/AboutUs/icons/Print.png" alt="Print"></div><div class="lineR"></div>
+						<div class="row contentExplain">
+							<div class="col-md-2"></div>
+							<div class="col-md-8">
+								<h2>Print</h2><br>
+								<p>
+									Detour's printed map is a way have to have everthing there is to know about the community in the palm of you hand. With 2 publications each year for each community and over 40,000 maps distributed you will be well informed with our printed maps. Inside the printed maps include a map of your community with different local business advertisements. The map pin points each business giving the user a better idea of where the business or resource is located in the community. We do not just have business locations on the map; we also have locations of parks, bus routes, schools, useful phone numbers, events and basically all public assets in the community. The printed map also is color coded so that residents may know which business is participating in the $10 Savings Card promotion
+								</p>
+								<br>
+								<a class="seeLess" href=""><i class="fa fa-2x fa-long-arrow-left"></i></a>
+							</div>
+							<div class="col-md-2"></div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-1"></div>
+			</div>
+		</div>
+		<!--
+		================================= ABOUT US ============================-->
+		<div class="abstracAbout">
+			<div class="row">
+				<div class="col-md-1"></div>
+				<div class="col-md-10">
+					<div class="headExplain">
+						<div class="lineL"></div><div class="context">ABOUT US</div><div class="lineR"></div>
+						<div class="row aboutContent">
+							<div class="col-md-4">
+								<div class="explainAbout">
+									<div class="titleAbout">
+										<h3>HISTORY</h3>
+									</div>
+									<div class="descriptionAbout">
+										<h3><b>Detour Communty Maps</b><br>
+										originated from MAPS (a marketing and Advertising Platform of Services) which is a division of Entire Marketing Group LLC established in 2007. The division was created to help the development of different communities in Illinois. We strive on connecting residents with local businesses and organizations to improve the community by creating a SHOP LOCAL campaign.</h3>
+									</div>
+									
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="explainAbout">
+									<div class="titleAbout">
+										<h3>VISION</h3>
+									</div>
+									<div class="descriptionAbout">
+										<h3>We are commited to help neighborhoods and organizations of all industries, sizes and locations by personalizing the clients brandings and marketing materials. When you partner with us, we help you by using a practical and effective advertising platform, whether it is print advertisement or adding your community to our online directory. Our vision is to help local businesses succeed by giving them the opportunity to advertise collectively and share the cost.</h3>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="explainAbout">
+									<div class="titleAbout">
+										<h3>IMPACT</h3>
+									</div>
+
+									<div class="descriptionAbout">
+										<h3>As of now, the participating businesses are Berwyn, Cicero, Archer Heights, Brighton Park, Back of the Yards, West Law, Chicago Law, Washington Heights, Morgan Park, and Roseland. Local organizations called Special Service Areas are also partnered with us, such as SSA 3, SSA 10, SSA 39, and SSA 45. These Special Service Areas work within the participating communities helping local businesses with different resources to improve the shopping corridors and quality of life.</h3>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-1"></div>
+			</div>
+		</div><br><br>
+
+		<!--
+		================================= TESTIMONIALS ============================-->
+		<div class="explainDescription">
+			<div class="row">
+				<div class="col-md-1"></div>
+				<div class="col-md-10">
+					<div class="headExplain custhead">
+						<div class="lineL"></div><div class="context">TESTIMONIALS</div><div class="lineR"></div>
+						<div class="row cust12">
+							<div class="col-md-1"></div>
+							<div class="col-md-10">
+								<div class="owl-carousel owl-theme" id="owl-demo2">
+									<div class="item">
+										<div class="row cust12">
+											<div class="col-md-2">
+												<img src="{{ STATIC_URL }}images/AboutUs/icons/GSDC.png" alt="GSDC">
+											</div>
+											<div class="col-md-8">
+												<p>
+													"Detour Maps are very good creating synergies and partnerships not just between themselves and the organization that they work, but also between the organization and other businesses within the same industry."<br><br>
+													<b>Nick Kolias, Commercial Director, GSDC</b>&nbsp;&nbsp;&nbsp;&nbsp;
+													<a class="googleplusBtn smGlobalBtn" href="#" ><i class="fa fa-play"></i></a>
+													<a class="facebookBtn smGlobalBtn" href="#" ><i class="fa fa-facebook"></i></a>
+												</p>
+											</div>
+											<div class="col-md-2"></div>
+										</div>
+									</div>
+									<div class="item">
+										<div class="row cust12">
+											<div class="col-md-2">
+												<img src="{{ STATIC_URL }}images/AboutUs/icons/BackOfYears.png" alt="BackOfYears">
+											</div>
+											<div class="col-md-8">
+												<p>
+													"Detour Maps see specifically what that community needs so they bring brand awareness, they know exactly what that community needs as far is marketing and promoting the neighbor hoods."<br><br>
+													<b>Fabiola Flores, Program Director, SSA 10</b>&nbsp;&nbsp;&nbsp;&nbsp;
+													<a class="googleplusBtn smGlobalBtn" href="#" ><i class="fa fa-play"></i></a>
+													<a class="facebookBtn smGlobalBtn" href="#" ><i class="fa fa-facebook"></i></a>
+												</p>
+											</div>
+											<div class="col-md-2"></div>
+										</div>
+									</div>
+									<div class="item">
+										<div class="row cust12">
+											<div class="col-md-2">
+												<img src="{{ STATIC_URL }}images/AboutUs/icons/SSA39.png" alt="SSA39">
+											</div>
+											<div class="col-md-8">
+												<p>
+													"Detour Maps has helped doing a lot of outreach and business development services, it's really help along our mission to outreach as many business as possible, I think they have definitely been a help to the community."<br><br>
+													<b>Miguel Moreno, Commercial Director, SSA 10</b>&nbsp;&nbsp;&nbsp;&nbsp;
+													<a class="googleplusBtn smGlobalBtn" href="#" ><i class="fa fa-play"></i></a>
+													<a class="facebookBtn smGlobalBtn" href="#" ><i class="fa fa-facebook"></i></a>
+												</p>
+											</div>
+											<div class="col-md-2"></div>
+										</div>
+									</div>
+									<div class="item">
+										<div class="row cust12">
+											<div class="col-md-2">
+												<img src="{{ STATIC_URL }}images/AboutUs/icons/Maucker.png" alt="Maucker">
+											</div>
+											<div class="col-md-8">
+												<p>
+													"If you Shop Locally promoted by Detour Maps concept the money stays and support local merchants, keep the local business strong. Shop Local true Detour Maps and everybody wins!"<br><br>
+													<b>Robert Maucker, Attorneys At Law, R.W. Maucker P.C.</b>&nbsp;&nbsp;&nbsp;&nbsp;
+													<a class="googleplusBtn smGlobalBtn" href="#" ><i class="fa fa-play"></i></a>
+													<a class="facebookBtn smGlobalBtn" href="#" ><i class="fa fa-facebook"></i></a>
+												</p>
+											</div>
+											<div class="col-md-2"></div>
+										</div>
+									</div>
+									<div class="item">
+										<div class="row cust12">
+											<div class="col-md-2">
+												<img src="{{ STATIC_URL }}images/AboutUs/icons/Optimum.png" alt="Optimum">
+											</div>
+											<div class="col-md-8">
+												<p>
+													"Detour Maps provide a community base service, It's a convenient way to advertise and to be recognized."<br><br>
+													<b>Gerry Toro, CEO, Optimum Tax Consultants</b>&nbsp;&nbsp;&nbsp;&nbsp;
+													<a class="googleplusBtn smGlobalBtn" href="#" ><i class="fa fa-play"></i></a>
+													<a class="facebookBtn smGlobalBtn" href="#" ><i class="fa fa-facebook"></i></a>
+												</p>
+											</div>
+											<div class="col-md-2"></div>
+										</div>
+									</div>
+									<div class="item">
+										<div class="row cust12">
+											<div class="col-md-2">
+												<img src="{{ STATIC_URL }}images/AboutUs/icons/LaClinica.png" alt="LaClinica">
+											</div>
+											<div class="col-md-8">
+												<p>
+													"I think Detour Maps does a good job highlighting businesses in the community, so local businesses do well by advertising on the local map, so being on the map is an advantage."<br><br>
+													<b>Dr. Eugene M. jao, Doctor of Chiropractic, La Clinica</b>&nbsp;&nbsp;&nbsp;&nbsp;
+													<a class="googleplusBtn smGlobalBtn" href="#" ><i class="fa fa-play"></i></a>
+													<a class="facebookBtn smGlobalBtn" href="#" ><i class="fa fa-facebook"></i></a>
+												</p>
+											</div>
+											<div class="col-md-2"></div>
+										</div>
+									</div>
+									<div class="item">
+										<div class="row cust12">
+											<div class="col-md-2">
+												<img src="{{ STATIC_URL }}images/AboutUs/icons/Lizneyland.png" alt="Lizneyland">
+											</div>
+											<div class="col-md-8">
+												<p>
+													"Working with Detour Maps was a very professional experience, they go out of their way, they go way and beyond to do business with us, so I want tell the community that Detour Maps is not just here for business they're here for the community."<br><br>
+													<b>Liz Medrano, Executive Director, Lizneyland</b>&nbsp;&nbsp;&nbsp;&nbsp;
+													<a class="googleplusBtn smGlobalBtn" href="#" ><i class="fa fa-play"></i></a>
+													<a class="facebookBtn smGlobalBtn" href="#" ><i class="fa fa-facebook"></i></a>
+												</p>
+											</div>
+											<div class="col-md-2"></div>
+										</div>
+									</div>
+									<div class="item">
+										<div class="row cust12">
+											<div class="col-md-2">
+												<img src="{{ STATIC_URL }}images/AboutUs/icons/TierraCaliente.png" alt="TierraCaliente">
+											</div>
+											<div class="col-md-8">
+												<p>
+													"It was one of the best experience I've had, I appreciate how they help us to make more business and it's really helpful. I really want to invite other business to participate with this type of marketing in our area, so I am really happy with that."<br><br>
+													<b>Fermin Saucedo, Business Ower, Tierra Caliente</b>&nbsp;&nbsp;&nbsp;&nbsp;
+													<a class="googleplusBtn smGlobalBtn" href="#" ><i class="fa fa-play"></i></a>
+													<a class="facebookBtn smGlobalBtn" href="#" ><i class="fa fa-facebook"></i></a>
+												</p>
+											</div>
+											<div class="col-md-2"></div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-1"></div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-1"></div>
+			</div>
+		</div>
+		
+		<!--
+		================================= REST ============================-->
+		<div class="row">
+			<div class="col-md-1"></div>
+			<div class="col-md-10">
+				<div class="resto">
+					<h1>We would love to hear from YOU</h1> <br><br>	
+					<a href="">Lets Talk</a>
+				</div>
+			</div>
+			<div class="col-md-1"></div>
+		</div>
+	</div>
+</div>
+<!--=================== Wrapper end ==================-->
+		{% block script %}
+			<script src="{{ STATIC_URL }}js/jquery-2.1.1.min.js"></script>
+			<script src="{{ STATIC_URL }}js/AboutUs/main.js"></script>
+			<script src="{{ STATIC_URL }}owl/js/owl.carousel.js"></script>
+			<script>
+					$(document).ready(function() {
+	 
+						  var owl = $("#owl-demo");
+						 
+						  owl.owlCarousel({
+						      items : 1, //10 items above 1000px browser width
+						      itemsDesktop : [1000,1], //5 items between 1000px and 901px
+						      itemsDesktopSmall : [900,1], // betweem 900px and 601px
+						      itemsTablet: [600,1], //2 items between 600 and 0
+						      itemsMobile : false // itemsMobile disabled - inherit from itemsTablet option
+						  });
+						 
+						  // Custom Navigation Events
+						  $(".next").click(function(){
+						    owl.trigger('owl.next');
+						  })
+						  $(".prev").click(function(){
+						    owl.trigger('owl.prev');
+						  })
+						  $(".play").click(function(){
+						    owl.trigger('owl.play',3000); //owl.play event accept autoPlay speed as second parameter
+						  })
+						  $(".stop").click(function(){
+						    owl.trigger('owl.stop');
+						  })
+						 	// Others
+						 	 $("#owl-demo2").owlCarousel({
+ 
+							    navigation : true, // Show next and prev buttons
+							    slideSpeed : 300,
+							    paginationSpeed : 400,
+							    singleItem:true
+							 
+							      // "singleItem:true" is a shortcut for:
+							      // items : 1, 
+							      // itemsDesktop : false,
+							      // itemsDesktopSmall : false,
+							      // itemsTablet: false,
+							      // itemsMobile : false
+							 
+							  });
+
+						});</script>
+		{% endblock %}
+{% endblock %}
+
+
