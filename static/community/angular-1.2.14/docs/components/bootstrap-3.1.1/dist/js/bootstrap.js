@@ -446,7 +446,8 @@ if (typeof jQuery === 'undefined') { throw new Error('Bootstrap\'s JavaScript re
       $target.data('bs.carousel').to(slideIndex)
     }
 
-    e.preventDefault()
+    e.preventDefault();
+    return false;
   })
 
   $(window).on('load', function () {

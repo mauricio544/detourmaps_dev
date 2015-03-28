@@ -2156,59 +2156,49 @@ h1.pageTitle {
         cursor: pointer;
     }
     .appcat.autos + label {
-        background: url(../images/auto-a-icon.png);
-        width: 91px;
-        height: 91px;
+        background: url(../images/back-auto.png) no-repeat;
+        width: 70px;
+        height: 90px;
         cursor: pointer;
     }
     .appcat.beauty + label {
-        background: url(../images/beauty-a-icon.png);
-        width: 91px;
-        height: 91px;
+        background: url(../images/back-beauty.png) no-repeat;
+        width: 70px;
+        height: 90px;
         cursor: pointer;
     }
     .appcat.health + label {
-        background: url(../images/health-a-icon.png);
-        width: 91px;
-        height: 91px;
+        background: url(../images/back-health.png) no-repeat;
+        width: 70px;
+        height: 90px;
         cursor: pointer;
     }
     .appcat.food + label {
-        background: url(../images/food-a-icon.png);
-        width: 91px;
-        height: 91px;
+        background: url(../images/back-food.png) no-repeat;
+        width: 70px;
+        height: 90px;
         cursor: pointer;
     }
     .appcat.services + label {
-        background: url(../images/services-a-icon.png);
-        width: 91px;
-        height: 91px;
+        background: url(../images/back-services.png) no-repeat;
+        width: 70px;
+        height: 90px;
         cursor: pointer;
     }
     .appcat.autos:checked + label, .appcat.autos:hover + label{
-        background: url(../images/auto-cat-icon.png);
-        width: 91px;
-        height: 91px;
+        border-bottom: 4px solid #ec1c24;
     }
     .appcat.beauty:checked + label, .appcat.beauty:hover + label{
-        background: url(../images/beauty-cat-icon.png);
-        width: 91px;
-        height: 91px;
+        border-bottom: 4px solid #f79420;
     }
     .appcat.health:checked + label, .appcat.health:hover + label {
-        background: url(../images/health-cat-icon.png);
-        width: 91px;
-        height: 91px;
+        border-bottom: 4px solid #17bab5;
     }
     .appcat.food:checked + label, .appcat.food:hover + label {
-        background: url(../images/food-cat-icon.png);
-        width: 91px;
-        height: 91px;
+        border-bottom: 4px solid #37b34a;
     }
     .appcat.services:checked + label, .appcat.services:hover + label {
-        background: url(../images/services-cat-icon.png);
-        width: 91px;
-        height: 91px;
+        border-bottom: 4px solid #1b75bb;
     }
 .app-biz {
     width: 95%;

@@ -40,7 +40,9 @@
         <link href="{% static 'css/app.css' %}" rel="stylesheet">
         <link href="{% static 'css/sweet-alert.css' %}" rel="stylesheet">
         <link href="{% static 'css/bootstrap-select.min.css' %}" rel="stylesheet">
-
+        <!--=============== plugin intro css ===============-->
+        <link rel="stylesheet" href="{{ STATIC_URL }}plugins/introjs/introjs.css">
+        <link rel="stylesheet" href="{{ STATIC_URL }}plugins/introjs/extensions.css">
 			<!--=============== ie styles  ===============-->
 				<!--[if lt IE 9]>
 	          		<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
@@ -70,6 +72,9 @@
                 background: #414042;
                 padding: 2px;
             }
+            /*#ventanaPopup1,#ventanaPopup1Fondo{
+                display: none;
+            }*/
         </style>
 		{% block css %}
 		{% endblock %}
@@ -94,22 +99,30 @@
         </script>
 	</head>
 	<body class="notransition" ng-app="catApp" ng-controller="bizCtrl" id="bodyApp">
-		
+	<!--============ Intro ============-->
+        <div id="ventanaPopup1">
+            <h1>Welcome to the newly enhanced Detour Maps platform </h1>
+            <h3>Would you like a quick tour?</h3><br><button class="custcl2 cust44" onclick="javascript:ocultaVentana();">No, Thanks</button>&nbsp;
+            <button class="custcl cust44" href="javascript:void(0);" onclick="javascript:testintro();">Yes</button>
+
+        </div>
+        <div id="ventanaPopup1Fondo"><a id="ventanaPopup1Cerrar">x</a></div>
+    <!--============ End Intro ============-->
 	<!--============ Header ============-->
 
         <div id="header">
-            <div class="logo">
-                <a href="/marius/home/">
+            <div class="logo" data-step="1" data-intro="Click on the arrows and find more information about Detour Maps" data-position='right'>
+                <a href="/home/">
                     <span class="marker"><img src="{{ STATIC_URL }}images/nuevo-isotipo.png" alt="DetourMaps"></span>
                     <!-- No es necesario este texto <span class="logoText">DetourMaps</span>-->
                 </a>
             </div>
-            <a href="#" class="navHandler"><span class="fa fa-bars"></span></a>
+            <a href="#" class="navHandler" data-step="2" data-intro="Use the dropdown menu to view Communities, Deals, How To, Events, Blog, About and Categories." data-position='right'><span class="fa fa-bars"></span></a>
             <div class="search">
                 <span class="searchIcon icon-magnifier"></span>
-                <input type="text" placeholder="[[ placeholder_nosearch ]]" ng-model="search" ng-change="searchtext(search)" list="_business">
+                <input type="text" placeholder="[[ placeholder_nosearch ]]" ng-model="searchService.searchText" ng-change="matchsearch(searchService.searchText)" list="_business">
                 <datalist id="_business">
-                    <option ng-repeat="biz in model.business" value="[[ biz.name ]]"></option>
+                    <option ng-repeat="biz in model.business track by biz.id" value="[[ biz.name ]]"></option>
                 </datalist>
             </div>
             <div class="panelcommunity" ng-show="panel==true">
@@ -126,7 +139,7 @@
                     </tr>
                 </table>
             </div>
-            <div class="headerUserWraper">
+            <div class="headerUserWraper" data-step="3" data-intro="Need to sign up / logout? Click on the human icon. (Don't worry your info is secure)" data-position='left'>
                 <a href="#" class="headerUser dropdown-toggle" data-toggle="dropdown">
                     <img class="avatar headerAvatar pull-left" src="{{ STATIC_URL }}images/user-account.png" alt="User">
                     <!--<img class="avatar headerAvatar pull-left" src="{{ STATIC_URL }}images/detour-icon.png" alt="detourmaps">-->
@@ -213,7 +226,7 @@
             <nav class="leftNav scrollable">
                 <div class="search">
                     <span class="searchIcon icon-magnifier"></span>
-                    <input type="text" placeholder="[[ placeholder_nosearch ]]" ng-model="search" ng-change="searchtext(search)">
+                    <input type="text" placeholder="[[ placeholder_nosearch ]]" ng-model="global.search">
                     <div class="clearfix"></div>
                 </div>
                 <ul>
@@ -235,15 +248,15 @@
                     <li>
                         <a href="/marius/about/"><span class="navIcon"><img src="{{ STATIC_URL }}images/about-us-icon.png" alt="About Us"></span><span class="navLabel">About Us</span></a>
                     </li>
-                    <li ng-show="cat==true" class="hasSub">
+                    <li class="hasSub">
                         <a href="#"><span class="navIcon"><img src="{{ STATIC_URL }}images/cat-icon.png" alt="Categories" style="height: 20px;"></span><span class="navLabel">Categories</span></a>
                         <ul>
-                            <li><a href=""><img src="{{ STATIC_URL }}images/menu-auto.png" alt="Auto" style="height: 19px"> Auto</a></li>
-                            <li><a href=""><img src="{{ STATIC_URL }}images/menu-beauty.png" alt="Beauty" style="height: 19px"> Beauty</a></li>
-                            <li><a href=""><img src="{{ STATIC_URL }}images/menu-health.png" alt="Health" style="height: 19px"> Health</a></li>
-                            <li><a href=""><img src="{{ STATIC_URL }}images/menu-food.png" alt="Food" style="height: 19px"> Food</a></li>
-                            <li><a href=""><img src="{{ STATIC_URL }}images/menu-services.png" alt="Services" style="height: 19px"> Services</a></li>
-                            <li><a href="lists.html"><img src="{{ STATIC_URL }}images/menu-orange.png" alt="Orange Deals" style="height: 19px"> Orange Deals</a></li>
+                            <li><a ng-href="#/y/17/Auto"><img src="{{ STATIC_URL }}images/menu-auto.png" alt="Auto" style="height: 19px"> Auto</a></li>
+                            <li><a ng-href="#/y/19/Beauty"><img src="{{ STATIC_URL }}images/menu-beauty.png" alt="Beauty" style="height: 19px"> Beauty</a></li>
+                            <li><a ng-href="#/y/20/Health"><img src="{{ STATIC_URL }}images/menu-health.png" alt="Health" style="height: 19px"> Health</a></li>
+                            <li><a ng-href="#/y/15/Food"><img src="{{ STATIC_URL }}images/menu-food.png" alt="Food" style="height: 19px"> Food</a></li>
+                            <li><a ng-href="#/y/21/Services"><img src="{{ STATIC_URL }}images/menu-services.png" alt="Services" style="height: 19px"> Services</a></li>
+                            <li><a ng-href="#/d/all"><img src="{{ STATIC_URL }}images/menu-orange.png" alt="Orange Deals" style="height: 19px"> Orange Deals</a></li>
                             <li><a href="tables.html"><img src="{{ STATIC_URL }}images/menu-promotions.png" alt="Promotions" style="height: 19px"> Monthly Promotions</a></li>
                         </ul>
                     </li>
@@ -358,7 +371,9 @@
             });            
         </script>                
         <!--<script src="{{ STATIC_URL }}js/app.js" type="text/javascript"></script>-->
-		
+        <!--=============== plugin intro js ===============-->
+        <script src="{{ STATIC_URL }}plugins/introjs/intro.js"></script>
+        <script src="{{ STATIC_URL }}plugins/introjs/extensions.js"></script>
 		{% block script %}
 		{% endblock %}
 	</body>

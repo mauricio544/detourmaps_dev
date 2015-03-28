@@ -1,13 +1,6 @@
 /**
  * Created by mauricio on 18/03/14.
  */
-/*var catctr = angular.module('category.', []);
-catctr.controller('categoryController', function($scope, $http){
-    $http.get('/communities/categories').success(function(data){
-        $scope.categories = data;
-    });
-    $scope.orderProp = 'name';
-});*/
 
 var myApp = angular.module('catApp', ['ngRoute']);
 var myEvents;
@@ -27,9 +20,21 @@ myApp.config(
         }
       )
       .when(
+          "/y/:catId/:catName", {
+          templateUrl: '/marius/category/',
+          controller: 'categoryctrl'
+        }
+      )
+      .when(
         "/b/:bizName/:bizCode", {
           templateUrl: '/marius/business/',
           controller: 'bizonectrl'
+        }
+      )
+      .when(
+        "/d/:dealType/", {
+          templateUrl: '/marius/orange-deals/',
+          controller: 'dealsctrl'
         }
       )
       .otherwise({
@@ -40,9 +45,13 @@ myApp.config(
 );
 
 myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
-  'businessScope', 'search', '$rootScope', 'catmenu', 'login', 'register',
+  'businessScope', 'search', '$rootScope', 'catmenu', 'login', 'register', 'globalSearch', 'searchService',
   function($scope, $route, $routeParams, $http, businessScope, search,
-    $rootScope, catmenu, login, register) {
+    $rootScope, catmenu, login, register, globalSearch, searchService) {
+    $scope.searchService = searchService;
+    $rootScope.global = {
+        search: ''
+    };
     $scope.options = {
       zoom: 14,
       mapTypeId: 'Styled',
@@ -55,8 +64,6 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
     $scope.$route = $route;
     $scope.$routeParams = $routeParams;
     $scope.notOverMarker = true;
-    $rootScope.business;
-    $rootScope.businesstmp;
     $rootScope.user;
     $rootScope.cat = false;
     $rootScope.panel = false;
@@ -96,6 +103,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
     $scope.newMarker = null;
     $scope.markers = []; // array de marcadores
     $scope.props = []; // array de diccionarios con información para marcadores
+    $scope.tmpBiz = [];
     $scope.markerCluster = null; // array para el marker cluster
     var infobox = new InfoBox({
       disableAutoPan: false,
@@ -127,6 +135,10 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
     $scope.buys = false;
     $scope.off = false;
     $scope.model = {
+      business: "",
+      businesstmp: ""
+    };
+    $rootScope.model = {
       business: "",
       businesstmp: ""
     };
@@ -265,6 +277,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
         $scope.communities = data.communities;
         $scope.categories = data.categories;
         $scope.model.businesstmp = data.businesses;
+        $rootScope.model.businesstmp = data.businesses;
         $scope.bizrandom = data.business;
         $rootScope.user = data.user;
         $scope.placeholder_nosearch =
@@ -2501,9 +2514,9 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
     // TODO: Implementar filtro por comunidad o por categoría
     $scope.searchtext = function(val) {
       $scope.deleteMarkers(null);
-      var tmpBiz = [];
+      $scope.tmpBiz = [];
       $scope.props = [];
-      angular.forEach($scope.model.businesstmp, function(bizitem) {
+      angular.forEach($rootScope.model.businesstmp, function(bizitem) {
         searchText = val.toLowerCase();
         var marker_icon;
         if (bizitem.category === "Lodging and Travel") {
@@ -2519,7 +2532,7 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
         }
         if (bizitem.name.toString().toLowerCase().search(searchText) >=
           0) {
-          tmpBiz.push(bizitem);
+          $scope.tmpBiz.push(bizitem);
           var geo = bizitem.geo || undefined;
           var r = geo.slice(7, geo.length - 1).split(' ') || [];
           var dict_marker = {
@@ -2613,15 +2626,26 @@ myApp.controller('bizCtrl', ['$scope', '$route', '$routeParams', '$http',
         }
       }
       return $scope.model.business;
-    }
+    };
+    $scope.searchwell = function(val){
+        var globalresult = globalSearch.search($scope.model.business, val);
+        $scope.model.business = globalresult.biz;
+        $scope.addMarkers(globalresult.markers, $scope.map, false);
+        var limits = new google.maps.LatLngBounds();
+        $.each($scope.markers, function(index, marker) {
+          limits.extend(marker.position);
+        });
+        $scope.map.fitBounds(limits);
+        return $scope.model.business;
+    };
   }
 ]);
 
 myApp.controller('bizonectrl', ['$scope', '$rootScope', '$routeParams',
   '$location', '$http', 'businessOneScope', 'search', '$sce', 'catmenu',
-  '$anchorScroll', 'login', 'register',
+  '$anchorScroll', 'login', 'register', 'globalSearch', 'searchService',
   function($scope, $rootScope, $routeParams, $location, $http,
-    businessOneScope, search, $sce, catmenu, $anchorScroll, login, register) {
+    businessOneScope, search, $sce, catmenu, $anchorScroll, login, register, globalSearch, searchService) {
     $scope.bizName = $routeParams.bizName;
     $scope.bizCode = $routeParams.bizCode;
     $scope.bizInfo;
@@ -2633,6 +2657,10 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope', '$routeParams',
     $rootScope.zip;
     $rootScope.partners;
     $rootScope.discover;
+    $rootScope.model = {
+      business: "",
+      businesstmp: ""
+    };
     $scope.actionconfirm = false;
     $scope.there_is_user = false;
     $scope.navigation = {
@@ -3128,15 +3156,27 @@ myApp.controller('bizonectrl', ['$scope', '$rootScope', '$routeParams',
       };
       initialize($scope.map);
       calcRoute();
-    }
+    };
+    $scope.searchwell = function(val){
+        var globalresult = globalSearch.search($scope.model.business, val);
+        $scope.model.business = globalresult.biz;
+        $scope.addMarkers(globalresult.markers, $scope.map, false);
+        var limits = new google.maps.LatLngBounds();
+        $.each($scope.markers, function(index, marker) {
+          limits.extend(marker.position);
+        });
+        $scope.map.fitBounds(limits);
+        return $scope.model.business;
+    };
   }
 ]);
 
 myApp.controller('commonectrl', ['$scope', '$rootScope', '$routeParams',
   '$location', '$http', 'communityOneScope', 'search', '$sce', 'catmenu',
-  '$anchorScroll', 'login', 'register',
+  '$anchorScroll', 'login', 'register', 'globalSearch', 'searchService',
   function($scope, $rootScope, $routeParams, $location, $http,
-    communityOneScope, search, $sce, catmenu, $anchorScroll, login, register) {
+    communityOneScope, search, $sce, catmenu, $anchorScroll, login, register, globalSearch, searchService) {
+    $scope.searchService = searchService;
     $scope.commurl = $routeParams.commUrl;
     $scope.communities;
     $scope.community;
@@ -3236,24 +3276,6 @@ myApp.controller('commonectrl', ['$scope', '$rootScope', '$routeParams',
             fillOpacity: 0.1,
             community: {id: community.id, label: community.label}
         });
-
-        google.maps.event.addListener(polygon, 'mouseover', function(event){
-            infoWindow.setContent(community.label);
-            infoWindow.setPosition(bounds.getCenter());
-            infoWindow.open(map);
-        });
-        google.maps.event.addListener(polygon, 'mouseout', function () {
-            this.setOptions({
-                fillColor: "#f48031",
-                fillOpacity: 0.1
-            });
-            infoWindow.close();
-        });
-        google.maps.event.addListener(polygon, 'click', function(){
-            window.location.href = "#/c/" + community.url;
-            map.setCenter(bounds.getCenter());
-            map.setZoom(14);
-        })
         polygon.setMap(map);
     };
     // Añadir marcadores al mapa
@@ -3371,6 +3393,456 @@ myApp.controller('commonectrl', ['$scope', '$rootScope', '$routeParams',
     }, function(errorMessage){
        console.log(errorMessage);
     });
+    $scope.searchwell = function(val){
+        var globalresult = globalSearch.search($scope.model.business, val);
+        $scope.model.business = globalresult.biz;
+        $scope.addMarkers(globalresult.markers, $scope.map, false);
+        var limits = new google.maps.LatLngBounds();
+        $.each($scope.markers, function(index, marker) {
+          limits.extend(marker.position);
+        });
+        $scope.map.fitBounds(limits);
+        return $scope.model.business;
+    };
+}]);
+
+myApp.controller('categoryctrl', ['$scope', '$rootScope', '$routeParams',
+  '$location', '$http', 'categoryOneScope', 'search', '$sce', 'catmenu',
+  '$anchorScroll', 'login', 'register', 'globalSearch', 'searchService',
+  function($scope, $rootScope, $routeParams, $location, $http,
+    categoryOneScope, search, $sce, catmenu, $anchorScroll, login, register, globalSearch, searchService) {
+    $scope.searchService = searchService;
+    $scope.catId = $routeParams.catId;
+    $scope.communities;
+    $scope.community;
+    $scope.model = {};
+    $scope.selectedCommunity = [];
+    $scope.currentPage = 0;
+    $scope.pageSize = 6;
+    $scope.options = {
+      zoom: 14,
+      mapTypeId: 'Styled',
+      disableDefaultUI: true,
+      mapTypeControlOptions: {
+        mapTypeIds: ['Styled']
+      }
+    };
+    var infobox = new InfoBox({
+      disableAutoPan: false,
+      maxWidth: 202,
+      pixelOffset: new google.maps.Size(-101, -285),
+      zIndex: null,
+      boxStyle: {
+        background: "url('/static/images/infobox-bg.png') no-repeat",
+        opacity: 1,
+        width: "202px",
+        height: "245px"
+      },
+      closeBoxMargin: "28px 26px 0px 0px",
+      closeBoxURL: "",
+      infoBoxClearance: new google.maps.Size(1, 1),
+      pane: "floatPane",
+      enableEventPropagation: false
+    });
+    var infoWindow;
+    $scope.styles = [{
+      stylers: [{
+        hue: "#cccccc"
+      }, {
+        saturation: -100
+      }]
+    }, {
+      featureType: "road",
+      elementType: "geometry",
+      stylers: [{
+        lightness: 100
+      }, {
+        visibility: "simplified"
+      }]
+    }, {
+      featureType: "road",
+      elementType: "labels",
+      stylers: [{
+        visibility: "on"
+      }]
+    }, {
+      featureType: "poi",
+      stylers: [{
+        visibility: "off"
+      }]
+    }];
+    var styledMapType = new google.maps.StyledMapType($scope.styles, {
+      name: 'Styled'
+    });
+    $scope.map = new google.maps.Map(document.getElementById('mapView'),
+      $scope.options);
+    $scope.map.mapTypes.set('Styled', styledMapType);
+    $scope.map.setZoom(14);
+    $scope.newMarker = null;
+    $scope.selectedCommunity = [];
+    $scope.markers = [];
+    $scope.props = [];
+    // Añadir marcadores al mapa
+    $scope.addMarkers = function(props, map, global) {
+      $.each(props, function(i, prop) {
+        var latlng = new google.maps.LatLng(prop.position.lat, prop.position
+          .lng);
+        var marker = new google.maps.Marker({
+          position: latlng,
+          map: map,
+          icon: new google.maps.MarkerImage(
+            prop.markerIcon,
+            null,
+            null,
+            null,
+            new google.maps.Size(36, 36)
+          ),
+          draggable: false,
+          animation: google.maps.Animation.DROP
+        });
+        var infoboxContent = '<div class="infoW">' +
+          '<div class="propImg">' +
+          '<img src="' + prop.image + '">' +
+          '<div class="propBg">' +
+          '<div class="propType">' + prop.type + '</div>' +
+          '</div>' +
+          '</div>' +
+          '<div class="paWrapper">' +
+          '<div class="propTitle">' + prop.title + '</div>' +
+          '<div class="propAddress">' + prop.address + '</div>' +
+          '</div>' +
+          '<div class="propRating">' +
+          '<span class="fa fa-star"></span>' +
+          '<span class="fa fa-star"></span>' +
+          '<span class="fa fa-star"></span>' +
+          '<span class="fa fa-star"></span>' +
+          '<span class="fa fa-star-o"></span>' +
+          '</div>' +
+          '<div class="clearfix"></div>' +
+          '<div class="infoButtons">' +
+          '<a class="btn btn-sm btn-round btn-gray btn-o closeInfo">Close</a>' +
+          '<a href="#/' + prop.url +
+          '" class="btn btn-sm btn-round btn-green viewInfo" target="_self">View</a>' +
+          '</div>' +
+          '</div>';
+
+        google.maps.event.addListener(marker, 'click', (function(
+          marker, i) {
+          return function() {
+            infobox.setContent(infoboxContent);
+            infobox.open(map, marker);
+          }
+        })(marker, i));
+
+
+        $(document).on('click', '.closeInfo', function() {
+          infobox.open(null, null);
+        });
+
+        $scope.markers.push(marker);
+      });
+    };
+    categoryOneScope.getAllItem($scope.catId).then(function(data){
+        console.log(data);
+        $scope.communities = data.communities;
+        $scope.model.business = data.businesses;
+        $scope.model.businesstmp = data.businesses;
+        angular.forEach($scope.model.businesstmp, function(bizmarker) {
+          var marker_icon;
+          if (bizmarker.category === "Lodging and Travel") {
+            marker_icon = "/static/images/Auto_location-01.png";
+          } else if (bizmarker.category === "Health and Medical") {
+            marker_icon = "/static/images/Health_location-01.png";
+          } else if (bizmarker.category === "Beauty and Spas") {
+            marker_icon = "/static/images/Beauty_location-01.png";
+          } else if (bizmarker.category === "Restaurants") {
+            marker_icon = "/static/images/Food_location-01.png";
+          } else {
+            marker_icon =
+              "/static/images/Services_location-01.png";
+          }
+          var geo = bizmarker.geo || undefined;
+          var r = geo.slice(7, geo.length - 1).split(' ') || [];
+          var dict_marker = {
+            id: bizmarker.id,
+            title: bizmarker.name,
+            url: 'b/' + bizmarker.slug + '/' + bizmarker.code,
+            code: bizmarker.code,
+            image: '/media/' + bizmarker.image,
+            type: bizmarker.category,
+            view: bizmarker.url,
+            address: bizmarker.address,
+            position: {
+              lat: parseFloat(r[1]),
+              lng: parseFloat(r[0])
+            },
+            markerIcon: marker_icon
+          };
+          $scope.props.push(dict_marker);
+        });
+
+        $scope.numberOfPages = function() {
+          return Math.ceil($scope.model.business.length / $scope.pageSize);
+        };
+
+        $scope.addMarkers($scope.props, $scope.map, true);
+        //$scope.addPolygones($scope.community, $scope.map);
+        //$scope.markerCluster = new MarkerClusterer($scope.map, $scope.markers);
+        //angular.forEach($scope.communities, function(community){
+        //    infoWindow = new google.maps.InfoWindow();
+        //
+        //});
+        var limits = new google.maps.LatLngBounds();
+        $.each($scope.markers, function (index, marker){
+            limits.extend(marker.position);
+        });
+        $scope.map.fitBounds(limits);
+        $scope.map.setCenter(limits.getCenter());
+        //var latlngbounds = new google.maps.LatLngBounds();
+        //latlng.each(function(n){
+        //   latlngbounds.extend(n);
+        //});
+        //map.setCenter(latlngbounds.getCenter());
+        //map.fitBounds(latlngbounds);
+        //$scope.map.setCenter(new google.maps.LatLng(41.8337329, -
+        //   87.7321555));
+        //$scope.map.setZoom(13);
+    }, function(errorMessage){
+       console.log(errorMessage);
+    });
+    $scope.searchwell = function(val){
+        var globalresult = globalSearch.search($scope.model.business, val);
+        $scope.model.business = globalresult.biz;
+        $scope.addMarkers(globalresult.markers, $scope.map, false);
+        var limits = new google.maps.LatLngBounds();
+        $.each($scope.markers, function(index, marker) {
+          limits.extend(marker.position);
+        });
+        $scope.map.fitBounds(limits);
+        return $scope.model.business;
+    };
+}]);
+
+myApp.controller('dealsctrl', ['$scope', '$rootScope', '$routeParams',
+  '$location', '$http', 'dealsScope', 'search', '$sce', 'catmenu',
+  '$anchorScroll', 'login', 'register', 'globalSearch', 'searchService',
+  function($scope, $rootScope, $routeParams, $location, $http,
+    dealsScope, search, $sce, catmenu, $anchorScroll, login, register, globalSearch, searchService) {
+    $scope.searchService = searchService;
+    $scope.dealType = $routeParams.dealType;
+    $scope.communities;
+    $scope.community;
+    $scope.model = {};
+    $scope.selectedCommunity = [];
+    $scope.currentPage = 0;
+    $scope.pageSize = 6;
+    $scope.options = {
+      zoom: 14,
+      mapTypeId: 'Styled',
+      disableDefaultUI: true,
+      mapTypeControlOptions: {
+        mapTypeIds: ['Styled']
+      }
+    };
+    var infobox = new InfoBox({
+      disableAutoPan: false,
+      maxWidth: 202,
+      pixelOffset: new google.maps.Size(-101, -285),
+      zIndex: null,
+      boxStyle: {
+        background: "url('/static/images/infobox-bg.png') no-repeat",
+        opacity: 1,
+        width: "202px",
+        height: "245px"
+      },
+      closeBoxMargin: "28px 26px 0px 0px",
+      closeBoxURL: "",
+      infoBoxClearance: new google.maps.Size(1, 1),
+      pane: "floatPane",
+      enableEventPropagation: false
+    });
+    var infoWindow;
+    $scope.styles = [{
+      stylers: [{
+        hue: "#cccccc"
+      }, {
+        saturation: -100
+      }]
+    }, {
+      featureType: "road",
+      elementType: "geometry",
+      stylers: [{
+        lightness: 100
+      }, {
+        visibility: "simplified"
+      }]
+    }, {
+      featureType: "road",
+      elementType: "labels",
+      stylers: [{
+        visibility: "on"
+      }]
+    }, {
+      featureType: "poi",
+      stylers: [{
+        visibility: "off"
+      }]
+    }];
+    var styledMapType = new google.maps.StyledMapType($scope.styles, {
+      name: 'Styled'
+    });
+    $scope.map = new google.maps.Map(document.getElementById('mapView'),
+      $scope.options);
+    $scope.map.mapTypes.set('Styled', styledMapType);
+    $scope.map.setZoom(14);
+    $scope.newMarker = null;
+    $scope.selectedCommunity = [];
+    $scope.markers = [];
+    $scope.props = [];
+    $rootScope.model = {
+      business: "",
+      businesstmp: ""
+    };
+    // Añadir marcadores al mapa
+    $scope.addMarkers = function(props, map, global) {
+      $.each(props, function(i, prop) {
+        var latlng = new google.maps.LatLng(prop.position.lat, prop.position
+          .lng);
+        var marker = new google.maps.Marker({
+          position: latlng,
+          map: map,
+          icon: new google.maps.MarkerImage(
+            prop.markerIcon,
+            null,
+            null,
+            null,
+            new google.maps.Size(36, 36)
+          ),
+          draggable: false,
+          animation: google.maps.Animation.DROP
+        });
+        var infoboxContent = '<div class="infoW">' +
+          '<div class="propImg">' +
+          '<img src="' + prop.image + '">' +
+          '<div class="propBg">' +
+          '<div class="propType">' + prop.type + '</div>' +
+          '</div>' +
+          '</div>' +
+          '<div class="paWrapper">' +
+          '<div class="propTitle">' + prop.title + '</div>' +
+          '<div class="propAddress">' + prop.address + '</div>' +
+          '</div>' +
+          '<div class="propRating">' +
+          '<span class="fa fa-star"></span>' +
+          '<span class="fa fa-star"></span>' +
+          '<span class="fa fa-star"></span>' +
+          '<span class="fa fa-star"></span>' +
+          '<span class="fa fa-star-o"></span>' +
+          '</div>' +
+          '<div class="clearfix"></div>' +
+          '<div class="infoButtons">' +
+          '<a class="btn btn-sm btn-round btn-gray btn-o closeInfo">Close</a>' +
+          '<a href="#/' + prop.url +
+          '" class="btn btn-sm btn-round btn-green viewInfo" target="_self">View</a>' +
+          '</div>' +
+          '</div>';
+
+        google.maps.event.addListener(marker, 'click', (function(
+          marker, i) {
+          return function() {
+            infobox.setContent(infoboxContent);
+            infobox.open(map, marker);
+          }
+        })(marker, i));
+
+
+        $(document).on('click', '.closeInfo', function() {
+          infobox.open(null, null);
+        });
+
+        $scope.markers.push(marker);
+      });
+    };
+    dealsScope.getAllItems().then(function(data){
+        //console.log(data);
+        $scope.communities = data.communities;
+        $scope.model.business = data.businesses;
+        $scope.model.businesstmp = data.businesses;
+        angular.forEach($scope.model.businesstmp, function(bizmarker) {
+          var marker_icon;
+          if (bizmarker.category === "Lodging and Travel") {
+            marker_icon = "/static/images/Auto_location-01.png";
+          } else if (bizmarker.category === "Health and Medical") {
+            marker_icon = "/static/images/Health_location-01.png";
+          } else if (bizmarker.category === "Beauty and Spas") {
+            marker_icon = "/static/images/Beauty_location-01.png";
+          } else if (bizmarker.category === "Restaurants") {
+            marker_icon = "/static/images/Food_location-01.png";
+          } else {
+            marker_icon =
+              "/static/images/Services_location-01.png";
+          }
+          var geo = bizmarker.geo || undefined;
+          var r = geo.slice(7, geo.length - 1).split(' ') || [];
+          var dict_marker = {
+            id: bizmarker.id,
+            title: bizmarker.name,
+            url: 'b/' + bizmarker.slug + '/' + bizmarker.code,
+            code: bizmarker.code,
+            image: '/media/' + bizmarker.image,
+            type: bizmarker.category,
+            view: bizmarker.url,
+            address: bizmarker.address,
+            position: {
+              lat: parseFloat(r[1]),
+              lng: parseFloat(r[0])
+            },
+            markerIcon: marker_icon
+          };
+          $scope.props.push(dict_marker);
+        });
+
+        $scope.numberOfPages = function() {
+          return Math.ceil($scope.model.business.length / $scope.pageSize);
+        };
+
+        $scope.addMarkers($scope.props, $scope.map, true);
+        var limits = new google.maps.LatLngBounds();
+        $.each($scope.markers, function (index, marker){
+            limits.extend(marker.position);
+        });
+        $scope.map.fitBounds(limits);
+        $scope.map.setCenter(limits.getCenter());
+        //$scope.addPolygones($scope.community, $scope.map);
+        //$scope.markerCluster = new MarkerClusterer($scope.map, $scope.markers);
+        //angular.forEach($scope.communities, function(community){
+        //    infoWindow = new google.maps.InfoWindow();
+        //
+        //});
+        //var limits = new google.maps.LatLngBounds();
+        //$.each($scope.markers, function (index, marker){
+        //    limits.extend(marker.position);
+        //});
+        //$scope.map.fitBounds(limits);
+        //$scope.map.setZoom(13);
+        //$scope.map.setCenter(new google.maps.LatLng(41.8337329, -
+        //   87.7321555));
+        //$scope.map.setZoom(12);
+    }, function(errorMessage){
+       console.log(errorMessage);
+    });
+    $scope.searchwell = function(val){
+        var globalresult = globalSearch.search($scope.model.business, val);
+        $scope.model.business = globalresult.biz;
+        $rootScope.model.business = globalresult.biz;
+        $scope.addMarkers(globalresult.markers, $scope.map, false);
+        var limits = new google.maps.LatLngBounds();
+        $.each($scope.markers, function(index, marker) {
+          limits.extend(marker.position);
+        });
+        $scope.map.fitBounds(limits);
+        return $rootScope.model.business;
+    };
 }]);
 
 myApp.filter('startFrom', function() {
@@ -3415,6 +3887,53 @@ myApp.factory('search', function() {
   };
 });
 
+myApp.factory('globalSearch', function(){
+    return {
+        search: function(items, text){
+            var listItems = [];
+            var props = [];
+            for (var i=0; i<items.length; i++){
+                var item = items[i];
+                searchText = text.toLowerCase();
+                var marker_icon;
+                if (item.category === "Lodging and Travel") {
+                  marker_icon = "/static/images/Auto_location-01.png";
+                } else if (item.category === "Health and Medical") {
+                  marker_icon = "/static/images/Health_location-01.png";
+                } else if (item.category === "Beauty and Spas") {
+                  marker_icon = "/static/images/Beauty_location-01.png";
+                } else if (item.category === "Restaurants") {
+                  marker_icon = "/static/images/Food_location-01.png";
+                } else {
+                  marker_icon = "/static/images/Services_location-01.png";
+                }
+                if(item.name.toString().toLowerCase().search(searchText) >=0){
+                      listItems.push(item);
+                      var geo = item.geo || undefined;
+                      var r = geo.slice(7, geo.length - 1).split(' ') || [];
+                      var dict_marker = {
+                        id: item.id,
+                        title: item.name,
+                        url: 'b/' + item.slug + '/' + item.code,
+                        code: item.code,
+                        image: '/media/' + item.image,
+                        type: item.category,
+                        address: item.address,
+                        view: item.url,
+                        position: {
+                          lat: parseFloat(r[1]),
+                          lng: parseFloat(r[0])
+                        },
+                        markerIcon: marker_icon
+                      };
+                      props.push(dict_marker);
+                }
+            };
+            return {biz: listItems, markers: props};
+        }
+    }
+})
+
 myApp.factory('businessOneScope', function($http, $q) {
   return {
     apiPath: '/communities/business-one/',
@@ -3453,6 +3972,46 @@ myApp.factory('communityOneScope', function($http, $q) {
   }
 });
 
+myApp.factory('categoryOneScope', function($http, $q) {
+  return {
+    apiPath: '/communities/y/businesses/',
+    getAllItem: function(id) {
+      var deferred = $q.defer();
+      $http.get(this.apiPath, {
+        params: {
+          id: id
+        }
+      }).success(function(data) {
+        deferred.resolve(data);
+      }).error(function() {
+        deferred.reject("An error occured while fetching items");
+      });
+      return deferred.promise;
+    }
+  }
+});
+myApp.factory('dealsScope', function($http, $q) {
+  return {
+    apiPath: '/communities/d/businesses/',
+    getAllItems: function() {
+      //Creating a deferred object
+      var deferred = $q.defer();
+
+      //Calling Web API to fetch shopping cart items
+      $http.get(this.apiPath).success(function(data) {
+        //Passing data to deferred's resolve function on successful completion
+        deferred.resolve(data);
+      }).error(function() {
+
+        //Sending a friendly error message in case of failure
+        deferred.reject("An error occured while fetching items");
+      });
+
+      //Returning the promise object
+      return deferred.promise;
+    }
+  }
+});
 myApp.factory('login', function($http, $q) {
   return {
     apiPath: '/user/login/ajax',
@@ -3507,6 +4066,12 @@ myApp.factory('businessScope', function($http, $q) {
       return deferred.promise;
     }
   }
+});
+
+myApp.factory('searchService', function() {
+    return {
+      searchText: ''
+    };
 });
 
 myApp.factory('Biz', function($http) {
